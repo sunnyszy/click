@@ -36,9 +36,9 @@ DeDupTCPPacket::~DeDupTCPPacket()
 }
 
 int
-DeDupTCPPacket::configure(Vector<String> &conf, ErrorHandler *errh)
+DeDupTCPPacket::configure()
 {
-
+  return 0;
 }
 
 int
@@ -46,6 +46,7 @@ DeDupTCPPacket::initialize(ErrorHandler *)
 {
   _timer.initialize(this);
   _timer.schedule_now();
+  return 0;
 }
 
 void
@@ -120,7 +121,6 @@ uint64_t
 DeDupTCPPacket::build_key(const click_ip *iph, const click_tcp *tcph, unsigned plen)
 {
   uint16_t csum, th_sum;
-  uint16_t temp_sport;
   uint64_t key = tcph->th_seq;
 
   // Create temporary headers where we modify the source ip and port
