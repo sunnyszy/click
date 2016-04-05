@@ -55,6 +55,7 @@ DeDupTCPPacket::cleanup(CleanupStage)
 Packet *
 DeDupTCPPacket::drop(Packet *p)
 {
+  click_chatter("Duplicate Packet, dropping.");
   if (noutputs() == 2)
     output(1).push(p);
   else
@@ -97,7 +98,8 @@ DeDupTCPPacket::simple_action(Packet *p_in)
   }
 
   _set.set(key, 1);
-  if (_set.size() > 500) {
+  if (_set.size() > 5) {
+     click_chatter("Dedup: Cleanup memory");
     _set.clear();
   }
 
