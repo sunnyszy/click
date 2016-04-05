@@ -25,8 +25,9 @@
 CLICK_DECLS
 
 DeDupTCPPacket::DeDupTCPPacket()
-  : _set(0, 256)
+  : _set(0, 256), _timer(this)
 {
+  // sets _timer to call this->run_timer(&_timer) when it fires.
 }
 
 DeDupTCPPacket::~DeDupTCPPacket()
@@ -43,13 +44,25 @@ DeDupTCPPacket::configure(Vector<String> &conf, ErrorHandler *errh)
 int
 DeDupTCPPacket::initialize(ErrorHandler *)
 {
-
+  _timer.initialize(this);
+  _timer.schedule_now();
 }
 
 void
 DeDupTCPPacket::cleanup(CleanupStage)
 {
 
+}
+
+void
+DeDupTCPPacket::run_timer(Timer *timer)
+{
+  assert(timer == &_timer);
+  if (_set.size() > 0) {
+     click_chatter("Dedup: Cleanup memory");
+    _set.clear();
+  }
+  _timer.reschedule_after_sec(2);
 }
 
 Packet *
@@ -98,10 +111,7 @@ DeDupTCPPacket::simple_action(Packet *p_in)
   }
 
   _set.set(key, 1);
-  if (_set.size() > 5) {
-     click_chatter("Dedup: Cleanup memory");
-    _set.clear();
-  }
+  // Cleared every 2 seconds by the timer.
 
   return p;
 }

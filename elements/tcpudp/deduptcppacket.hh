@@ -3,6 +3,7 @@
 #include <click/element.hh>
 #include <click/atomic.hh>
 #include <click/hashtable.hh>
+#include <click/timer.hh>
 CLICK_DECLS
 
 /*
@@ -53,9 +54,12 @@ class DeDupTCPPacket : public Element { public:
   int initialize(ErrorHandler *);
   void cleanup(CleanupStage);
 
+  void run_timer(Timer *);
+
  private:
 
   Set _set;
+  Timer _timer;
 
   Packet *drop(Packet *);
 
