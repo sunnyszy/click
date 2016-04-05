@@ -36,7 +36,7 @@ DeDupTCPPacket::~DeDupTCPPacket()
 }
 
 int
-DeDupTCPPacket::configure()
+DeDupTCPPacket::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   return 0;
 }

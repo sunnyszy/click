@@ -46,7 +46,7 @@ class DeDupTCPPacket : public Element { public:
   const char *port_count() const		{ return PORTS_1_1X2; }
   const char *processing() const		{ return AGNOSTIC; }
 
-  int configure(Vector<String> &, ErrorHandler *);
+  int configure();
   void add_handlers();
 
   Packet *simple_action(Packet *);
