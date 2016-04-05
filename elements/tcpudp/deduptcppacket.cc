@@ -111,6 +111,7 @@ DeDupTCPPacket::simple_action(Packet *p_in)
     return drop(p);
   }
 
+  click_chatter("Dedup: First Packet");
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.
 
@@ -121,19 +122,25 @@ uint64_t
 DeDupTCPPacket::build_key(const click_ip *iph, const click_tcp *tcph, unsigned plen)
 {
   uint16_t csum, th_sum;
-  uint64_t key = tcph->th_seq;
+  uint64_t key = 0;
 
   // Create temporary headers where we modify the source ip and port
-  struct click_tcp temp_tcp;
-  struct click_tcp *temp_tcph = &temp_tcp;
-  struct click_ip temp_ip;
-  struct click_ip *temp_iph = &temp_ip;
+  char temp_tcp[plen];
+  struct click_tcp *temp_tcph = (struct click_tcp *) &temp_tcp;
+  char temp_ip[plen];
+  struct click_ip *temp_iph = (struct click_ip *) &temp_ip;
 
-  memcpy(temp_tcph, tcph, sizeof(struct click_tcp));
-  memcpy(temp_iph, iph, sizeof(struct click_ip));
+  // The entire packet is used for the checksum, so we copy everything over.
+  memset(temp_tcph, 0, plen);
+  memcpy(temp_tcph, tcph, plen);
+  memset(temp_iph, 0, plen);
+  memcpy(temp_iph, iph, plen);
 
   // Build checksum with the same source port
   // and same source ip every time:
+  // We can have the same effect by subtracting the existing values from
+  // the existing checksum (and faster!), but one's complement subtraction
+  // can be difficult.
   temp_tcph->th_sport = 1234;
   inet_pton(AF_INET, "127.0.0.1", &(temp_iph->ip_src));
 
@@ -142,6 +149,7 @@ DeDupTCPPacket::build_key(const click_ip *iph, const click_tcp *tcph, unsigned p
   csum = click_in_cksum((unsigned char *)temp_tcph, plen);
   th_sum = click_in_cksum_pseudohdr(csum, temp_iph, plen);
 
+  key = temp_tcph->th_seq;
   key = key << 32;
   key = key | (uint64_t) tcph->th_dport;
 
