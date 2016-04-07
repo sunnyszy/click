@@ -1,5 +1,5 @@
-#ifndef CLICK_DEDUPTCPPACKET_HH
-#define CLICK_DEDUPTCPPACKET_HH
+#ifndef CLICK_DEDUPUDPPACKET_HH
+#define CLICK_DEDUPUDPPACKET_HH
 #include <click/element.hh>
 #include <click/atomic.hh>
 #include <click/hashtable.hh>
@@ -9,18 +9,18 @@ CLICK_DECLS
 /*
 =c
 
-DeDupTCPPacket()
+DeDupUDPPacket()
 
 =s tcp
 
-drops duplicate TCP packets
+drops duplicate UDP packets
 
 =d
 
-Deduplicates TCP packets, if the same one is seen multiple times.
+Deduplicates UDP packets, if the same one is seen multiple times.
 
-Expects TCP/IP packets as input. Checks that the TCP header length is valid.
-Keys each packet on the TCP sequence number, destination port, and
+Expects UDP/IP packets as input. Checks that the UDP header length is valid.
+Keys each packet on the UDP destination IP, destination port, and
 checksum (ignoring source IP or source Port). If the key has been seen before,
 the packet is dropped.
 Otherwise, the packet is allowed through, and the key is stored for a maximum
@@ -32,19 +32,19 @@ Install with
             make elemlist
             make install
 
-=a DedupIPPacket, DedupUDPPacket, CheckTCPHeader, CheckIPHeader,
+=a DedupTCPPacket, DedupIPPacket, CheckTCPHeader, CheckIPHeader,
 CheckUDPHeader, MarkIPHeader */
 
-class DeDupTCPPacket : public Element { public:
+class DeDupUDPPacket : public Element { public:
 
   typedef HashTable<uint64_t, int> Set;
 
-  DeDupTCPPacket();
-  ~DeDupTCPPacket();
+  DeDupUDPPacket();
+  ~DeDupUDPPacket();
 
-  const char *class_name() const		{ return "DeDupTCPPacket"; }
-  const char *port_count() const		{ return PORTS_1_1X2; }
-  const char *processing() const		{ return AGNOSTIC; }
+  const char *class_name() const        { return "DeDupUDPPacket"; }
+  const char *port_count() const        { return PORTS_1_1X2; }
+  const char *processing() const        { return AGNOSTIC; }
 
   int configure(Vector<String> &, ErrorHandler *);
   void add_handlers();
@@ -63,7 +63,7 @@ class DeDupTCPPacket : public Element { public:
 
   Packet *drop(Packet *);
 
-  uint64_t build_key(struct click_ip *, struct click_tcp *, unsigned);
+  uint64_t build_key(struct click_ip *, struct click_udp *, unsigned);
 
 };
 

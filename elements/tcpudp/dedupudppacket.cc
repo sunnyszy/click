@@ -1,5 +1,5 @@
 /*
- * deduptcppacket.{cc,hh} -- deduplicates identical TCP packets
+ * dedupudppacket.{cc,hh} -- deduplicates identical UDP packets
  * (checksums, lengths)
  * Hansen Qian (hq@cs.princeton.edu)
  *
@@ -18,32 +18,32 @@
  */
 
 #include <click/config.h>
-#include "deduptcppacket.hh"
+#include "dedupudppacket.hh"
 #include <clicknet/ip.h>
-#include <clicknet/tcp.h>
+#include <clicknet/udp.h>
 #include <click/args.hh>
 #include <arpa/inet.h>
 CLICK_DECLS
 
-DeDupTCPPacket::DeDupTCPPacket()
+DeDupUDPPacket::DeDupUDPPacket()
   : _set(0, 256), _timer(this)
 {
   // sets _timer to call this->run_timer(&_timer) when it fires.
 }
 
-DeDupTCPPacket::~DeDupTCPPacket()
+DeDupUDPPacket::~DeDupUDPPacket()
 {
   // Does something need to be here?
 }
 
 int
-DeDupTCPPacket::configure(Vector<String> &conf, ErrorHandler *errh)
+DeDupUDPPacket::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   return 0;
 }
 
 int
-DeDupTCPPacket::initialize(ErrorHandler *)
+DeDupUDPPacket::initialize(ErrorHandler *)
 {
   _timer.initialize(this);
   _timer.schedule_now();
@@ -51,13 +51,13 @@ DeDupTCPPacket::initialize(ErrorHandler *)
 }
 
 void
-DeDupTCPPacket::cleanup(CleanupStage)
+DeDupUDPPacket::cleanup(CleanupStage)
 {
 
 }
 
 void
-DeDupTCPPacket::run_timer(Timer *timer)
+DeDupUDPPacket::run_timer(Timer *timer)
 {
   assert(timer == &_timer);
   if (_set.size() > 0) {
@@ -67,9 +67,9 @@ DeDupTCPPacket::run_timer(Timer *timer)
 }
 
 Packet *
-DeDupTCPPacket::drop(Packet *p)
+DeDupUDPPacket::drop(Packet *p)
 {
-  click_chatter("Duplicate TCP Packet, dropping.");
+  click_chatter("Duplicate UDP Packet, dropping.");
   if (noutputs() == 2)
     output(1).push(p);
   else
@@ -79,39 +79,32 @@ DeDupTCPPacket::drop(Packet *p)
 }
 
 Packet *
-DeDupTCPPacket::simple_action(Packet *p_in)
+DeDupUDPPacket::simple_action(Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
   click_ip *iph = p->ip_header();
-  click_tcp *tcph = p->tcp_header();
+  click_udp *udph = p->udp_header();
   uint64_t key;
-  unsigned len, iph_len, tcph_len, plen;
+  unsigned len, iph_len, udph_len, plen;
 
-  plen = ntohs(iph->ip_len) - (iph->ip_hl << 2);
-  if (!p->has_network_header() || iph->ip_p != IP_PROTO_TCP
-      || !p->has_transport_header() || plen < sizeof(click_tcp)
-      || plen > (unsigned)p->transport_length()) {
+  if (!p->has_network_header() || iph->ip_p != IP_PROTO_UDP)
     return drop(p);
-  }
 
   iph_len = iph->ip_hl << 2;
-  len = ntohs(iph->ip_len) - iph_len;
-  tcph_len = tcph->th_off << 2;
-  if (tcph_len < sizeof(click_tcp) || len < tcph_len
-      || p->length() < len + iph_len + p->network_header_offset()) {
+  len = ntohs(udph->uh_ulen);
+  if (len < sizeof(click_udp)
+      || p->length() < len + iph_len + p->network_header_offset())
     return drop(p);
-  }
 
   // Deduplication Code here:
 
-  key = build_key(iph, tcph, plen);
+  key = build_key(iph, udph, len);
 
   if (_set.get(key) != _set.default_value()) {
     // In the table
     return drop(p);
   }
 
-  click_chatter("Dedup: First Packet");
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.
 
@@ -119,48 +112,48 @@ DeDupTCPPacket::simple_action(Packet *p_in)
 }
 
 uint64_t
-DeDupTCPPacket::build_key(struct click_ip *iph, struct click_tcp *tcph, unsigned plen)
+DeDupUDPPacket::build_key(struct click_ip *iph, struct click_udp *udph, unsigned len)
 {
-  uint16_t csum, th_sum;
-  uint64_t key;
+  uint16_t csum, uh_sum;
+  uint64_t key = 0;
   uint16_t temp_sport, temp_sum;
   struct in_addr temp_src;
 
   // Save
   memcpy(&temp_src, &(iph->ip_src), sizeof(struct in_addr));
-  temp_sport = tcph->th_sport;
-  temp_sum = tcph->th_sum;
+  temp_sport = udph->uh_sport;
+  temp_sum = udph->uh_sum;
 
   // Replace
   inet_pton(AF_INET, "127.0.0.1", &(iph->ip_src));
-  tcph->th_sport = 1234;
-  tcph->th_sum = 0;
+  udph->uh_sport = 1234;
+  udph->uh_sum = 0;
 
   // Calculate
-  csum = click_in_cksum((unsigned char *)tcph, plen);
-  th_sum = click_in_cksum_pseudohdr(csum, iph, plen);
+  csum = click_in_cksum((unsigned char *)udph, len);
+  uh_sum = click_in_cksum_pseudohdr(csum, iph, len);
 
   // Restore
   memcpy(&(iph->ip_src), &temp_src, sizeof(struct in_addr));
-  tcph->th_sport = temp_sport;
-  tcph->th_sum = temp_sum;
+  udph->uh_sport = temp_sport;
+  udph->uh_sum = temp_sum;
 
-  key = tcph->th_seq;
+  key = iph->ip_dst.s_addr;
   key = key << 32;
 
-  key = key | (uint64_t) tcph->th_dport;
+  key = key | (uint64_t) udph->uh_dport;
   key = key << 16;
 
-  key = key | (uint64_t) th_sum;
+  key = key | (uint64_t) uh_sum;
 
   return key;
 }
 
 void
-DeDupTCPPacket::add_handlers()
+DeDupUDPPacket::add_handlers()
 {
 
 }
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(DeDupTCPPacket)
+EXPORT_ELEMENT(DeDupUDPPacket)
