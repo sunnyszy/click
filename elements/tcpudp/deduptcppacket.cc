@@ -26,7 +26,7 @@
 CLICK_DECLS
 
 DeDupTCPPacket::DeDupTCPPacket()
-  : _set(0, 256), _timer(this)
+  : _set(0, 512), _timer(this)
 {
   // sets _timer to call this->run_timer(&_timer) when it fires.
 }
@@ -111,7 +111,6 @@ DeDupTCPPacket::simple_action(Packet *p_in)
     return drop(p);
   }
 
-  click_chatter("Dedup: First Packet");
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.
 
