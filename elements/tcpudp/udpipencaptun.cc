@@ -133,7 +133,7 @@ UDPIPEncapTun::push(int port, Packet *p_in)
 
     memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
   }
-  output(1).push(p_in);
+  output(1).push(p);
   return;
 }
 
