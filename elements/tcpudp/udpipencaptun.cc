@@ -68,10 +68,19 @@ UDPIPEncapTun::configure(Vector<String> &conf, ErrorHandler *errh)
   if (Args(conf, this, errh)
       .read_mp("SRC", saddr)
       .read_mp("SPORT", IPPortArg(IP_PROTO_UDP), sport)
+      .read_mp("DST", AnyArg(), daddr_str)
       .read_mp("DPORT", IPPortArg(IP_PROTO_UDP), dport)
       .read_p("CHECKSUM", BoolArg(), cksum)
       .complete() < 0)
     return -1;
+
+  if (daddr_str.equals("DST_ANNO", 8)) {
+    _daddr = IPAddress();
+    _use_dst_anno = true;
+  } else if (IPAddressArg().parse(daddr_str, _daddr, this))
+    _use_dst_anno = false;
+  else
+    return errh->error("bad DST");
 
   _saddr = saddr;
   _sport = htons(sport);
