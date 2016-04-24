@@ -69,7 +69,7 @@ DeDupUDPPacket::run_timer(Timer *timer)
 Packet *
 DeDupUDPPacket::drop(Packet *p)
 {
-  click_chatter("Duplicate UDP Packet, dropping.");
+//  click_chatter("UDP: duplicate, dropping");
   if (noutputs() == 2)
     output(1).push(p);
   else
@@ -82,10 +82,10 @@ Packet *
 DeDupUDPPacket::simple_action(Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  click_ip *iph = p->ip_header();
-  click_udp *udph = p->udp_header();
+  struct click_ip *iph = p->ip_header();
+  struct click_udp *udph = p->udp_header();
   uint64_t key;
-  unsigned len, iph_len, udph_len, plen;
+  unsigned len, iph_len;
 
   if (!p->has_network_header() || iph->ip_p != IP_PROTO_UDP)
     return drop(p);
@@ -104,6 +104,7 @@ DeDupUDPPacket::simple_action(Packet *p_in)
     // In the table
     return drop(p);
   }
+//  click_chatter("UDP: successful");
 
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.

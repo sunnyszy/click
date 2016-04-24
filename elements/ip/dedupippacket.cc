@@ -68,7 +68,7 @@ DeDupIPPacket::run_timer(Timer *timer)
 Packet *
 DeDupIPPacket::drop(Packet *p)
 {
-  click_chatter("Duplicate Packet, dropping.");
+//  click_chatter("IP: duplicate, dropping");
   if (noutputs() == 2)
     output(1).push(p);
   else
@@ -81,7 +81,7 @@ Packet *
 DeDupIPPacket::simple_action(Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  click_ip *iph = p->ip_header();
+  struct click_ip *iph = p->ip_header();
   uint64_t key;
   unsigned len;
 
@@ -94,6 +94,8 @@ DeDupIPPacket::simple_action(Packet *p_in)
     // In the table
     return drop(p);
   }
+  
+//  click_chatter("IP: successful");
 
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.

@@ -69,7 +69,7 @@ DeDupTCPPacket::run_timer(Timer *timer)
 Packet *
 DeDupTCPPacket::drop(Packet *p)
 {
-  click_chatter("Duplicate TCP Packet, dropping.");
+//  click_chatter("TCP: duplicate, dropping");
   if (noutputs() == 2)
     output(1).push(p);
   else
@@ -82,10 +82,13 @@ Packet *
 DeDupTCPPacket::simple_action(Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  click_ip *iph = p->ip_header();
-  click_tcp *tcph = p->tcp_header();
+  struct click_ip *iph = p->ip_header();
+  struct click_tcp *tcph = p->tcp_header();
   uint64_t key;
   unsigned len, iph_len, tcph_len, plen;
+  click_tcp temp_tcph;
+
+  memcpy(&temp_tcph, tcph, sizeof(struct click_tcp));
 
   plen = ntohs(iph->ip_len) - (iph->ip_hl << 2);
   if (!p->has_network_header() || iph->ip_p != IP_PROTO_TCP
@@ -110,6 +113,7 @@ DeDupTCPPacket::simple_action(Packet *p_in)
     // In the table
     return drop(p);
   }
+//  click_chatter("TCP: successful");
 
   _set.set(key, 1);
   // Cleared every 2 seconds by the timer.
