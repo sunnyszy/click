@@ -64,6 +64,7 @@ UDPIPEncapTun::configure(Vector<String> &conf, ErrorHandler *errh)
   IPAddress saddr;
   uint16_t sport, dport;
   bool cksum;
+  String daddr_str;
 
   if (Args(conf, this, errh)
       .read_mp("SRC", saddr)
