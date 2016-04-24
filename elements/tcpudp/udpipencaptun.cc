@@ -106,9 +106,9 @@ UDPIPEncapTun::configure(Vector<String> &conf, ErrorHandler *errh)
 void
 UDPIPEncapTun::push(int port, Packet *p_in)
 {
-  WritablePacket *p = p_in->uniqueify();
-  struct click_ip *iph = p->ip_header();
-  struct click_udp *udph = p->udp_header();
+  WritablePacket *p;
+  struct click_ip *iph;
+  struct click_udp *udph;
   uint32_t key;
 
   if (port == 0) {
@@ -118,6 +118,10 @@ UDPIPEncapTun::push(int port, Packet *p_in)
       output(0).push(p_in);
     return;
   }
+  p = p_in->uniqueify();
+  iph = p->ip_header();
+  udph = p->udp_header();
+
   // Uplink traffic
   // Input 1 -> Output 1
   key = build_key(iph, udph);
