@@ -259,6 +259,8 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   udph->uh_sum = temp_uh_sum;
   iph->ip_sum = temp_ip_sum;
 
+  click_chatter("IPSum: %d, UDPSum: %d", ip_sum, uh_sum);
+
   key = ip_sum;
   key = key << 16;
 
