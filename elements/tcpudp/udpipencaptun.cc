@@ -156,6 +156,8 @@ UDPIPEncapTun::push(int port, Packet *p_in)
       // We prefer to stick with the AP that works than switch
       _counter = 0;
     }
+  } else {
+    click_chatter("Packet Seen Before");
   }
 
   output(1).push(p);
