@@ -64,7 +64,7 @@ UDPIPEncapTun::run_timer(Timer *timer)
   char strbuf[INET6_ADDRSTRLEN];
 
   assert(timer == &_timer);
-  if (_set.size() > 100) {
+  if (_set.size() > 50) {
     _set.clear();
   }
 
