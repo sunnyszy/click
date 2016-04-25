@@ -134,7 +134,7 @@ UDPIPEncapTun::push(int port, Packet *p_in)
 
     memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
     inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
-    click_chatter("============================== Changing Tunnel Destination: %s")
+    click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
   }
   output(1).push(p);
   return;
