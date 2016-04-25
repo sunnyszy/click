@@ -204,8 +204,6 @@ UDPIPEncapTun::push(int port, Packet *p_in)
       _counter = 0;
     }
     */
-  } else {
-    click_chatter("Packet Seen Before");
   }
 
   output(1).push(p);
@@ -288,10 +286,6 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   iph->ip_sum = 0;
   iph->ip_id = 0;
 
-  click_chatter("Packet Details: IPLength:%d, IPTTL:%d, IPP:%d, UHSPort:%d, UHDPort%d, UHLength:%d", iph->ip_len, iph->ip_ttl, iph->ip_p, udph->uh_sport, udph->uh_dport, udph->uh_ulen);
-
-  click_chatter("IPV:%d, IPTOS:%d, IPID:%d, IPOFF:%d, IPHLength:%d", iph->ip_v, iph->ip_tos, iph->ip_id, iph->ip_off, iph->ip_hl);
- 
   // Calculate
   csum = click_in_cksum((unsigned char *)udph, plen);
   uh_sum = click_in_cksum_pseudohdr(csum, iph, plen);
@@ -311,8 +305,6 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   udph->uh_sum = temp_uh_sum;
   iph->ip_sum = temp_ip_sum;
   iph->ip_id = temp_ip_id;
-
-  click_chatter("IPSum: %d, UDPSum: %d, NewSum:%d", ip_sum, uh_sum, click_in_cksum((unsigned char *) udph + sizeof(click_udp), ntohs(udph->uh_ulen) - sizeof(click_udp)));
 
   key = ip_sum;
   key = key << 16;
