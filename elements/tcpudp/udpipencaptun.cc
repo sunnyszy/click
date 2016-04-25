@@ -110,6 +110,7 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   struct click_ip *iph;
   struct click_udp *udph;
   uint32_t key;
+  char strbuf[INET6_ADDRSTRLEN];
 
   if (port == 0) {
     // Downlink traffic--encap (use simple_action)
@@ -126,12 +127,14 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   // Input 1 -> Output 1
   key = build_key(iph, udph);
 
-  if (_set.get(key) == _set.default_value()) {
+  if (!(_set.get(key) != _set.default_value())) {
     // Not in the table. We assume this is the first unique packet
     // we've seen.
     _set.set(key, 1);
 
     memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
+    inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
+    click_chatter("============================== Changing Tunnel Destination: %s")
   }
   output(1).push(p);
   return;
