@@ -109,6 +109,7 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   WritablePacket *p;
   struct click_ip *iph;
   struct click_udp *udph;
+  uint32_t key;
   char strbuf[INET6_ADDRSTRLEN];
   int cmpres = 0;
   bool alreadySeen;
@@ -128,7 +129,8 @@ UDPIPEncapTun::push(int port, Packet *p_in)
 
   // Uplink traffic
   // Input 1 -> Output 1
-  alreadySeen = _set.get(build_key(iph, udph)) != _set.default_value();
+  key = build_key(iph, udph);
+  alreadySeen = _set.get(key) != _set.default_value();
   if (alreadySeen == false) {
     // If we haven't seen this packet before
 
