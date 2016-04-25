@@ -133,18 +133,21 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   alreadySeen = _set.get(key) != _set.default_value();
   if (alreadySeen == false) {
     // If we haven't seen this packet before
+    inet_ntop(AF_INET, &(iph->ip_src), strbuf, INET6_ADDRSTRLEN);
+    click_chatter("Unique Packet from %s", strbuf);
+
+    // Add into hashset
+    _set.set(key, 1);
 
     cmpres = memcmp(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
     if (cmpres != 0) {
-      // If the source IP Addresses differ:
-      _set.set(key, 1);
+      // If this comes from a different AP
       _counter++;
 
       // Only change _daddr after we've seen 5 packets that confirm the new
       // _daddr is closer
-      if (_counter >= 5) {
+      if (_counter >= 10) {
         memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
-        inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
         click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
         _counter = 0;
       }
