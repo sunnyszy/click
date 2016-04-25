@@ -109,8 +109,9 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   WritablePacket *p;
   struct click_ip *iph;
   struct click_udp *udph;
-  uint32_t key;
   char strbuf[INET6_ADDRSTRLEN];
+  int cmpres = 0;
+  bool alreadySeen;
 
   if (port == 0) {
     // Downlink traffic--encap (use simple_action)
@@ -119,23 +120,39 @@ UDPIPEncapTun::push(int port, Packet *p_in)
       output(0).push(p_in);
     return;
   }
+
+
   p = p_in->uniqueify();
   iph = p->ip_header();
   udph = p->udp_header();
 
   // Uplink traffic
   // Input 1 -> Output 1
-  key = build_key(iph, udph);
+  alreadySeen = _set.get(build_key(iph, udph)) != _set.default_value();
+  if (alreadySeen == false) {
+    // If we haven't seen this packet before
 
-  if (!(_set.get(key) != _set.default_value())) {
-    // Not in the table. We assume this is the first unique packet
-    // we've seen.
-    _set.set(key, 1);
+    cmpres = memcmp(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
+    if (cmpres != 0) {
+      // If the source IP Addresses differ:
+      _set.set(key, 1);
+      _counter++;
 
-    memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
-    inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
-    click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
+      // Only change _daddr after we've seen 5 packets that confirm the new
+      // _daddr is closer
+      if (_counter >= 5) {
+        memcpy(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
+        inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
+        click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
+        _counter = 0;
+      }
+    } else {
+      // If the source IP Address is the same, reset counter to 0.
+      // We prefer to stick with the AP that works than switch
+      _counter = 0;
+    }
   }
+
   output(1).push(p);
   return;
 }

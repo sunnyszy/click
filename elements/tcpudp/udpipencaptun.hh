@@ -51,6 +51,7 @@ class UDPIPEncapTun : public Element { public:
 
     struct in_addr _saddr;
     struct in_addr _daddr;
+    uint16_t _counter;
     uint16_t _sport;
     uint16_t _dport;
     bool _cksum;
