@@ -228,6 +228,8 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   unsigned plen = ntohs(udph->uh_ulen);
   struct in_addr temp_src;
 
+  click_chatter("Packet Details: IPHLength:%d, IPLength:%d, IPTTL:%d, IPP:%d, UHSPort:%d, UHDPort%d, UHLength:%d", iph->ip_hl, iph->ip_len, iph->ip_ttl, iph->ip_p, udph->uh_sport, udph->uh_dport, udph->uh_ulen);
+
   // Save
   memcpy(&temp_src, &(iph->ip_src), sizeof(struct in_addr));
   temp_uh_sum = udph->uh_sum;
@@ -241,16 +243,16 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   // Calculate
   csum = click_in_cksum((unsigned char *)udph, plen);
   uh_sum = click_in_cksum_pseudohdr(csum, iph, plen);
-  #if HAVE_FAST_CHECKSUM && FAST_CHECKSUM_ALIGNED
+#if HAVE_FAST_CHECKSUM && FAST_CHECKSUM_ALIGNED
     if (_aligned)
       ip_sum = ip_fast_csum((unsigned char *)iph, sizeof(click_ip) >> 2);
     else
       ip_sum = click_in_cksum((unsigned char *)iph, sizeof(click_ip));
-  #elif HAVE_FAST_CHECKSUM
+#elif HAVE_FAST_CHECKSUM
     ip_sum = ip_fast_csum((unsigned char *)iph, sizeof(click_ip) >> 2);
-  #else
+#else
     ip_sum = click_in_cksum((unsigned char *)iph, sizeof(click_ip));
-  #endif
+#endif
 
   // Restore
   memcpy(&(iph->ip_src), &temp_src, sizeof(struct in_addr));
