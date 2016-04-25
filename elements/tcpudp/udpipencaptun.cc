@@ -58,7 +58,7 @@ void
 UDPIPEncapTun::run_timer(Timer *timer)
 {
   HashTable_iterator<Pair<const uint32_t, int> > it;
-  uint32_t temp_key, max_key;
+  uint32_t max_key = _daddr.s_addr;
   int max_val = 0;
   struct in_addr temp_in_addr;
   char strbuf[INET6_ADDRSTRLEN];
