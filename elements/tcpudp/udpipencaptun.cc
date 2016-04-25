@@ -81,7 +81,7 @@ UDPIPEncapTun::run_timer(Timer *timer)
   inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
   click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
 
-  _timer.reschedule_after_sec(3);
+  _timer.reschedule_after_sec(1.5);
 }
 
 int

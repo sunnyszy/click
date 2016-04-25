@@ -8,7 +8,7 @@
 #include <click/timer.hh>
 CLICK_DECLS
 
-#define BUF_SIZE 40
+#define BUF_SIZE 30
 
 /*
 =c
