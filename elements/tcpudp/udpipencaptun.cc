@@ -228,8 +228,6 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   unsigned plen = ntohs(udph->uh_ulen);
   struct in_addr temp_src;
 
-  click_chatter("Packet Details: IPHLength:%d, IPLength:%d, IPTTL:%d, IPP:%d, UHSPort:%d, UHDPort%d, UHLength:%d", iph->ip_hl, iph->ip_len, iph->ip_ttl, iph->ip_p, udph->uh_sport, udph->uh_dport, udph->uh_ulen);
-
   // Save
   memcpy(&temp_src, &(iph->ip_src), sizeof(struct in_addr));
   temp_uh_sum = udph->uh_sum;
@@ -239,6 +237,8 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   inet_pton(AF_INET, "127.0.0.1", &(iph->ip_src));
   udph->uh_sum = 0;
   iph->ip_sum = 0;
+
+  click_chatter("Packet Details: IPV:%s, IPTOS:%d, IPID:%d, IPOFF:%d, IPHLength:%d, IPLength:%d, IPTTL:%d, IPP:%d, UHSPort:%d, UHDPort%d, UHLength:%d", iph->ip_v, iph->ip_tos, iph->ip_id, iph->ip_off, iph->ip_hl, iph->ip_len, iph->ip_ttl, iph->ip_p, udph->uh_sport, udph->uh_dport, udph->uh_ulen);
 
   // Calculate
   csum = click_in_cksum((unsigned char *)udph, plen);
@@ -259,7 +259,7 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   udph->uh_sum = temp_uh_sum;
   iph->ip_sum = temp_ip_sum;
 
-  click_chatter("IPSum: %d, UDPSum: %d", ip_sum, uh_sum);
+  click_chatter("IPSum: %d, UDPSum: %d, NewSum:%d", ip_sum, uh_sum, click_in_cksum((unsigned char *) udph + sizeof(click_udp), ntohs(udph->uh_ulen) - sizeof(click_udp)));
 
   key = ip_sum;
   key = key << 16;
