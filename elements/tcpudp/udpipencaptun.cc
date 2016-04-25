@@ -225,7 +225,7 @@ UDPIPEncapTun::build_key(struct click_ip *iph, struct click_udp *udph)
   uint32_t key;
   uint16_t csum, ip_sum, uh_sum;
   uint16_t temp_uh_sum, temp_ip_sum;
-  unsigned plen = ntohs(iph->ip_len) - (iph->ip_hl << 2);
+  unsigned plen = ntohs(udph->uh_ulen);
   struct in_addr temp_src;
 
   // Save
