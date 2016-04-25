@@ -8,6 +8,8 @@
 #include <click/timer.hh>
 CLICK_DECLS
 
+#define BUF_SIZE 40
+
 /*
 =c
 
@@ -47,7 +49,11 @@ class UDPIPEncapTun : public Element { public:
   private:
 
     Set _set;
+    Set _packet_counts;
     Timer _timer;
+
+    uint32_t _circ_buf[BUF_SIZE];
+    int _buf_ptr;
 
     struct in_addr _saddr;
     struct in_addr _daddr;

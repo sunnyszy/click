@@ -28,9 +28,15 @@
  CLICK_DECLS
 
  UDPIPEncapTun::UDPIPEncapTun()
- : _set(0, 512), _timer(this), _cksum(true), _use_dst_anno(false)
+ : _set(0, 512), _packet_counts(0, 512), _timer(this),
+   _cksum(true), _use_dst_anno(false)
  {
   _id = 0;
+
+  _buf_ptr = 0;
+  for (int i = 0; i < BUF_SIZE; i++) {
+    _circ_buf[i] = 0;
+  }
 #if HAVE_FAST_CHECKSUM && FAST_CHECKSUM_ALIGNED
   _checked_aligned = false;
 #endif
@@ -51,10 +57,30 @@ UDPIPEncapTun::initialize(ErrorHandler *)
 void
 UDPIPEncapTun::run_timer(Timer *timer)
 {
+  HashTable_iterator<Pair<const uint32_t, int> > it;
+  uint32_t temp_key, max_key;
+  int max_val = 0;
+  struct in_addr temp_in_addr;
+  char strbuf[INET6_ADDRSTRLEN];
+
   assert(timer == &_timer);
   if (_set.size() > 0) {
     _set.clear();
   }
+
+  for (it = _packet_counts.begin(); it != _packet_counts.end(); it++) {
+    if (it.get()->second > max_val) {
+      max_key = it.get()->first;
+      max_val = it.get()->second;
+    }
+  }
+  temp_in_addr.s_addr = max_key;
+  memcpy(&_daddr, &temp_in_addr, sizeof(struct in_addr));
+
+
+  inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
+  click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
+
   _timer.reschedule_after_sec(5);
 }
 
@@ -109,7 +135,8 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   WritablePacket *p;
   struct click_ip *iph;
   struct click_udp *udph;
-  uint32_t key;
+  uint32_t key, new_addr, old_addr;
+  int temp_count;
   char strbuf[INET6_ADDRSTRLEN];
   int cmpres = 0;
   bool alreadySeen;
@@ -139,6 +166,26 @@ UDPIPEncapTun::push(int port, Packet *p_in)
     // Add into hashset
     _set.set(key, 1);
 
+    // Accounting Code
+    new_addr = iph->ip_src.s_addr;
+
+    old_addr = _circ_buf[_buf_ptr];
+
+    if (new_addr != old_addr) {
+      if (old_addr != 0) {
+        temp_count = _packet_counts.get(old_addr); // 0 if old_addr not in table
+        _packet_counts.set(old_addr, temp_count - 1);
+      }
+      _circ_buf[_buf_ptr] = new_addr;
+
+      temp_count = _packet_counts.get(new_addr);
+      _packet_counts.set(new_addr, temp_count + 1);
+    }
+
+    _buf_ptr = (_buf_ptr + 1) % BUF_SIZE;
+
+
+    /*
     cmpres = memcmp(&_daddr, &(iph->ip_src), sizeof(struct in_addr));
     if (cmpres != 0) {
       // If this comes from a different AP
@@ -156,6 +203,7 @@ UDPIPEncapTun::push(int port, Packet *p_in)
       // We prefer to stick with the AP that works than switch
       _counter = 0;
     }
+    */
   } else {
     click_chatter("Packet Seen Before");
   }
