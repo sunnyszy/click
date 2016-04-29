@@ -160,8 +160,8 @@ UDPIPEncapTun::push(int port, Packet *p_in)
   alreadySeen = _set.get(key) != _set.default_value();
   if (alreadySeen == false) {
     // If we haven't seen this packet before
-    inet_ntop(AF_INET, &(iph->ip_src), strbuf, INET6_ADDRSTRLEN);
-    click_chatter("Unique Packet from %s", strbuf);
+    //inet_ntop(AF_INET, &(iph->ip_src), strbuf, INET6_ADDRSTRLEN);
+    //click_chatter("Unique Packet from %s", strbuf);
 
     // Add into hashset
     _set.set(key, 1);
