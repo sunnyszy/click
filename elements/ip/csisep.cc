@@ -19,7 +19,6 @@
 
 #include <click/config.h>
 #include "csisep.hh"
-#include <clicknet/ip.h>
 #include <click/args.hh>
 #include <click/error.hh>
 #include <click/glue.hh>
