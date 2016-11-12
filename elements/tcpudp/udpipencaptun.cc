@@ -79,7 +79,7 @@ UDPIPEncapTun::run_timer(Timer *timer)
 
 
   inet_ntop(AF_INET, &_daddr, strbuf, INET6_ADDRSTRLEN);
-  click_chatter("============================== Changing Tunnel Destination: %s", strbuf);
+  click_chatter("Tunneling through AP address: %s", strbuf);
 
   _timer.reschedule_after_sec(1.5);
 }
@@ -190,7 +190,6 @@ UDPIPEncapTun::push(int port, Packet *p_in)
     if (cmpres != 0) {
       // If this comes from a different AP
       _counter++;
-
       // Only change _daddr after we've seen 5 packets that confirm the new
       // _daddr is closer
       if (_counter >= 10) {
@@ -216,6 +215,7 @@ UDPIPEncapTun::simple_action(Packet *p_in)
   WritablePacket *p = p_in->push(sizeof(click_udp) + sizeof(click_ip));
   struct click_ip *ip = reinterpret_cast<click_ip *>(p->data());
   struct click_udp *udp = reinterpret_cast<click_udp *>(ip + 1);
+  char strbuf[INET6_ADDRSTRLEN];
 
 #if !HAVE_INDIFFERENT_ALIGNMENT
   assert((uintptr_t)ip % 4 == 0);
@@ -236,6 +236,9 @@ UDPIPEncapTun::simple_action(Packet *p_in)
   ip->ip_tos = 0;
   ip->ip_off = 0;
   ip->ip_ttl = 250;
+
+  inet_ntop(AF_INET, &ip->ip_dst, strbuf, INET6_ADDRSTRLEN);
+  //click_chatter("============================== transmitting to: %s", strbuf);
 
   ip->ip_sum = 0;
 #if HAVE_FAST_CHECKSUM && FAST_CHECKSUM_ALIGNED

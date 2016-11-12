@@ -2,68 +2,33 @@
 #define CLICK_DEDUPTCPPACKET_HH
 #include <click/element.hh>
 #include <click/atomic.hh>
-#include <click/hashtable.hh>
-#include <click/timer.hh>
+
+#include <set>
+#include <queue>
+
 CLICK_DECLS
 
-/*
-=c
 
-DeDupTCPPacket()
-
-=s tcp
-
-drops duplicate TCP packets
-
-=d
-
-Deduplicates TCP packets, if the same one is seen multiple times.
-
-Expects TCP/IP packets as input. Checks that the TCP header length is valid.
-Keys each packet on the TCP sequence number, destination port, and
-checksum (ignoring source IP or source Port). If the key has been seen before,
-the packet is dropped.
-Otherwise, the packet is allowed through, and the key is stored for a maximum
-of two seconds. The memory usage is reset every two seconds to prevent
-memory usage.
-
-Install with
-
-            make elemlist
-            make install
-
-=a DedupIPPacket, DedupUDPPacket, CheckTCPHeader, CheckIPHeader,
-CheckUDPHeader, MarkIPHeader */
 
 class DeDupTCPPacket : public Element { public:
-
-  typedef HashTable<uint64_t, int> Set;
 
   DeDupTCPPacket();
   ~DeDupTCPPacket();
 
   const char *class_name() const		{ return "DeDupTCPPacket"; }
   const char *port_count() const		{ return PORTS_1_1X2; }
-  const char *processing() const		{ return AGNOSTIC; }
+  const char *processing() const		{ return PUSH; }
 
-  int configure(Vector<String> &, ErrorHandler *);
-  void add_handlers();
+  void push(int, Packet *);
 
-  Packet *simple_action(Packet *);
-
-  int initialize(ErrorHandler *);
-  void cleanup(CleanupStage);
-
-  void run_timer(Timer *);
 
  private:
 
-  Set _set;
-  Timer _timer;
+  std::set<uint64_t> _set;
+  std::queue<uint64_t> _queue;
+  static const uint16_t max_elem_num = 1000;
 
   Packet *drop(Packet *);
-
-  uint64_t build_key(struct click_ip *, struct click_tcp *, unsigned);
 
 };
 
