@@ -37,18 +37,16 @@ CSISep::~CSISep()
 void
 CSISep::fragment(Packet *p_in)
 {
-    Packet *first_fragment = p_in->clone();
-    WritablePacket *p_master = first_fragment->uniqueify();
+    WritablePacket *p_csi = Packet::make(CSI_LEN);
+    memcpy(p_csi->data(), p_in->end_data()-CSI_LEN, CSI_LEN);
+    WritablePacket *p_master = p_in->uniqueify();
     p_master->take(CSI_LEN);
     output(0).push(p_master);
-
-    WritablePacket *p_csi = Packet::make(CSI_LEN);
-    memcpy(p_csi, p_in+(p_in->length()-CSI_LEN), CSI_LEN);
-
+    
     if (noutputs() == 2)
-    output(1).push(p_csi);
-  else
-    p_csi->kill();
+        output(1).push(p_csi);
+    else
+        p_csi->kill();
 }
 
 void
