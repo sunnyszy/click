@@ -58,8 +58,8 @@ PacketSelection::configure(Vector<String> &conf, ErrorHandler *errh)
 void
 PacketSelection::push(int port, Packet *p_in)
 {
-  if(port==0)
-    state_change(p_in);
+  if(port<n_outport)
+    state_change(port, p_in);
   else
     destination_change(p_in);
 
@@ -129,25 +129,18 @@ PacketSelection::csi_get_score(Packet *p_in)
 
 
 void
-PacketSelection::state_change(Packet *p_in)
+PacketSelection::state_change(int port, Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
   struct click_ip *iph = p->ip_header();
-  int router_id;
-  switch((iph->ip_src).s_addr)
-  {
-    case 0x0201a8c0: router_id = 0;break;
-    case 0x0401a8c0: router_id = 1;break;
-    case 0x0501a8c0: router_id = 2;break;
-  }
 
 
   double csi_score = csi_get_score(p);
 
 
-  if(early_counter[router_id]<fresh_time)
-    early_counter[router_id]++;
-  score[router_id] = alpha*csi_score + (1-alpha)*score[router_id];
+  if(early_counter[port]<fresh_time)
+    early_counter[port]++;
+  score[port] = alpha*csi_score + (1-alpha)*score[port];
   p -> kill();
 
 }
