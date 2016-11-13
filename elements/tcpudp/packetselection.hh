@@ -22,12 +22,13 @@ class PacketSelection : public Element { public:
 
     void state_change(int, Packet *);
     void destination_change(Packet *);
-    double csi_get_score(Packet *);
+    int csi_get_score(Packet *);
     int bit_convert(int, int);
 
   private:
     double alpha;
     double *score;
+    int print_counter;
     int *early_counter;
     static const int n_outport = 3;
     static const int fresh_time = 1000;

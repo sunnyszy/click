@@ -23,6 +23,7 @@
 #include <click/error.hh>
 #include <click/glue.hh>
 #include <clicknet/ip.h>
+#include <math.h>
  CLICK_DECLS
 
 PacketSelection::PacketSelection()
@@ -35,6 +36,7 @@ PacketSelection::PacketSelection()
     score[i] = 0;
     early_counter[i] = 0;
   }
+  print_counter = 0;
 }
 
 PacketSelection::~PacketSelection()
@@ -76,7 +78,7 @@ PacketSelection::bit_convert(int data, int maxbit)
     return data;
 }
 
-double 
+int 
 PacketSelection::csi_get_score(Packet *p_in)
 {
 // －－－－－－－－－－
@@ -122,7 +124,7 @@ PacketSelection::csi_get_score(Packet *p_in)
 
     real = current_data & bitmask;
     real = bit_convert(real,10);
-    return (real^2+imag^2);
+    return (real*real+imag*imag);
 }
 
 
@@ -132,14 +134,21 @@ void
 PacketSelection::state_change(int port, Packet *p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  struct click_ip *iph = p->ip_header();
 
 
-  double csi_score = csi_get_score(p);
-
+  double csi_score = sqrt(csi_get_score(p));
+  print_counter ++;
+  if(print_counter%100==0)
+    printf("port: %d, csi_score: %d\n", port, csi_score);
 
   if(early_counter[port]<fresh_time)
     early_counter[port]++;
+  else
+  {
+    printf("score 0: %lf\n", score[0]);
+    printf("score 1: %lf\n", score[1]);
+    printf("score 2: %lf\n", score[2]);
+  }
   score[port] = alpha*csi_score + (1-alpha)*score[port];
   p -> kill();
 
@@ -169,6 +178,9 @@ PacketSelection::destination_change(Packet *p_in)
       max_id = i;
     }
   }
+  print_counter ++;
+  if(print_counter%100==0)
+    printf("choose router id: %d\n", max_id);
 
   output(max_id).push(p_in);
 }

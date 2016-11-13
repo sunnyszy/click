@@ -25,27 +25,88 @@
 CLICK_DECLS
 
 CSISep::CSISep()
-{
+{    
+    csi_status = (csi_struct*)malloc(sizeof(csi_struct));
+
+    fd = open_csi_device();
+    if (fd < 0)
+        printf("Failed to open the device...");
+    else 
+        printf("#Receiving data!\n");
+    total_msg_cnt = 0;
+
 }
 
 CSISep::~CSISep()
 {
+    close_csi_device(fd);
+    free(csi_status);
 }
+
+
+
+int CSISep::open_csi_device(){
+   int fd;
+   fd = open("/dev/CSI_dev",O_RDWR);
+    return fd;
+}
+
+void CSISep::close_csi_device(int fd){
+    close(fd);
+    //remove("/dev/CSI_dev");
+}
+
+
+int CSISep::read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE){
+    int cnt;
+    /* listen to the port
+     * read when 1, a csi is reported from kernel
+     *           2, time out
+     */           
+    cnt = read(fd,buf_addr,BUFSIZE);
+    if(cnt)
+        return cnt;
+    else
+        return 0;
+}
+void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_status){
+    csi_status->rssi_0    = buf_addr[20];
+    csi_status->rssi_1    = buf_addr[21];
+    csi_status->rssi_2    = buf_addr[22];
+}
+
 
 
 void
 CSISep::fragment(Packet *p_in)
 {
-    WritablePacket *p_csi = Packet::make(CSI_LEN);
-    memcpy(p_csi->data(), p_in->end_data()-CSI_LEN, CSI_LEN);
+    
+    int  cnt;
+    /* keep listening to the kernel and waiting for the csi report */
+    cnt = read_csi_buf(buf_addr,fd,4096);
+
+    if (cnt){
+        total_msg_cnt += 1;
+
+        /* fill the status struct with information about the rx packet */
+        record_status(buf_addr, cnt, csi_status);
+ 
+        if(total_msg_cnt%100 == 0)
+        {
+            printf("rssi : %u %u %u\n", csi_status->rssi_0, csi_status->rssi_1, csi_status->rssi_2);
+        }
+        WritablePacket *p_csi = Packet::make(1);
+        memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
+        if (noutputs() == 2)
+            output(1).push(p_csi);
+        else
+            p_csi->kill();
+    }
+
     WritablePacket *p_master = p_in->uniqueify();
     p_master->take(CSI_LEN);
     output(0).push(p_master);
-    
-    if (noutputs() == 2)
-        output(1).push(p_csi);
-    else
-        p_csi->kill();
+        
 }
 
 void
