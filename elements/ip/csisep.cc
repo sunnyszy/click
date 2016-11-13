@@ -83,7 +83,7 @@ CSISep::fragment(Packet *p_in)
     
     int  cnt;
     /* keep listening to the kernel and waiting for the csi report */
-    cnt = read_csi_buf(buf_addr,fd,4096);
+    cnt = read_csi_buf(buf_addr,fd,24);
 
     if (cnt){
         total_msg_cnt += 1;

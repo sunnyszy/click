@@ -24,6 +24,7 @@
 #include <click/glue.hh>
 #include <clicknet/ip.h>
 #include <math.h>
+
  CLICK_DECLS
 
 PacketSelection::PacketSelection()
@@ -136,19 +137,21 @@ PacketSelection::state_change(int port, Packet *p_in)
   WritablePacket *p = p_in->uniqueify();
 
 
-  double csi_score = sqrt(csi_get_score(p));
+  //double csi_score = sqrt(csi_get_score(p));
+  uint8_t csi_score;
+  memcpy(&csi_score, p_in->data(), 1);
   print_counter ++;
-  if(print_counter%100==0)
+  if(print_counter%20==0)
     printf("port: %d, csi_score: %d\n", port, csi_score);
 
   if(early_counter[port]<fresh_time)
     early_counter[port]++;
-  else
-  {
-    printf("score 0: %lf\n", score[0]);
-    printf("score 1: %lf\n", score[1]);
-    printf("score 2: %lf\n", score[2]);
-  }
+  // else
+  // {
+  //   printf("score 0: %lf\n", score[0]);
+  //   printf("score 1: %lf\n", score[1]);
+  //   printf("score 2: %lf\n", score[2]);
+  // }
   score[port] = alpha*csi_score + (1-alpha)*score[port];
   p -> kill();
 

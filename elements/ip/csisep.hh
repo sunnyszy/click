@@ -54,7 +54,7 @@ class CSISep : public Element { public:
   int         fd;
   int total_msg_cnt;
 
-  unsigned char buf_addr[4096];
+  unsigned char buf_addr[24];
   void fragment(Packet *);
 
 };
