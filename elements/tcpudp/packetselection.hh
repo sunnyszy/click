@@ -30,9 +30,15 @@ class PacketSelection : public Element { public:
     double alpha;
     double *score;
     int print_counter;
-    int *early_counter;
-    static const int n_outport = 3;
-    static const int fresh_time = 1000;
+    
+    int n_outport = 3;
+    int fresh_time;
+    int fresh_counter;
+    int bigger_time;
+    int bigger_counter;
+    int output_port;
+    bool lock;
+    int fix;
     
 
 };

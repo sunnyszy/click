@@ -31,13 +31,17 @@ PacketSelection::PacketSelection()
 {
   int i;
   score = new double[n_outport];
-  early_counter = new int[n_outport];
+  fresh_counter = 0;
+  bigger_counter = 0;
   for(i=0; i<n_outport; i++)
   {
     score[i] = 0;
-    early_counter[i] = 0;
   }
   print_counter = 0;
+  lock = false;
+  output_port = 0;
+
+
 }
 
 PacketSelection::~PacketSelection()
@@ -52,8 +56,17 @@ PacketSelection::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   if (Args(conf, this, errh)
       .read_p("ALPHA", DoubleArg(), alpha)
+      .read_p("FRESHTIME", IntArg(), fresh_time)
+      .read_p("BIGGERTIME", IntArg(), bigger_time)
+      .read_p("FIX", IntArg(), fix)
       .complete() < 0)
     return -1;
+
+  if(fix >= 0)
+  {
+      lock = true;
+      output_port = fix;
+  }
 
   return 0;
 }
@@ -141,18 +154,31 @@ PacketSelection::state_change(int port, Packet *p_in)
   uint8_t csi_score;
   memcpy(&csi_score, p_in->data(), 1);
   print_counter ++;
-  if(print_counter%20==0)
-    printf("port: %d, csi_score: %d\n", port, csi_score);
+  if(print_counter%10==0)
+    printf("port: %d, csi_score: %d, output_port: %d\n", port, csi_score, output_port);
 
-  if(early_counter[port]<fresh_time)
-    early_counter[port]++;
-  // else
-  // {
-  //   printf("score 0: %lf\n", score[0]);
-  //   printf("score 1: %lf\n", score[1]);
-  //   printf("score 2: %lf\n", score[2]);
-  // }
+
   score[port] = alpha*csi_score + (1-alpha)*score[port];
+
+  if(fresh_counter<fresh_time)
+    fresh_counter++;
+  else
+  {
+    if(score[1] > score[0])
+    {
+      if(bigger_counter<bigger_time)
+        bigger_counter ++;
+      else if(!lock)
+      {
+        output_port = 1;
+        lock = true;
+        printf("Switching to port 1\n");
+      }
+
+    }
+
+  }
+
   p -> kill();
 
 }
@@ -160,32 +186,11 @@ PacketSelection::state_change(int port, Packet *p_in)
 void
 PacketSelection::destination_change(Packet *p_in)
 {
-  double tmp_score[n_outport];
-  int i, max_id;
-  double max = -99;
 
-  // mask score before fresh time
-  for(i=0;i<n_outport;i++)
-  {
-    if(early_counter[i]<fresh_time)
-      tmp_score[i] = 0;
-    else
-      tmp_score[i] = score[i];
-  }
+  if(print_counter%10==0)
+    printf("choose router id: %d\n", output_port);
 
-  for(i=0;i<n_outport;i++)
-  {
-    if(tmp_score[i]>max)
-    {
-      max = tmp_score[i];
-      max_id = i;
-    }
-  }
-  print_counter ++;
-  if(print_counter%100==0)
-    printf("choose router id: %d\n", max_id);
-
-  output(max_id).push(p_in);
+  output(output_port).push(p_in);
 }
 
 CLICK_ENDDECLS
