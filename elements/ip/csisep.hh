@@ -52,7 +52,7 @@ class CSISep : public Element { public:
   static const uint32_t CSI_LEN = 280;
   csi_struct*   csi_status;
   int         fd;
-  int total_msg_cnt;
+  // int total_msg_cnt;
 
   unsigned char buf_addr[24];
   void fragment(Packet *);

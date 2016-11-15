@@ -187,10 +187,10 @@ void
 PacketSelection::destination_change(Packet *p_in)
 {
 
+  WritablePacket *p_master = p_in->uniqueify();
   if(print_counter%10==0)
     printf("choose router id: %d\n", output_port);
-
-  output(output_port).push(p_in);
+  output(output_port).push(p_master);
 }
 
 CLICK_ENDDECLS
