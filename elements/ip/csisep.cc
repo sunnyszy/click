@@ -30,11 +30,9 @@ CSISep::CSISep()
 
     fd = open_csi_device();
     if (fd < 0)
-        if(print_flag)
-            printf("Failed to open the device...");
+        printf("Failed to open the device...");
     else
-        if(print_flag) 
-            printf("#Receiving data!\n");
+        printf("#Receiving data!\n");
     // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
 
@@ -103,7 +101,11 @@ void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_sta
 void
 CSISep::fragment(Packet *p_in)
 {
-    
+
+    if(print_flag)
+    {
+        printf("Enter fragment.\n");
+    }  
     int  cnt;
     /* keep listening to the kernel and waiting for the csi report */
     cnt = read_csi_buf(buf_addr,fd,23);
@@ -117,6 +119,10 @@ CSISep::fragment(Packet *p_in)
         memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
         output(1).push(p_csi);
     }
+    if(print_flag)
+    {
+        printf("finish output 1.\n");
+    } 
 
     WritablePacket *p_master = p_in->uniqueify();
     struct click_ip *iph = p_master->ip_header();
@@ -132,6 +138,10 @@ CSISep::fragment(Packet *p_in)
         {
             p_master->take(CSI_LEN);
         }
+        if(print_flag)
+        {
+        printf("Finish up.\n");
+        } 
     }
     else//ip
     {
@@ -146,6 +156,10 @@ CSISep::fragment(Packet *p_in)
         }
 
     }
+    if(print_flag)
+    {
+        printf("Finish ip.\n");
+    } 
     output(0).push(p_master);
         
 }
