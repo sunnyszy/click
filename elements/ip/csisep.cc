@@ -27,12 +27,12 @@ CLICK_DECLS
 CSISep::CSISep()
 {    
     csi_status = (csi_struct*)malloc(sizeof(csi_struct));
-
+    print_flag = true;
     fd = open_csi_device();
-    // if (fd < 0)
-        // printf("Failed to open the device...");
-    // else
-        // printf("#Receiving data!\n");
+    if (fd < 0)
+        printf("Failed to open the device...");
+    else
+        printf("#Receiving data!\n");
     // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
 
@@ -137,42 +137,61 @@ CSISep::fragment(Packet *p_in)
         // }
         output(1).push(p_csi);
     }
-    // if(print_flag)
-    // {
-    //     printf("finish output 1.\n");
-    // } 
+    if(print_flag)
+    {
+        printf("finish output 1.\n");
+    } 
 
     WritablePacket *p_master = p_in->uniqueify();
-    // struct click_ip *iph = p_master->ip_header();
-    // //arp
-    // if(!iph)
-    // {
-    //     // if(print_flag)
-    //     // {
-    //     //     printf("This is an arp pkt.\n");
-    //     //     printf("Arp len: %d\n", p_master->length());
-    //     // }   
-    //     if(p_master->length()>CSI_LEN)//if contain CSI
-    //     {
-    //         p_master->take(CSI_LEN);
-    //     }
-    //     // if(print_flag)
-    //     // {
-    //     // printf("Finish up.\n");
-    //     // } 
-    // }
+    //struct click_ip *iph = p_master->ip_header();
+    uint16_t ether_code = *((uint16_t*)(p_master -> data()+12));
+    ether_code = (((ether_code)&0xff00)>>8)+(((ether_code)&0x00ff)<<8);
+    if(print_flag)
+    {
+        printf("ether_code: %X.\n", ether_code);
+    } 
+
+    uint16_t ip_length = *((uint16_t*)(p_master -> data()+16));
+    ip_length = (((ip_length)&0xff00)>>8)+(((ip_length)&0x00ff)<<8);
+    if(print_flag)
+    {
+        printf("ip_length: %X.\n", ip_length);
+    } 
+    //arp
+    if(ether_code == 0x0806)
+    {
+        if(print_flag)
+        {
+            printf("This is an arp pkt.\n");
+            printf("Arp len: %d\n", p_master->length());
+        }   
+        if(p_master->length()>CSI_LEN)//if contain CSI
+        {
+            p_master->take(CSI_LEN);
+        }
+        // if(print_flag)
+        // {
+        // printf("Finish up.\n");
+        // } 
+    }
     // no wonder about ip because ip check will do it for you
-    // else//ip
-    // {
-    //     uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
-    //     if(print_flag)
-    //         printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
-    //     if(ipLenth < p_master->length()-14)
-    //     {   
-    //         if(print_flag)
-    //             printf("CSI appended ip\n");
-    //         p_master->take(CSI_LEN);
-    //     }
+    else//ip
+    {
+        if(print_flag)
+        {
+            printf("This is an ip pkt.\n");
+            // printf("IP len: %d\n", p_master->length());
+        }  
+        //uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
+        if(print_flag)
+            printf("IP len: %d, real_len: %d\n", ip_length,p_master->length()-14);
+        if(ip_length < p_master->length()-14)
+        {   
+            if(print_flag)
+                printf("CSI appended ip\n");
+            p_master->take(CSI_LEN);
+        }
+    }
 
     // }
     // if(print_flag)
