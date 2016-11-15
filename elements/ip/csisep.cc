@@ -29,9 +29,9 @@ CSISep::CSISep()
     csi_status = (csi_struct*)malloc(sizeof(csi_struct));
 
     fd = open_csi_device();
-    if (fd < 0)
+    // if (fd < 0)
         // printf("Failed to open the device...");
-    else
+    // else
         // printf("#Receiving data!\n");
     // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
