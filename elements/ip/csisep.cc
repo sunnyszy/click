@@ -109,14 +109,32 @@ CSISep::fragment(Packet *p_in)
     int  cnt;
     /* keep listening to the kernel and waiting for the csi report */
     cnt = read_csi_buf(buf_addr,fd,23);
-
-    if (cnt && noutputs() == 2){
+    if(print_flag)
+    {
+    printf("READ CSI.\n");
+    }
+    if (cnt){
 
         /* fill the status struct with information about the rx packet */
+        if(print_flag)
+        {
+        printf("before record.\n");
+        }
         record_status(buf_addr, cnt, csi_status);
-
+        if(print_flag)
+        {
+        printf("before create.\n");
+        }
         WritablePacket *p_csi = Packet::make(1);
+        if(print_flag)
+        {
+        printf("before copy.\n");
+        }
         memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
+        if(print_flag)
+        {
+        printf("before output 1.\n");
+        }
         output(1).push(p_csi);
     }
     if(print_flag)
