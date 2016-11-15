@@ -161,19 +161,20 @@ CSISep::fragment(Packet *p_in)
         printf("Finish up.\n");
         } 
     }
-    else//ip
-    {
-        uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
-        if(print_flag)
-            printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
-        if(ipLenth < p_master->length()-14)
-        {   
-            if(print_flag)
-                printf("CSI appended ip\n");
-            p_master->take(CSI_LEN);
-        }
+    // no wonder about ip because ip check will do it for you
+    // else//ip
+    // {
+    //     uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
+    //     if(print_flag)
+    //         printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
+    //     if(ipLenth < p_master->length()-14)
+    //     {   
+    //         if(print_flag)
+    //             printf("CSI appended ip\n");
+    //         p_master->take(CSI_LEN);
+    //     }
 
-    }
+    // }
     if(print_flag)
     {
         printf("Finish ip.\n");
