@@ -30,9 +30,9 @@ CSISep::CSISep()
 
     fd = open_csi_device();
     if (fd < 0)
-        printf("Failed to open the device...");
+        // printf("Failed to open the device...");
     else
-        printf("#Receiving data!\n");
+        // printf("#Receiving data!\n");
     // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
 
@@ -102,64 +102,64 @@ void
 CSISep::fragment(Packet *p_in)
 {
 
-    if(print_flag)
-    {
-        printf("Enter fragment.\n");
-    }  
+    // if(print_flag)
+    // {
+    //     printf("Enter fragment.\n");
+    // }  
     int  cnt;
     /* keep listening to the kernel and waiting for the csi report */
     cnt = read_csi_buf(buf_addr,fd,23);
-    if(print_flag)
-    {
-    printf("READ CSI.\n");
-    }
+    // if(print_flag)
+    // {
+    // printf("READ CSI.\n");
+    // }
     if (cnt){
 
         /* fill the status struct with information about the rx packet */
-        if(print_flag)
-        {
-        printf("before record.\n");
-        }
+        // if(print_flag)
+        // {
+        // printf("before record.\n");
+        // }
         record_status(buf_addr, cnt, csi_status);
-        if(print_flag)
-        {
-        printf("before create.\n");
-        }
+        // if(print_flag)
+        // {
+        // printf("before create.\n");
+        // }
         WritablePacket *p_csi = Packet::make(1);
-        if(print_flag)
-        {
-        printf("before copy.\n");
-        }
+        // if(print_flag)
+        // {
+        // printf("before copy.\n");
+        // }
         memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
-        if(print_flag)
-        {
-        printf("before output 1.\n");
-        }
+        // if(print_flag)
+        // {
+        // printf("before output 1.\n");
+        // }
         output(1).push(p_csi);
     }
-    if(print_flag)
-    {
-        printf("finish output 1.\n");
-    } 
+    // if(print_flag)
+    // {
+    //     printf("finish output 1.\n");
+    // } 
 
     WritablePacket *p_master = p_in->uniqueify();
     struct click_ip *iph = p_master->ip_header();
     //arp
     if(!iph)
     {
-        if(print_flag)
-        {
-            printf("This is an arp pkt.\n");
-            printf("Arp len: %d\n", p_master->length());
-        }   
+        // if(print_flag)
+        // {
+        //     printf("This is an arp pkt.\n");
+        //     printf("Arp len: %d\n", p_master->length());
+        // }   
         if(p_master->length()>CSI_LEN)//if contain CSI
         {
             p_master->take(CSI_LEN);
         }
-        if(print_flag)
-        {
-        printf("Finish up.\n");
-        } 
+        // if(print_flag)
+        // {
+        // printf("Finish up.\n");
+        // } 
     }
     // no wonder about ip because ip check will do it for you
     // else//ip
@@ -175,10 +175,10 @@ CSISep::fragment(Packet *p_in)
     //     }
 
     // }
-    if(print_flag)
-    {
-        printf("Finish ip.\n");
-    } 
+    // if(print_flag)
+    // {
+    //     printf("Finish ip.\n");
+    // } 
     output(0).push(p_master);
         
 }
