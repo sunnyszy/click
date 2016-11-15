@@ -174,7 +174,10 @@ PacketSelection::state_change(int port, Packet *p_in)
         lock = true;
         printf("Switching to port 1\n");
       }
-
+    }
+    else
+    {
+      bigger_counter = 0;
     }
 
   }

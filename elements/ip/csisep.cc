@@ -29,6 +29,7 @@ CSISep::CSISep()
     csi_status = (csi_struct*)malloc(sizeof(csi_struct));
     print_flag = true;
     fd = open_csi_device();
+    prinf("This is a new version");
     if (fd < 0)
         printf("Failed to open the device...");
     else
@@ -47,10 +48,10 @@ CSISep::~CSISep()
 int
 CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  if (Args(conf, this, errh)
-      .read_p("PRINTFLAG", BoolArg(), print_flag)
-      .complete() < 0)
-    return -1;
+  // if (Args(conf, this, errh)
+  //     .read_p("PRINTFLAG", BoolArg(), print_flag)
+  //     .complete() < 0)
+  //   return -1;
 
   return 0;
 }
@@ -101,7 +102,7 @@ void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_sta
 void
 CSISep::fragment(Packet *p_in)
 {
-
+    print_flag = true;
     // if(print_flag)
     // {
     //     printf("Enter fragment.\n");
