@@ -60,6 +60,9 @@ class CSISep : public Element { public:
   void fragment(Packet *);
   bool print_flag;
   bool big_endian_flag;
+  char shellcmd[64];
+  char buffer[100];
+  FILE *file;
 
 };
 

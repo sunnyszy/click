@@ -39,6 +39,8 @@ CSISep::CSISep()
         printf("big endian\n");
     else
         printf("little endian\n");
+    sprintf(shellcmd,"iwinfo wlan0 info | grep 'Signal'");
+
     // total_msg_cnt = 0;
 
 }
@@ -106,110 +108,32 @@ void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_sta
 void
 CSISep::fragment(Packet *p_in)
 {
-    print_flag = true;
-    // if(print_flag)
-    // {
-    //     printf("Enter fragment.\n");
-    // }  
-    int  cnt;
-    /* keep listening to the kernel and waiting for the csi report */
-    cnt = read_csi_buf(buf_addr,fd,23);
-    // if(print_flag)
-    // {
-    // printf("READ CSI.\n");
-    // }
-    if (cnt){
 
-        /* fill the status struct with information about the rx packet */
-        // if(print_flag)
-        // {
-        // printf("before record.\n");
-        // }
-        record_status(buf_addr, cnt, csi_status);
-        // if(print_flag)
-        // {
-        // printf("before create.\n");
-        // }
-        WritablePacket *p_csi = Packet::make(1);
-        // if(print_flag)
-        // {
-        // printf("before copy.\n");
-        // }
-        memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
-        // if(print_flag)
-        // {
-        // printf("before output 1.\n");
-        // }
-        output(1).push(p_csi);
-    }
-    if(print_flag)
-    {
-        printf("finish output 1.\n");
-    } 
-
-    WritablePacket *p_master = p_in->uniqueify();
-    //struct click_ip *iph = p_master->ip_header();
-    uint16_t ether_code, ip_length;
-    if(big_endian_flag)
-    {
-        ether_code= *((uint16_t*)(p_master -> data()+12));
-        ip_length = *((uint16_t*)(p_master -> data()+16));
+    if(NULL == (file = popen(shellcmd,"r")))     
+    {    
+        printf("execute command failed!");         
     }
     else
     {
-        ether_code= *((uint16_t*)(p_master -> data()+12));   
-        ether_code = (((ether_code)&0xff00)>>8)+(((ether_code)&0x00ff)<<8);
-        ip_length = *((uint16_t*)(p_master -> data()+16));
-        ip_length = (((ip_length)&0xff00)>>8)+(((ip_length)&0x00ff)<<8);
-    }
-    if(print_flag)
-    {
-        printf("ether_code: %X.\n", ether_code);
-        printf("ip_length: %X.\n", ip_length);
-    } 
-    
-    
-    //arp
-    if(ether_code == 0x0806)
-    {
-        if(print_flag)
+        fgets(buffer, 100, file);
+        char * p = strchr(buffer, ':');
+        printf("the string buffer: %s\n", p+3);
+        //char q[50] = "Signal: -54 dBm  Link";
+        uint16_t length = atoi(p+3);
+        printf("The Signal length %hu\n", length);
+        if(length>0)
         {
-            printf("This is an arp pkt.\n");
-            printf("Arp len: %d\n", p_master->length());
-        }   
-        if(p_master->length()>CSI_LEN)//if contain CSI
-        {
-            p_master->take(CSI_LEN);
+            WritablePacket *p_csi = Packet::make(2);
+            memcpy(p_csi->data(), &length, 2);
+            output(1).push(p_csi);
         }
-        // if(print_flag)
-        // {
-        // printf("Finish up.\n");
-        // } 
+        
+            
     }
-    // no wonder about ip because ip check will do it for you
-    else//ip
-    {
-        if(print_flag)
-        {
-            printf("This is an ip pkt.\n");
-            // printf("IP len: %d\n", p_master->length());
-        }  
-        //uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
-        if(print_flag)
-            printf("IP len: %d, real_len: %d\n", ip_length,p_master->length()-14);
-        if(ip_length < p_master->length()-14)
-        {   
-            if(print_flag)
-                printf("CSI appended ip\n");
-            p_master->take(CSI_LEN);
-        }
-    }
+    
 
-    // }
-    // if(print_flag)
-    // {
-    //     printf("Finish ip.\n");
-    // } 
+    WritablePacket *p_master = p_in->uniqueify();
+    
     output(0).push(p_master);
         
 }
