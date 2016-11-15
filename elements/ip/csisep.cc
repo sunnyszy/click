@@ -29,7 +29,7 @@ CSISep::CSISep()
     csi_status = (csi_struct*)malloc(sizeof(csi_struct));
     print_flag = true;
     fd = open_csi_device();
-    prinf("This is a new version");
+    printf("This is a new version");
     if (fd < 0)
         printf("Failed to open the device...");
     else
