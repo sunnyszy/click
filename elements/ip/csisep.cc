@@ -29,12 +29,16 @@ CSISep::CSISep()
     csi_status = (csi_struct*)malloc(sizeof(csi_struct));
     print_flag = true;
     fd = open_csi_device();
-    printf("This is a new version");
+    printf("This is a new version\n");
     if (fd < 0)
-        printf("Failed to open the device...");
+        printf("Failed to open the device...\n");
     else
         printf("#Receiving data!\n");
-    // big_endian_flag = is_big_endian();
+    big_endian_flag = is_big_endian();
+    if(big_endian_flag)
+        printf("big endian\n");
+    else
+        printf("little endian\n");
     // total_msg_cnt = 0;
 
 }
@@ -68,16 +72,16 @@ void CSISep::close_csi_device(int fd){
     //remove("/dev/CSI_dev");
 }
 
-// bool CSISep::is_big_endian()
-// {
-//     unsigned int a = 0x1;
-//     unsigned char b = *(unsigned char *)&a;
-//     if ( b == 0)
-//     {
-//         return true;
-//     }
-//     return false;
-// }
+bool CSISep::is_big_endian()
+{
+    unsigned int a = 0x1;
+    unsigned char b = *(unsigned char *)&a;
+    if ( b == 0)
+    {
+        return true;
+    }
+    return false;
+}
 
 int CSISep::read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE){
     int cnt;
@@ -145,19 +149,26 @@ CSISep::fragment(Packet *p_in)
 
     WritablePacket *p_master = p_in->uniqueify();
     //struct click_ip *iph = p_master->ip_header();
-    uint16_t ether_code = *((uint16_t*)(p_master -> data()+12));
-    ether_code = (((ether_code)&0xff00)>>8)+(((ether_code)&0x00ff)<<8);
+    uint16_t ether_code, ip_length;
+    if(big_endian_flag)
+    {
+        ether_code= *((uint16_t*)(p_master -> data()+12));
+        ip_length = *((uint16_t*)(p_master -> data()+16));
+    }
+    else
+    {
+        ether_code= *((uint16_t*)(p_master -> data()+12));   
+        ether_code = (((ether_code)&0xff00)>>8)+(((ether_code)&0x00ff)<<8);
+        ip_length = *((uint16_t*)(p_master -> data()+16));
+        ip_length = (((ip_length)&0xff00)>>8)+(((ip_length)&0x00ff)<<8);
+    }
     if(print_flag)
     {
         printf("ether_code: %X.\n", ether_code);
-    } 
-
-    uint16_t ip_length = *((uint16_t*)(p_master -> data()+16));
-    ip_length = (((ip_length)&0xff00)>>8)+(((ip_length)&0x00ff)<<8);
-    if(print_flag)
-    {
         printf("ip_length: %X.\n", ip_length);
     } 
+    
+    
     //arp
     if(ether_code == 0x0806)
     {
