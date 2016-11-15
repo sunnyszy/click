@@ -40,6 +40,8 @@ class CSISep : public Element { public:
   const char *port_count() const		{ return PORTS_1_1X2; }
   const char *processing() const		{ return PUSH; }
 
+  int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
+  
   void push(int, Packet *);
   int   open_csi_device();
   void  close_csi_device(int fd);
@@ -56,6 +58,7 @@ class CSISep : public Element { public:
 
   unsigned char buf_addr[24];
   void fragment(Packet *);
+  bool print_flag;
   // bool big_endian_flag;
 
 };

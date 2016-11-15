@@ -30,9 +30,11 @@ CSISep::CSISep()
 
     fd = open_csi_device();
     if (fd < 0)
-        printf("Failed to open the device...");
-    else 
-        printf("#Receiving data!\n");
+        if(print_flag)
+            printf("Failed to open the device...");
+    else
+        if(print_flag) 
+            printf("#Receiving data!\n");
     // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
 
@@ -44,6 +46,16 @@ CSISep::~CSISep()
     free(csi_status);
 }
 
+int
+CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
+{
+  if (Args(conf, this, errh)
+      .read_p("PRINTFLAG", BoolArg(), print_flag)
+      .complete() < 0)
+    return -1;
+
+  return 0;
+}
 
 
 int CSISep::open_csi_device(){
@@ -111,8 +123,11 @@ CSISep::fragment(Packet *p_in)
     //arp
     if(!iph)
     {
-        printf("This is an arp pkt.\n");
-        printf("Arp len: %d\n", p_master->length());
+        if(print_flag)
+        {
+            printf("This is an arp pkt.\n");
+            printf("Arp len: %d\n", p_master->length());
+        }   
         if(p_master->length()>CSI_LEN)//if contain CSI
         {
             p_master->take(CSI_LEN);
@@ -121,10 +136,12 @@ CSISep::fragment(Packet *p_in)
     else//ip
     {
         uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
-        printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
+        if(print_flag)
+            printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
         if(ipLenth < p_master->length()-14)
-        {
-            printf("CSI appended ip\n");
+        {   
+            if(print_flag)
+                printf("CSI appended ip\n");
             p_master->take(CSI_LEN);
         }
 
