@@ -26,19 +26,19 @@ CLICK_DECLS
 
 CSISep::CSISep()
 {    
-    csi_status = (csi_struct*)malloc(sizeof(csi_struct));
-    print_flag = true;
-    fd = open_csi_device();
-    printf("This is a new version\n");
-    if (fd < 0)
-        printf("Failed to open the device...\n");
-    else
-        printf("#Receiving data!\n");
-    big_endian_flag = is_big_endian();
-    if(big_endian_flag)
-        printf("big endian\n");
-    else
-        printf("little endian\n");
+    // csi_status = (csi_struct*)malloc(sizeof(csi_struct));
+    // print_flag = true;
+    // fd = open_csi_device();
+    // printf("This is a new version\n");
+    // if (fd < 0)
+    //     printf("Failed to open the device...\n");
+    // else
+    //     printf("#Receiving data!\n");
+    // big_endian_flag = is_big_endian();
+    // if(big_endian_flag)
+    //     printf("big endian\n");
+    // else
+    //     printf("little endian\n");
     sprintf(shellcmd,"iwinfo wlan0 info | grep 'Signal'");
 
     // total_msg_cnt = 0;
@@ -47,61 +47,61 @@ CSISep::CSISep()
 
 CSISep::~CSISep()
 {
-    close_csi_device(fd);
-    free(csi_status);
+    // close_csi_device(fd);
+    // free(csi_status);
 }
 
-int
-CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
-{
-  // if (Args(conf, this, errh)
-  //     .read_p("PRINTFLAG", BoolArg(), print_flag)
-  //     .complete() < 0)
-  //   return -1;
+// int
+// CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
+// {
+//   // if (Args(conf, this, errh)
+//   //     .read_p("PRINTFLAG", BoolArg(), print_flag)
+//   //     .complete() < 0)
+//   //   return -1;
 
-  return 0;
-}
+//   return 0;
+// }
 
 
-int CSISep::open_csi_device(){
-   int fd;
-   fd = open("/dev/CSI_dev",O_RDWR);
-    return fd;
-}
+// int CSISep::open_csi_device(){
+//    int fd;
+//    fd = open("/dev/CSI_dev",O_RDWR);
+//     return fd;
+// }
 
-void CSISep::close_csi_device(int fd){
-    close(fd);
-    //remove("/dev/CSI_dev");
-}
+// void CSISep::close_csi_device(int fd){
+//     close(fd);
+//     //remove("/dev/CSI_dev");
+// }
 
-bool CSISep::is_big_endian()
-{
-    unsigned int a = 0x1;
-    unsigned char b = *(unsigned char *)&a;
-    if ( b == 0)
-    {
-        return true;
-    }
-    return false;
-}
+// bool CSISep::is_big_endian()
+// {
+//     unsigned int a = 0x1;
+//     unsigned char b = *(unsigned char *)&a;
+//     if ( b == 0)
+//     {
+//         return true;
+//     }
+//     return false;
+// }
 
-int CSISep::read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE){
-    int cnt;
-    /* listen to the port
-     * read when 1, a csi is reported from kernel
-     *           2, time out
-     */           
-    cnt = read(fd,buf_addr,BUFSIZE);
-    if(cnt)
-        return cnt;
-    else
-        return 0;
-}
-void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_status){
-    csi_status->rssi_0    = buf_addr[20];
-    csi_status->rssi_1    = buf_addr[21];
-    csi_status->rssi_2    = buf_addr[22];
-}
+// int CSISep::read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE){
+//     int cnt;
+//     /* listen to the port
+//      * read when 1, a csi is reported from kernel
+//      *           2, time out
+//      */           
+//     cnt = read(fd,buf_addr,BUFSIZE);
+//     if(cnt)
+//         return cnt;
+//     else
+//         return 0;
+// }
+// void CSISep::record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_status){
+//     csi_status->rssi_0    = buf_addr[20];
+//     csi_status->rssi_1    = buf_addr[21];
+//     csi_status->rssi_2    = buf_addr[22];
+// }
 
 
 
@@ -111,30 +111,26 @@ CSISep::fragment(Packet *p_in)
 
     if(NULL == (file = popen(shellcmd,"r")))     
     {    
-        printf("execute command failed!");         
+        // printf("execute command failed!");         
     }
     else
     {
         fgets(buffer, 100, file);
         char * p = strchr(buffer, ':');
-        printf("the string buffer: %s\n", p+3);
-        //char q[50] = "Signal: -54 dBm  Link";
-        uint16_t length = atoi(p+3);
-        printf("The Signal length %hu\n", length);
+        // printf("the string buffer: %s\n", p+3);
+        uint8_t length = atoi(p+3);
+        // printf("The Signal length %hu\n", length);
         if(length>0)
         {
-            WritablePacket *p_csi = Packet::make(2);
-            memcpy(p_csi->data(), &length, 2);
+            WritablePacket *p_csi = Packet::make(1);
+            memcpy(p_csi->data(), &length, 1);
             output(1).push(p_csi);
         }
         
             
     }
     
-
-    WritablePacket *p_master = p_in->uniqueify();
-    
-    output(0).push(p_master);
+    output(0).push(p_in);
         
 }
 
