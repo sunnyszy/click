@@ -151,8 +151,8 @@ PacketSelection::state_change(int port, Packet *p_in)
 
 
   //double csi_score = sqrt(csi_get_score(p));
-  uint8_t csi_score;
-  memcpy(&csi_score, p_in->data(), 1);
+  uint16_t csi_score;
+  memcpy(&csi_score, p_in->data(), 2);
   print_counter ++;
   if(print_counter%10==0)
     printf("port: %d, csi_score: %d, output_port: %d\n", port, csi_score, output_port);
