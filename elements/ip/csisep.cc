@@ -143,24 +143,24 @@ CSISep::fragment(Packet *p_in)
     // } 
 
     WritablePacket *p_master = p_in->uniqueify();
-    struct click_ip *iph = p_master->ip_header();
-    //arp
-    if(!iph)
-    {
-        // if(print_flag)
-        // {
-        //     printf("This is an arp pkt.\n");
-        //     printf("Arp len: %d\n", p_master->length());
-        // }   
-        if(p_master->length()>CSI_LEN)//if contain CSI
-        {
-            p_master->take(CSI_LEN);
-        }
-        // if(print_flag)
-        // {
-        // printf("Finish up.\n");
-        // } 
-    }
+    // struct click_ip *iph = p_master->ip_header();
+    // //arp
+    // if(!iph)
+    // {
+    //     // if(print_flag)
+    //     // {
+    //     //     printf("This is an arp pkt.\n");
+    //     //     printf("Arp len: %d\n", p_master->length());
+    //     // }   
+    //     if(p_master->length()>CSI_LEN)//if contain CSI
+    //     {
+    //         p_master->take(CSI_LEN);
+    //     }
+    //     // if(print_flag)
+    //     // {
+    //     // printf("Finish up.\n");
+    //     // } 
+    // }
     // no wonder about ip because ip check will do it for you
     // else//ip
     // {
