@@ -45,7 +45,7 @@ class CSISep : public Element { public:
   void  close_csi_device(int fd);
   int   read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE);
   void  record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_status);
-
+  // bool is_big_endian();
 
  private:
 
@@ -56,6 +56,7 @@ class CSISep : public Element { public:
 
   unsigned char buf_addr[24];
   void fragment(Packet *);
+  // bool big_endian_flag;
 
 };
 

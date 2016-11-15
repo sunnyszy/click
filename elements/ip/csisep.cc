@@ -33,6 +33,7 @@ CSISep::CSISep()
         printf("Failed to open the device...");
     else 
         printf("#Receiving data!\n");
+    // big_endian_flag = is_big_endian();
     // total_msg_cnt = 0;
 
 }
@@ -56,6 +57,16 @@ void CSISep::close_csi_device(int fd){
     //remove("/dev/CSI_dev");
 }
 
+// bool CSISep::is_big_endian()
+// {
+//     unsigned int a = 0x1;
+//     unsigned char b = *(unsigned char *)&a;
+//     if ( b == 0)
+//     {
+//         return true;
+//     }
+//     return false;
+// }
 
 int CSISep::read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE){
     int cnt;
@@ -86,15 +97,9 @@ CSISep::fragment(Packet *p_in)
     cnt = read_csi_buf(buf_addr,fd,23);
 
     if (cnt && noutputs() == 2){
-        // total_msg_cnt += 1;
 
         /* fill the status struct with information about the rx packet */
         record_status(buf_addr, cnt, csi_status);
- 
-        // if(total_msg_cnt%100 == 0)
-        // {
-        //     printf("rssi : %u %u %u\n", csi_status->rssi_0, csi_status->rssi_1, csi_status->rssi_2);
-        // }
 
         WritablePacket *p_csi = Packet::make(1);
         memcpy(p_csi->data(), &(csi_status->rssi_0), 1);
@@ -102,7 +107,28 @@ CSISep::fragment(Packet *p_in)
     }
 
     WritablePacket *p_master = p_in->uniqueify();
-    //p_master->take(CSI_LEN);
+    struct click_ip *iph = p_master->ip_header();
+    //arp
+    if(!iph)
+    {
+        printf("This is an arp pkt.\n");
+        printf("Arp len: %d\n", p_master->length());
+        if(p_master->length()>CSI_LEN)//if contain CSI
+        {
+            p_master->take(CSI_LEN);
+        }
+    }
+    else//ip
+    {
+        uint16_t ipLenth = (((iph->ip_len)&0xff00)>>8)+(((iph->ip_len)&0x00ff)<<8);
+        printf("IP len: %d, real_len: %d\n", ipLenth,p_master->length()-14);
+        if(ipLenth < p_master->length()-14)
+        {
+            printf("CSI appended ip\n");
+            p_master->take(CSI_LEN);
+        }
+
+    }
     output(0).push(p_master);
         
 }
