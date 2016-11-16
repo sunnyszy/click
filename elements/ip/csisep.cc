@@ -40,7 +40,7 @@ CSISep::CSISep()
     // else
     //     printf("little endian\n");
     sprintf(shellcmd,"iwinfo wlan0 info | grep 'Signal'");
-
+    sample_counter = 0;
     // total_msg_cnt = 0;
 
 }
@@ -51,16 +51,16 @@ CSISep::~CSISep()
     // free(csi_status);
 }
 
-// int
-// CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
-// {
-//   // if (Args(conf, this, errh)
-//   //     .read_p("PRINTFLAG", BoolArg(), print_flag)
-//   //     .complete() < 0)
-//   //   return -1;
+int
+CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
+{
+  if (Args(conf, this, errh)
+      .read_p("SAMPLERATE", IntArg(), sample_rate)
+      .complete() < 0)
+    return -1;
 
-//   return 0;
-// }
+  return 0;
+}
 
 
 // int CSISep::open_csi_device(){
@@ -108,6 +108,10 @@ CSISep::~CSISep()
 void
 CSISep::fragment(Packet *p_in)
 {
+    sample_counter ++;
+    if(sample_counter>sample_rate)
+    {
+        sample_counter = 0;
 
     if(NULL == (file = popen(shellcmd,"r")))     
     {    
@@ -126,8 +130,10 @@ CSISep::fragment(Packet *p_in)
             memcpy(p_csi->data(), &length, 1);
             output(1).push(p_csi);
         }
+        pclose(file);
         
             
+    }
     }
     
     output(0).push(p_in);

@@ -40,7 +40,7 @@ class CSISep : public Element { public:
   const char *port_count() const		{ return PORTS_1_1X2; }
   const char *processing() const		{ return PUSH; }
 
-  // int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
+  int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
   
   void push(int, Packet *);
   void fragment(Packet *);
@@ -64,6 +64,8 @@ class CSISep : public Element { public:
   char shellcmd[64];
   char buffer[100];
   FILE *file;
+  int sample_rate;
+  int sample_counter;
 
 };
 
