@@ -35,7 +35,7 @@ PacketSelection::PacketSelection()
   bigger_counter = 0;
   for(i=0; i<n_outport; i++)
   {
-    score[i] = 0;
+    score[i] = 10000;
   }
   print_counter = 0;
   lock = false;
@@ -150,12 +150,20 @@ PacketSelection::state_change(int port, Packet *p_in)
   WritablePacket *p = p_in->uniqueify();
 
 
-  //double csi_score = sqrt(csi_get_score(p));
+  
   uint16_t csi_score;
   memcpy(&csi_score, p_in->data(), 2);
+  //csi_score = ((csi_score&0x00ff)<<8)+((csi_score&0xff00)>>8);
   print_counter ++;
   if(print_counter%10==0)
-    printf("port: %d, csi_score: %d, output_port: %d\n", port, csi_score, output_port);
+  {
+    //printf("port: %d, csi_score: %u, output_port: %d\n", port, csi_score, output_port);
+    //printf("port: %d, csi_score1: %u, output_port: %d\n", port, csi_score1, output_port);
+    //printf("port: %d, csi_score2: %x, output_port: %d\n", port, csi_score2, output_port);
+    printf("port: %d, csi_score: %u, hex: %x, output_port: %d\n", port, csi_score, csi_score, output_port);
+
+    
+  }
 
 
   score[port] = alpha*csi_score + (1-alpha)*score[port];
@@ -164,7 +172,7 @@ PacketSelection::state_change(int port, Packet *p_in)
     fresh_counter++;
   else
   {
-    if(score[1] > score[0])
+    if(score[1] < score[0])
     {
       if(bigger_counter<bigger_time)
         bigger_counter ++;
@@ -191,8 +199,8 @@ PacketSelection::destination_change(Packet *p_in)
 {
 
   WritablePacket *p_master = p_in->uniqueify();
-  if(print_counter%10==0)
-    printf("choose router id: %d\n", output_port);
+  //if(print_counter%1000==0)
+    //printf("choose router id: %d\n", output_port);
   output(output_port).push(p_master);
 }
 
