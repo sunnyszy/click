@@ -162,7 +162,7 @@ WGTTQueue::deq()
 	Packet *p = _q[h];
 	set_head(next_i(h));
 	assert(p);
-    if (dequeue_counter = dequeue_time - 1)
+    if (dequeue_counter == dequeue_time - 1)
     {
         syslog(LOG_DEBUG, "DEQUEUE DISABLE\n");
         closelog();
