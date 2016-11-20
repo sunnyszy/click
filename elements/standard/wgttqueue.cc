@@ -48,6 +48,7 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         .complete() < 0)
 	return -1;
     dequeue_time = tmp_dequeue_time;
+    syslog(LOG_DEBUG, "dequeue time: %d\n", dequeue_time);
     _capacity = new_capacity;
     return 0;
 }
