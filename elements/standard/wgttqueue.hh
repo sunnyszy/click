@@ -3,6 +3,7 @@
 #define CLICK_WGTTQUEUE_HH
 #include <click/element.hh>
 #include <click/standard/storage.hh>
+#include <syslog.h>
 CLICK_DECLS
 
 /*
@@ -161,12 +162,17 @@ WGTTQueue::deq()
 	Packet *p = _q[h];
 	set_head(next_i(h));
 	assert(p);
+    if (dequeue_counter = dequeue_time - 1)
+    {
+        syslog(LOG_DEBUG, "DEQUEUE DISABLE\n");
+        closelog();
+    }
     dequeue_counter ++;
-    printf("dequeue success!\n");
+    
 	return p;
     } else
     {
-        printf("deque function\n");
+        // printf("deque function\n");
 	   return 0;
     }
 }

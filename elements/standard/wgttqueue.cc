@@ -25,6 +25,7 @@ CLICK_DECLS
 WGTTQueue::WGTTQueue()
     : _q(0), dequeue_counter(0)
 {
+    openlog("MYLOG", LOG_CONS| LOG_NDELAY| LOG_NOWAIT, LOG_KERN);
 }
 
 void *
@@ -151,14 +152,14 @@ WGTTQueue::push(int, Packet *p)
 	int s = size(h, nt);
 	if (s > _highwater_length)
 	    _highwater_length = s;
-    printf("enque\n");
+    // printf("enque\n");
 
     } else {
 	// if (!(_drops % 100))
 	if (_drops == 0 && _capacity > 0)
 	    click_chatter("%p{element}: overflow", this);
 	_drops++;
-    printf("overflow\n");
+    // printf("overflow\n");
 	checked_output_push(1, p);
     }
 }
