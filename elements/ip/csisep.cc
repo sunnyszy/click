@@ -39,7 +39,7 @@ CSISep::CSISep()
     //     printf("big endian\n");
     // else
     //     printf("little endian\n");
-    sprintf(shellcmd,"iwinfo wlan0 info | grep 'Signal'");
+    sprintf(shellcmd,"iwinfo wlan1 info | grep 'Signal'");
     sample_counter = 0;
     // total_msg_cnt = 0;
 
