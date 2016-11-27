@@ -25,7 +25,6 @@ CLICK_DECLS
 WGTTQueue::WGTTQueue()
     : _q(0), dequeue_counter(0)
 {
-    openlog("MYLOG", LOG_CONS| LOG_NDELAY| LOG_NOWAIT, LOG_KERN);
 }
 
 void *
@@ -48,7 +47,6 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         .complete() < 0)
 	return -1;
     dequeue_time = tmp_dequeue_time;
-    syslog(LOG_DEBUG, "dequeue time: %d\n", dequeue_time);
     _capacity = new_capacity;
     return 0;
 }

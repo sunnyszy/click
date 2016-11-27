@@ -3,65 +3,8 @@
 #define CLICK_WGTTQUEUE_HH
 #include <click/element.hh>
 #include <click/standard/storage.hh>
-#include <syslog.h>
 CLICK_DECLS
 
-/*
-=c
-
-SimpleQueue
-SimpleQueue(CAPACITY)
-
-=s storage
-
-stores packets in a FIFO queue
-
-=d
-
-Stores incoming packets in a first-in-first-out queue.
-Drops incoming packets if the queue already holds CAPACITY packets.
-The default for CAPACITY is 1000.
-
-B<Multithreaded Click note:> SimpleQueue is designed to be used in an
-environment with at most one concurrent pusher and at most one concurrent
-puller.  Thus, at most one thread pushes to the SimpleQueue at a time and at
-most one thread pulls from the SimpleQueue at a time.  Different threads can
-push to and pull from the SimpleQueue concurrently, however.  See
-ThreadSafeQueue for a queue that can support multiple concurrent pushers and
-pullers.
-
-=n
-
-The Queue and NotifierQueue elements act like SimpleQueue, but additionally
-notify interested parties when they change state (from nonempty to empty or
-vice versa, and/or from nonfull to full or vice versa).
-
-=h length read-only
-
-Returns the current number of packets in the queue.
-
-=h highwater_length read-only
-
-Returns the maximum number of packets that have ever been in the queue at once.
-
-=h capacity read/write
-
-Returns or sets the queue's capacity.
-
-=h drops read-only
-
-Returns the number of packets dropped by the queue so far.  Dropped packets
-are emitted on output 1 if output 1 exists.
-
-=h reset_counts write-only
-
-When written, resets the C<drops> and C<highwater_length> counters.
-
-=h reset write-only
-
-When written, drops all packets in the queue.
-
-=a Queue, NotifierQueue, MixedQueue, RED, FrontDropQueue, ThreadSafeQueue */
 
 class WGTTQueue : public Element, public Storage { public:
 
@@ -164,8 +107,6 @@ WGTTQueue::deq()
 	assert(p);
     if (dequeue_counter == dequeue_time - 1)
     {
-        syslog(LOG_DEBUG, "DEQUEUE DISABLE\n");
-        closelog();
     }
     dequeue_counter ++;
     
