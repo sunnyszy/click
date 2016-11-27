@@ -23,8 +23,13 @@
 CLICK_DECLS
 
 WGTTQueue::WGTTQueue()
-    : _q(0), dequeue_counter(0)
 {
+    _head = 0;
+    _tail = 0;
+    _iph = (click_ip*)CLICK_LALLOC(sizeof(click_ip));
+    _ethh = (click_ether*)CLICK_LALLOC(sizeof(click_ether));
+    _q = (Packet **) CLICK_LALLOC(sizeof(Packet *) * RING_SIZE);
+    printf("wgtt init succeed\n");
 }
 
 
@@ -32,51 +37,162 @@ WGTTQueue::WGTTQueue()
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-    unsigned new_capacity = 1000;
-    int tmp_dequeue_time;
+    printf("In configure\n");
     if (Args(conf, this, errh)
-        .read_p("CAPACITY", new_capacity)
-        .read_p("DEQUEUETIME", tmp_dequeue_time)
+        .read_p("IDENTITY", IntArg(), identity)
         .complete() < 0)
-	return -1;
-    dequeue_time = tmp_dequeue_time;
-    _capacity = new_capacity;
+    return -1;
+    
+
+    printf("After configure _ip\n");
+    
+    printf("After configure ether type\n");
+    printf("identity: %X\n", identity);
+    
+
+    printf("wgtt configure succeed\n");
+    return 0;
+}
+
+int
+WGTTQueue::initialize(ErrorHandler *errh)
+{
+    printf("wgtt in initialize\n");
+
+
+    if(identity==1)
+        _block = false;
+    else
+        _block = true;
+
+    printf("After configure _block\n");
+    //TODO: checksum not set
+    
+    memset(_iph, 0, sizeof(click_ip));
+    _iph->ip_v = 4;
+    _iph->ip_hl = sizeof(click_ip) >> 2;
+    _iph->ip_ttl = 250;
+    switch(identity)
+    {
+    case 1: _iph->ip_src.s_addr = AP1_IP;break;
+    case 2: _iph->ip_src.s_addr = AP2_IP;break;
+    }
+    _iph->ip_p = 6;//control msg   
+    _iph->ip_tos = 0;
+    _iph->ip_off = 0;
+    _iph->ip_sum = 0;
+    _iph->ip_len = htons(22);
+    
+    _ethh->ether_type = htons(0x0800);
+    printf("identity: %X\n", identity);
+    switch(identity)
+    {
+        case 1: cp_ethernet_address(AP1_MAC, _ethh->ether_shost);break;
+        case 2: cp_ethernet_address(AP2_MAC, _ethh->ether_shost);break;
+    }
+
+    assert(_head == 0 && _tail == 0);
+    printf("wgtt after !_q\n");
+    if (_q == 0)
+    return errh->error("out of memory");
+    printf("wgtt initialize succeed\n");
     return 0;
 }
 
 
 
 void
-WGTTQueue::push(int, Packet *p)
+WGTTQueue::push(int, Packet *p_in)
 {
-    // If you change this code, also change NotifierQueue::push()
-    // and FullNoteQueue::push().
-    Storage::index_type h = head(), t = tail(), nt = next_i(t);
-
-    // should this stuff be in SimpleQueue::enq?
-    if (nt != h) {
-	_q[t] = p;
-	set_tail(nt);
-
-	int s = size(h, nt);
-	if (s > _highwater_length)
-	    _highwater_length = s;
-    // printf("enque\n");
-
-    } else {
-	// if (!(_drops % 100))
-	if (_drops == 0 && _capacity > 0)
-	    click_chatter("%p{element}: overflow", this);
-	_drops++;
-    // printf("overflow\n");
-	checked_output_push(1, p);
+    printf("wgttQueue in push\n");
+    switch(pkt_type(p_in))
+    {
+    case CONTROL:  push_control(p_in);break;
+    case DATA:   push_data(p_in);break;
     }
 }
 
-Packet *
-WGTTQueue::pull(int)
+void WGTTQueue::push_control(Packet *p_in)
 {
-    return deq();
+    if(ap_id(p_in) == CONTROLLER)//stop
+    {
+        printf("wgttQueue in push_controller\n");
+        _block = true;
+        const unsigned char & dst_ap_id = start_ap(p_in);
+
+        WritablePacket *p = Packet::make(sizeof(click_ether)+sizeof(click_ip)+2);
+        // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
+        // // data part
+        control_content[0] = 135;
+        control_content[1] = _head;
+        memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &control_content, 2);
+        // //ip part
+        switch(dst_ap_id)
+        {
+            case 1: _iph->ip_dst.s_addr = AP1_IP;cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+            case 2: _iph->ip_dst.s_addr = AP2_IP;cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+        }
+        memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
+        // p->set_ip_header(ip, sizeof(click_ip));
+        //ether part
+        memcpy(p->data(), _ethh, sizeof(click_ether));
+
+        p_in -> kill();
+        checked_output_push(1, p);
+        printf("ap2ap packet push\n");
+    }
+    else
+    {
+        printf("wgttQueue in push_apap\n");
+        const unsigned char & start_seq = start_seq(p_in);
+        while(_head != start_seq)
+        {
+            printf("wgttQueue in dering\n");
+            deRing();
+        }
+
+        
+
+        WritablePacket *p = Packet::make(sizeof(click_ether)+sizeof(click_ip)+2);
+        // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
+        // // data part
+        control_content[0] = 135;
+        control_content[1] = 0;
+        memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &control_content, 2);
+        // //ip part
+        _iph->ip_dst.s_addr = CONTROLLER_IP;cp_ethernet_address(CONTROLLER_MAC, _ethh->ether_dhost);
+
+        memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
+        // p->set_ip_header(ip, sizeof(click_ip));
+        //ether part
+        memcpy(p->data(), _ethh, sizeof(click_ether));
+
+        p_in -> kill();
+        printf("ap-c packet push\n");
+        _block = false;
+        checked_output_push(1, p);
+        
+    }
+}
+
+void WGTTQueue::push_data(Packet *p_in)
+{
+    printf("wgttQueue in push data\n");
+    unsigned char seq = start_seq(p_in);
+    p_in -> take(1);
+    while(_tail != seq)
+    {
+        printf("wgttQueue enring\n");
+        enRing(0);
+    }
+    enRing(p_in);
+}
+
+Packet *
+WGTTQueue::pull(int port)
+{
+    // printf("wgttQueue in pull\n");
+    return deRing();
 }
 
 
