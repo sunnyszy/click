@@ -31,7 +31,7 @@
 
 IDAdder::IDAdder()
 {
-	printf("idadder in init\n");
+	// printf("idadder in init\n");
 	counter = 0;
 	_iph = (click_ip*)CLICK_LALLOC(sizeof(click_ip));
 	
@@ -62,14 +62,14 @@ IDAdder::initialize(ErrorHandler *errh)
 	
 
     
-    printf("idadder initial finish\n");
+    printf("idadder initial finish, ready to start\n");
     return 0;
 }
 
 
 void IDAdder::push(int port, Packet *p_in)
 {
-	printf("idadder in push\n");
+	// printf("idadder in push\n");
 	static unsigned char tmp_counter = 0;
 	if(tmp_counter ==0)
 	{
@@ -100,7 +100,7 @@ void IDAdder::push(int port, Packet *p_in)
 		memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &counter, 1);
 		memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
 		memcpy(p->data(), &_ethh, sizeof(click_ether));
-		printf("idadder push %dth\n", i);
+		// printf("idadder push %dth\n", i);
 		output(0).push(p);
 	}
 

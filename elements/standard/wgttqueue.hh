@@ -76,7 +76,7 @@ WGTTQueue::enRing(Packet *p)
 {
     if((_tail+1)%RING_SIZE == _head)//override
     {
-        printf("WGTTQueue override\n");
+        // printf("WGTTQueue override\n");
         if(_q[_head] != 0)
             _q[_head] -> kill();
         _head = (_head+1)%RING_SIZE;

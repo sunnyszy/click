@@ -72,7 +72,7 @@ PacketSelectionSerial::PacketSelectionSerial()
   
   _ethh->ether_type = htons(0x0800);
   bool result = cp_ethernet_address(CONTROLLER_MAC, _ethh->ether_shost);
-
+  printf("Packetselection: init finish, ready to start\n");
 
 }
 
@@ -119,9 +119,9 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 
 void PacketSelectionSerial::push_status(Packet *p_in)
 {
-  printf("In push status.\n");
+  //printf("In push status.\n");
   unsigned char a;
-  printf("ap id: %x\n", ap_id(p_in));
+  //printf("ap id: %x\n", ap_id(p_in));
   switch(ap_id(p_in))
   {
     case AP1: a = 0; break;
@@ -135,9 +135,9 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   // able to change state
   if(state[0] == IDLE)
   {
-      printf("state idle\n");
+      //printf("state idle\n");
       unsigned char best_ap = find_best_ap();
-      printf("best ap: %x\n", best_ap);
+      //printf("best ap: %x\n", best_ap);
       if(best_ap != output_port[0])
       {
         // send message

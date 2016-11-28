@@ -37,7 +37,7 @@ WGTTQueue::WGTTQueue()
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-    printf("In configure\n");
+    //printf("In configure\n");
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
         .complete() < 0)
@@ -51,7 +51,7 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 int
 WGTTQueue::initialize(ErrorHandler *errh)
 {
-    printf("wgtt in initialize\n");
+    //printf("wgtt in initialize\n");
 
 
     if(identity==1)
@@ -59,7 +59,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
     else
         _block = true;
 
-    printf("After configure _block\n");
+    // printf("After configure _block\n");
     //TODO: checksum not set
     
     memset(_iph, 0, sizeof(click_ip));
@@ -78,7 +78,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
     _iph->ip_len = htons(22);
     
     _ethh->ether_type = htons(0x0800);
-    printf("identity: %X\n", identity);
+    // printf("identity: %X\n", identity);
     switch(identity)
     {
         case 1: cp_ethernet_address(AP1_MAC, _ethh->ether_shost);break;
@@ -86,10 +86,10 @@ WGTTQueue::initialize(ErrorHandler *errh)
     }
 
     assert(_head == 0 && _tail == 0);
-    printf("wgtt after !_q\n");
+    // printf("wgtt after !_q\n");
     if (_q == 0)
     return errh->error("out of memory");
-    printf("wgtt initialize succeed\n");
+    printf("wgtt initialize succeed, ready to start\n");
     return 0;
 }
 
@@ -98,7 +98,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
 void
 WGTTQueue::push(int, Packet *p_in)
 {
-    printf("wgttQueue in push\n");
+    // printf("wgttQueue in push\n");
     switch(pkt_type(p_in))
     {
     case CONTROL:  push_control(p_in);break;
@@ -110,7 +110,7 @@ void WGTTQueue::push_control(Packet *p_in)
 {
     if(ap_id(p_in) == CONTROLLER)//stop
     {
-        printf("wgttQueue in push_controller\n");
+        // printf("wgttQueue in push_controller\n");
         _block = true;
         const unsigned char & dst_ap_id = start_ap(p_in);
 
@@ -133,11 +133,11 @@ void WGTTQueue::push_control(Packet *p_in)
 
         p_in -> kill();
         checked_output_push(1, p);
-        printf("ap2ap packet push\n");
+        // printf("ap2ap packet push\n");
     }
     else
     {
-        printf("wgttQueue in push_apap\n");
+        // printf("wgttQueue in push_apap\n");
         const unsigned char & start_seq = start_seq(p_in);
         while(_head != start_seq)
         {
@@ -162,7 +162,7 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
         p_in -> kill();
-        printf("ap-c packet push\n");
+        // printf("ap-c packet push\n");
         _block = false;
         checked_output_push(1, p);
         
@@ -171,7 +171,7 @@ void WGTTQueue::push_control(Packet *p_in)
 
 void WGTTQueue::push_data(Packet *p_in)
 {
-    printf("wgttQueue in push data\n");
+    // printf("wgttQueue in push data\n");
     const unsigned char & seq = start_seq(p_in);
     while(_tail != seq)
     {
