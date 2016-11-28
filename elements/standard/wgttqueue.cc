@@ -71,7 +71,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
     case 1: _iph->ip_src.s_addr = AP1_IP;break;
     case 2: _iph->ip_src.s_addr = AP2_IP;break;
     }
-    _iph->ip_p = 6;//control msg   
+    _iph->ip_p = 27;//control msg   
     _iph->ip_tos = 0;
     _iph->ip_off = 0;
     _iph->ip_sum = 0;
@@ -141,7 +141,7 @@ void WGTTQueue::push_control(Packet *p_in)
         const unsigned char & start_seq = start_seq(p_in);
         while(_head != start_seq)
         {
-            printf("wgttQueue in dering\n");
+            // printf("wgttQueue in dering\n");
             deRing();
         }
 
@@ -175,7 +175,7 @@ void WGTTQueue::push_data(Packet *p_in)
     const unsigned char & seq = start_seq(p_in);
     while(_tail != seq)
     {
-        printf("wgttQueue enring\n");
+        // printf("wgttQueue enring\n");
         enRing(0);
     }
     p_in -> pull(21);

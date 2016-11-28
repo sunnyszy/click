@@ -11,7 +11,7 @@ CLICK_DECLS
 
 #define STATUS 4
 #define DATA 17
-#define CONTROL 6
+#define CONTROL 27
 #define IDLE 0
 #define SWITCH_REQ 1
 #define CLIENT1 135

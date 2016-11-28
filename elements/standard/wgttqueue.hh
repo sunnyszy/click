@@ -11,7 +11,7 @@ CLICK_DECLS
 #define RING_SIZE 256
 #define STATUS 4
 #define DATA 17
-#define CONTROL 6
+#define CONTROL 27
 #define IDLE 0
 #define SWITCH_REQ 1
 #define CLIENT1 135
@@ -81,13 +81,13 @@ WGTTQueue::enRing(Packet *p)
             _q[_head] -> kill();
         _head = (_head+1)%RING_SIZE;
     }
-    printf("WGTTQueue before _q[_tail] = p\n");
+    // printf("WGTTQueue before _q[_tail] = p\n");
     Packet *tmp = _q[_tail];
-    printf("_tail: %x\n", _tail);
+    // printf("_tail: %x\n", _tail);
     _q[_tail] = p;
-    printf("WGTTQueue finish _q[_tail] = p\n");
+    // printf("WGTTQueue finish _q[_tail] = p\n");
     _tail = (_tail+1)%RING_SIZE;
-    printf("WGTTQueue finish enRing\n");
+    // printf("WGTTQueue finish enRing\n");
 }
 
 inline Packet *

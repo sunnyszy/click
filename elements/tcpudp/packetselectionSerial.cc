@@ -60,7 +60,7 @@ PacketSelectionSerial::PacketSelectionSerial()
   _iph.ip_hl = sizeof(click_ip) >> 2;
   _iph.ip_ttl = 250;
   _iph.ip_src.s_addr = CONTROLLER_IP;
-  _iph.ip_p = 6;//control msg   
+  _iph.ip_p = 27;//control msg   
   _iph.ip_tos = 0;
   _iph.ip_off = 0;
   _iph.ip_sum = 0;
@@ -129,7 +129,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   }
   // update_score(&ap_score(p_in), &c)
   printf("ap score: %x\n", ap_score(p_in));
-  printf("next_score_id[a]: %x\n", next_score_id[a]);
+  // printf("next_score_id[a]: %x\n", next_score_id[a]);
   score[a][next_score_id[a]] = ap_score(p_in);
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
@@ -161,7 +161,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
         output(0).push(p);
-        printf("packet push\n");
+        // printf("packet push\n");
         state[0] = SWITCH_REQ;
       }
   }
