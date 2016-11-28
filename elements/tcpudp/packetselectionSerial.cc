@@ -161,7 +161,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
         output(0).push(p);
-        // printf("packet push\n");
+        printf("controller issu switch to ap %X\n", best_ap);
         state[0] = SWITCH_REQ;
       }
   }
