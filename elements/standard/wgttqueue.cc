@@ -110,7 +110,7 @@ void WGTTQueue::push_control(Packet *p_in)
 {
     if(ap_id(p_in) == CONTROLLER)//stop
     {
-        // printf("wgttQueue in push_controller\n");
+        printf("wgttQueue: receive switch req\n");
         _block = true;
         const unsigned char & dst_ap_id = start_ap(p_in);
 
@@ -133,11 +133,11 @@ void WGTTQueue::push_control(Packet *p_in)
 
         p_in -> kill();
         checked_output_push(1, p);
-        // printf("ap2ap packet push\n");
+        printf("wgttQueue send ap-ap seq\n");
     }
     else
     {
-        // printf("wgttQueue in push_apap\n");
+        printf("wgttQueue receive ap-ap seq\n");
         const unsigned char & start_seq = start_seq(p_in);
         while(_head != start_seq)
         {
@@ -165,7 +165,7 @@ void WGTTQueue::push_control(Packet *p_in)
         // printf("ap-c packet push\n");
         _block = false;
         checked_output_push(1, p);
-        
+        printf("wgttQueue send switch ack\n");
     }
 }
 
