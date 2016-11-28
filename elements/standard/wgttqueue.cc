@@ -123,8 +123,8 @@ void WGTTQueue::push_control(Packet *p_in)
         // //ip part
         switch(dst_ap_id)
         {
-            case 1: _iph->ip_dst.s_addr = AP1_IP;cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
-            case 2: _iph->ip_dst.s_addr = AP2_IP;cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+            case 0: _iph->ip_dst.s_addr = AP1_IP;cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+            case 1: _iph->ip_dst.s_addr = AP2_IP;cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
         }
         memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
         // p->set_ip_header(ip, sizeof(click_ip));
