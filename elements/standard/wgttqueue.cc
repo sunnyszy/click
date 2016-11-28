@@ -44,12 +44,6 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
     return -1;
     
 
-    printf("After configure _ip\n");
-    
-    printf("After configure ether type\n");
-    printf("identity: %X\n", identity);
-    
-
     printf("wgtt configure succeed\n");
     return 0;
 }
@@ -178,13 +172,13 @@ void WGTTQueue::push_control(Packet *p_in)
 void WGTTQueue::push_data(Packet *p_in)
 {
     printf("wgttQueue in push data\n");
-    unsigned char seq = start_seq(p_in);
-    p_in -> take(1);
+    const unsigned char & seq = start_seq(p_in);
     while(_tail != seq)
     {
         printf("wgttQueue enring\n");
         enRing(0);
     }
+    p_in -> pull(21);
     enRing(p_in);
 }
 
