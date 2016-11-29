@@ -137,11 +137,14 @@ void WGTTQueue::push_control(Packet *p_in)
     }
     else
     {
+
         printf("wgttQueue receive ap-ap seq\n");
+        printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail)
         const unsigned char & start_seq = start_seq(p_in);
         while(_head != start_seq)
         {
-            // printf("wgttQueue in dering\n");
+            printf("wgttQueue in dering\n");
+            printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail)
             deRing();
         }
 
