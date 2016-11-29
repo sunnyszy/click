@@ -132,8 +132,9 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
         p_in -> kill();
-        checked_output_push(1, p);
         printf("wgttQueue send ap-ap seq\n");
+        checked_output_push(1, p);
+        
     }
     else
     {
@@ -143,7 +144,7 @@ void WGTTQueue::push_control(Packet *p_in)
         const unsigned char & start_seq = start_seq(p_in);
         while(_head != start_seq)
         {
-            printf("wgttQueue in dering\n");
+            printf("wgttQueue in dering-prepare\n");
             printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
             if(_q[_head] != 0)
                 _q[_head] -> kill();
@@ -169,8 +170,9 @@ void WGTTQueue::push_control(Packet *p_in)
         p_in -> kill();
         // printf("ap-c packet push\n");
         _block = false;
-        checked_output_push(1, p);
         printf("wgttQueue send switch ack\n");
+        checked_output_push(1, p);
+        
     }
 }
 
@@ -180,18 +182,20 @@ void WGTTQueue::push_data(Packet *p_in)
     const unsigned char & seq = start_seq(p_in);
     while(_tail != seq)
     {
-        printf("wgttQueue enring 0, _head: %X, _tail: %X\n");
+        printf("wgttQueue in enring-prepare\n");
+        printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
         enRing(0);
     }
     p_in -> pull(21);
     enRing(p_in);
-    printf("wgttQueue enring, _head: %X, _tail: %X\n");
+    printf("wgttQueue enring, _head: %X, _tail: %X\n", _head, _tail);
 }
 
 Packet *
 WGTTQueue::pull(int port)
 {
-    // printf("wgttQueue in pull\n");
+    printf("wgttQueue in pull\n");
+    printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
     return deRing();
 }
 

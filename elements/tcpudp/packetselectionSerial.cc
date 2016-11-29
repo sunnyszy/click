@@ -163,6 +163,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         output(0).push(p);
         printf("controller issu switch to ap %X\n", best_ap);
         state[0] = SWITCH_REQ;
+        output_port[0] = best_ap;
       }
   }
   p_in -> kill();
