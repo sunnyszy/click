@@ -187,15 +187,13 @@ void WGTTQueue::push_data(Packet *p_in)
         enRing(0);
     }
     p_in -> pull(21);
-    enRing(p_in);
     printf("wgttQueue enring, _head: %X, _tail: %X\n", _head, _tail);
+    enRing(p_in);
 }
 
 Packet *
 WGTTQueue::pull(int port)
 {
-    printf("wgttQueue in pull\n");
-    printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
     return deRing();
 }
 
