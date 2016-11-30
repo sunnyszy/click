@@ -55,7 +55,7 @@ IDAdder::initialize(ErrorHandler *errh)
 	_iph->ip_hl = sizeof(click_ip) >> 2;
 	_iph->ip_ttl = 250;
 	_iph->ip_src.s_addr = CONTROLLER_IP;
-	_iph->ip_p = 17;//data msg   
+	_iph->ip_p = DATA;//data msg   
 	_iph->ip_tos = 0;
 	_iph->ip_off = 0;
 	_iph->ip_sum = 0;

@@ -11,7 +11,7 @@ CLICK_DECLS
 
 #define RING_SIZE 256
 #define STATUS 4
-#define DATA 17
+#define DATA 0x1c
 #define CONTROL 6
 #define IDLE 0
 #define SWITCH_REQ 1
