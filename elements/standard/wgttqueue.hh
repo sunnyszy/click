@@ -98,11 +98,11 @@ WGTTQueue::deRing()
         return 0;
     Packet *p = _q[_head];
     _head = (_head+1)%RING_SIZE;
-    if(p != 0)
-    {
-        printf("wgttQueue in pull\n");
-        printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
-    }
+    // if(p != 0)
+    // {
+    //     printf("wgttQueue in pull\n");
+    //     printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
+    // }
     return p;
 }
 
