@@ -53,7 +53,7 @@ PacketSelectionSerial::PacketSelectionSerial()
   }
 
   state = new unsigned char[n_client];
-
+  state[0] = IDLE; 
   //TODO: checksum not set
   memset(&_iph, 0, sizeof(click_ip));
   _iph.ip_v = 4;
@@ -113,7 +113,7 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 {
   unsigned char c = 0;
   state[c] = IDLE;
-  //printf("In push control.\n");
+  printf("switch request ack.\n");
   p_in -> kill();
 }
 
@@ -128,16 +128,25 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     case AP2: a = 1; break;
   }
   // update_score(&ap_score(p_in), &c)
-  printf("ap score: %x\n", ap_score(p_in));
+  printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   // printf("next_score_id[a]: %x\n", next_score_id[a]);
   score[a][next_score_id[a]] = ap_score(p_in);
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
+
+  static unsigned char tmp_counter = 0;
+
+
   if(state[0] == IDLE)
   {
-      //printf("state idle\n");
+      tmp_counter++;
+      printf("state idle\n");
       unsigned char best_ap = find_best_ap();
       //printf("best ap: %x\n", best_ap);
+      if(tmp_counter == 20)
+      {
+        best_ap = 1;
+      }
       if(best_ap != output_port[0])
       {
         // send message
@@ -149,12 +158,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         control_content[1] = best_ap;
         memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &control_content, 2);
         // //ip part
-        _iph.ip_dst.s_addr = (best_ap == 0)? AP1_IP : AP2_IP;
+        _iph.ip_dst.s_addr = (output_port[0] == 0)? AP1_IP : AP2_IP;
 
         memcpy(p->data()+sizeof(click_ether), &_iph, sizeof(click_ip));
         // p->set_ip_header(ip, sizeof(click_ip));
         //ether part
-        if(best_ap == 0)
+        if(output_port[0] == 0)
           cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);
         else
           cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);
