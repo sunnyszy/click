@@ -32,6 +32,7 @@ CLICK_DECLS
 #define start_ap(p) *(p->data()+21)
 #define start_seq(p) *(p->data()+21)
 #define ap_score(p) *(p->data()+20)
+#define sep(p) *(p->data()+20)
 
 
 class WGTTQueue : public Element, public Storage { public:
