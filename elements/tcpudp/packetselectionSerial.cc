@@ -143,7 +143,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
       printf("state idle\n");
       unsigned char best_ap = find_best_ap();
       //printf("best ap: %x\n", best_ap);
-      if(tmp_counter == 20)
+      if(tmp_counter >= 20)
       {
         best_ap = 1;
       }
@@ -169,10 +169,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
           cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
-        output(0).push(p);
+
         printf("controller issu switch to ap %X\n", best_ap);
         state[0] = SWITCH_REQ;
         output_port[0] = best_ap;
+        output(0).push(p);
+        
       }
   }
   p_in -> kill();

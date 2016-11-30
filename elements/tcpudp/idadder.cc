@@ -78,6 +78,7 @@ void IDAdder::push(int port, Packet *p_in)
 		cp_ethernet_address(CONTROLLER_MAC, _ethh.ether_shost);
 		
 	}
+	printf("IDadder: counter: %X\n", counter);
 
 
 	_iph->ip_len = p_in->length()+sizeof(click_ip)+1;
@@ -110,9 +111,10 @@ void IDAdder::push(int port, Packet *p_in)
 	memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &counter, 1);
 	memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
 	memcpy(p->data(), &_ethh, sizeof(click_ether));
+	counter ++;
 	output(0).push(p);
 
-	counter ++;
+	
   
 }
 
