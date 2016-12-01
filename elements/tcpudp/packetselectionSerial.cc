@@ -33,6 +33,7 @@
 PacketSelectionSerial::PacketSelectionSerial()
 {
   int i,j;
+  interval = 20;
   score = new unsigned char*[n_ap];
   next_score_id = new unsigned char[n_ap];
   output_port = new unsigned char[n_client];
@@ -83,19 +84,16 @@ PacketSelectionSerial::~PacketSelectionSerial()
 
 
 
-// int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
-// {
-//   // if (Args(conf, this, errh)
-//   //     .read_p("ALPHA", DoubleArg(), alpha)
-//   //     .read_p("FRESHTIME", IntArg(), fresh_time)
-//   //     .read_p("BIGGERTIME", IntArg(), bigger_time)
-//   //     .read_p("FIX", IntArg(), fix)
-//   //     .complete() < 0)
-//   //   return -1;
+int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
+{
+  if (Args(conf, this, errh)
+      .read_p("INTERVAl", IntArg(), interval)
+      .complete() < 0)
+    return -1;
 
 
-//   return 0;
-// }
+  return 0;
+}
 
 void PacketSelectionSerial::push(int port, Packet *p_in)
 {
@@ -141,12 +139,13 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   {
       tmp_counter++;
       // printf("state idle\n");
-      unsigned char best_ap = find_best_ap();
-      printf("best ap: %x\n", best_ap);
-      if(tmp_counter >= 20)
-      {
-        best_ap = 1;
-      }
+      // unsigned char best_ap = find_best_ap();
+
+      // WGTT
+      unsigned char best_ap = output_port[0];
+      if(!(tmp_counter%interval))
+          best_ap = 1 - output_port[0];
+
       if(best_ap != output_port[0])
       {
         // send message

@@ -42,7 +42,7 @@ class PacketSelectionSerial : public Element { public:
     const char *port_count() const	{ return "1/1"; }
     const char *flags() const		{ return "A"; }
 
-    // int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
+    int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
    
     void push(int port, Packet *p_in);
     void push_control(Packet *p_in);
@@ -59,6 +59,7 @@ class PacketSelectionSerial : public Element { public:
     unsigned char *next_score_id;
     unsigned char *output_port;
     unsigned char control_content[2];
+    int interval;
 
     click_ip _iph;
     click_ether * _ethh;
