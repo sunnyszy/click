@@ -134,19 +134,19 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
 
-  // static unsigned char tmp_counter = 0;
+  static unsigned int tmp_counter = 0;
 
 
   if(state[0] == IDLE)
   {
-      // tmp_counter++;
+      tmp_counter++;
       // printf("state idle\n");
       unsigned char best_ap = find_best_ap();
-      //printf("best ap: %x\n", best_ap);
-      // if(tmp_counter >= 20)
-      // {
-      //   best_ap = 1;
-      // }
+      printf("best ap: %x\n", best_ap);
+      if(tmp_counter >= 20)
+      {
+        best_ap = 1;
+      }
       if(best_ap != output_port[0])
       {
         // send message
