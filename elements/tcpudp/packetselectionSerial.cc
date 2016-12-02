@@ -73,6 +73,7 @@ PacketSelectionSerial::PacketSelectionSerial()
   
   _ethh->ether_type = htons(0x0800);
   bool result = cp_ethernet_address(CONTROLLER_MAC, _ethh->ether_shost);
+
   printf("Packetselection: init finish, ready to start\n");
 
 }
@@ -86,25 +87,61 @@ PacketSelectionSerial::~PacketSelectionSerial()
 
 int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
 {
+  printf("PacketSelectionSerial in\n");
   if (Args(conf, this, errh)
-      .read_p("INTERVAl", IntArg(), interval)
+      .read_p("INTERVAL", IntArg(), interval)
       .complete() < 0)
     return -1;
 
-
+  printf("PacketSelectionSerial out. interval: %X\n", interval);
   return 0;
 }
 
 void PacketSelectionSerial::push(int port, Packet *p_in)
 {
+  static unsigned char lock = 0;
+
+  if(!lock)
+  { 
+    lock++;
+    reset_ap();
+  }
+
   // printf("pkt_type: %x\n", pkt_type(p_in));
   switch(pkt_type(p_in))
   {
     case CONTROL:  push_control(p_in);break;
     case STATUS:   push_status(p_in);break;
   }
+
 }
 
+void PacketSelectionSerial::reset_ap()
+{
+  for(int i=0;i<2;i++){ 
+  WritablePacket *p = Packet::make(sizeof(click_ether)+sizeof(click_ip)+2);
+  // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
+  // // data part
+  control_content[0] = 0xff;
+  control_content[1] = 0xff;
+  memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &control_content, 2);
+  // //ip part
+  _iph.ip_dst.s_addr = (i == 0)? AP1_IP : AP2_IP;
+
+  memcpy(p->data()+sizeof(click_ether), &_iph, sizeof(click_ip));
+  // p->set_ip_header(ip, sizeof(click_ip));
+  //ether part
+  if(i == 0)
+    cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);
+  else
+    cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);
+  memcpy(p->data(), _ethh, sizeof(click_ether));
+
+
+  printf("controller reset ap %X\n", i);
+  output(0).push(p);
+  }
+}
 
 
 void PacketSelectionSerial::push_control(Packet *p_in)

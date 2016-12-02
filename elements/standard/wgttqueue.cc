@@ -110,6 +110,20 @@ void WGTTQueue::push_control(Packet *p_in)
 {
     if(ap_id(p_in) == CONTROLLER)//stop
     {
+        if(ip_id(p_in) == 0xff)
+        {
+            printf("wgttQueue: receive reset req\n");
+            _tail = 0;
+            _head = 0;
+            _block = (identity == 1)? false:true;
+            for(unsigned int i=0;i<256;i++)
+            {   
+                if(_q[i] != 0)
+                    _q[i] -> kill();
+            }
+        }
+        else
+        {
         printf("wgttQueue: receive switch req\n");
         _block = true;
         const unsigned char & dst_ap_id = start_ap(p_in);
@@ -134,6 +148,7 @@ void WGTTQueue::push_control(Packet *p_in)
         p_in -> kill();
         printf("wgttQueue send ap-ap seq\n");
         checked_output_push(1, p);
+        }
         
     }
     else

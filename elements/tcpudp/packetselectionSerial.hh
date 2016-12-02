@@ -44,6 +44,7 @@ class PacketSelectionSerial : public Element { public:
 
     int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
    
+    void reset_ap();
     void push(int port, Packet *p_in);
     void push_control(Packet *p_in);
     void push_status(Packet *p_in);
