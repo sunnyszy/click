@@ -44,6 +44,7 @@ class CSISep : public Element { public:
   
   void push(int, Packet *);
   void fragment(Packet *);
+  int get_rssi();
   // int   open_csi_device();
   // void  close_csi_device(int fd);
   // int   read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE);

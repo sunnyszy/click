@@ -127,12 +127,12 @@ void WGTTQueue::push_control(Packet *p_in)
         printf("wgttQueue: receive switch req\n");
         _block = true;
         const unsigned char & dst_ap_id = start_ap(p_in);
-
         WritablePacket *p = Packet::make(sizeof(click_ether)+sizeof(click_ip)+2);
         // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
         // // data part
         control_content[0] = 135;
         control_content[1] = _head;
+        printf("wgttQueue: switch id: %X\n", _head);
         memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &control_content, 2);
         // //ip part
         switch(dst_ap_id)

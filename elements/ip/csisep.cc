@@ -22,6 +22,7 @@
 #include <click/args.hh>
 #include <click/error.hh>
 #include <click/glue.hh>
+#include "iwinfo.h"
 CLICK_DECLS
 
 CSISep::CSISep()
@@ -41,6 +42,7 @@ CSISep::CSISep()
     //     printf("little endian\n");
     sprintf(shellcmd,"iwinfo wlan1 info | grep 'Signal'");
     sample_counter = 0;
+    printf("CSISep: finish init\n");
     // total_msg_cnt = 0;
 
 }
@@ -103,11 +105,56 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
 //     csi_status->rssi_2    = buf_addr[22];
 // }
 
+int CSISep::get_rssi()
+{
+    printf("In get_rssi\n");
+    int i, rv = 0, len;
+    const struct iwinfo_ops *iw;
+    char buf[IWINFO_BUFSIZE];
+    struct iwinfo_assoclist_entry *e;
+    const char ifname[6] = "wlan1"; 
 
+    iw = iwinfo_backend(ifname);
+    
+
+    if (!iw)
+    {
+        rv = 1;
+    }
+    else
+    {
+        if (iw->assoclist(ifname, buf, &len))
+        {
+            rv = 2;
+        }
+        else if (len <= 0)
+        {
+            rv = 3;
+        }
+        else
+        {
+            for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
+            {
+                e = (struct iwinfo_assoclist_entry *) &buf[i];
+
+                printf("RateSignal: %d\n", e->signal);
+                printf("RateNoise: %d\n", e->noise);
+                printf("RateRXRaw: %d\n", e->rx_rate);
+                printf("RateTXRaw: %d\n", e->tx_rate);
+            }
+            rv = 0;
+        }
+    }
+
+    iwinfo_finish();
+
+    return rv;
+}
 
 void
 CSISep::fragment(Packet *p_in)
 {
+    get_rssi();
     sample_counter ++;
     if(sample_counter>sample_rate)
     {
@@ -136,6 +183,7 @@ CSISep::fragment(Packet *p_in)
     }
     }
     
+    // printf("CSISep: out fragment\n");
     output(0).push(p_in);
         
 }
@@ -143,10 +191,11 @@ CSISep::fragment(Packet *p_in)
 void
 CSISep::push(int, Packet *p)
 {
+    // printf("CSISep: in push\n");
 	fragment(p);
 }
 
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(CSISep)
-ELEMENT_MT_SAFE(CSISep)
+ELEMENT_LIBS(-L/Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib -liwinfo)
