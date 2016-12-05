@@ -29,18 +29,12 @@ CLICK_DECLS
 
 CSISep::CSISep()
 {
-#ifndef __APPLE__ 
-
-    iw = iwinfo_backend(ifname);
-    if (!iw)
-        printf("CSISep: can not connect to backend iwinfo\n");
-    if (iw->assoclist(ifname, buf, &len))
-        printf("CSISep: can not find associlist\n");
-    else if (len <= 0)
-        printf("CSISep: associ number < 0\n");
+#ifndef __APPLE__
+    strcpy(ifname, "wlan0");
     printf("CSISep: finish init\n");
     // total_msg_cnt = 0;
-#endif
+#endif 
+
 }
 
 CSISep::~CSISep()
@@ -53,20 +47,30 @@ CSISep::~CSISep()
 int
 CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  if (Args(conf, this, errh)
+    if (Args(conf, this, errh)
       .read_p("SAMPLERATE", IntArg(), sample_rate)
       .complete() < 0)
     return -1;
-  printf("CSISep: finish configure, ready to start\n");
-  return 0;
+
+#ifndef __APPLE__ 
+
+    iw = iwinfo_backend(ifname);
+    if (!iw)
+        printf("CSISep: can not connect to backend iwinfo\n");
+    if (iw->assoclist(ifname, buf, &len))
+        printf("CSISep: can not find associlist\n");
+    else if (len <= 0)
+        printf("CSISep: associ number < 0\n");
+#endif
+    printf("CSISep: finish configure, ready to start\n");
+    return 0;
 }
 
 void
 CSISep::fragment(Packet *p_in)
 {
 #ifndef __APPLE__ 
-    int i;
-    get_rssi();
+    // int i;
     sample_counter ++;
     if(sample_counter>sample_rate)
     {
@@ -74,9 +78,9 @@ CSISep::fragment(Packet *p_in)
 
         if(len>0)
         {
-            WritablePacket *p_csi = Packet::make(sizeof(iwinfo_associlist_entry)*len);
+            WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*len);
 
-            memcpy(p_csi->data(), buf, sizeof(iwinfo_assoclist_entry)*len);
+            memcpy(p_csi->data(), buf, sizeof(my_test_struct)*len);
             output(1).push(p_csi);
             // for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
             // {

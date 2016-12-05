@@ -4,14 +4,14 @@
 #include <click/etheraddress.hh>
 #ifdef __linux__
 #include <linux/types.h>
-#include <linux/if.h>
-#include <linux/wireless.h>
+// #include <linux/if.h>
+// #include <linux/wireless.h>
 #else
 /* OpenBSD 2.9 doesn't protect <net/if.h> from multiple inclusion, but
    later versions do */
 #ifndef CLICK_NET_IF_H
 #define CLICK_NET_IF_H
-#include <net/if.h>
+// #include <net/if.h>
 #endif
 #endif
 CLICK_DECLS
@@ -69,12 +69,12 @@ private:
   int _fd;
   String _ifname;
 
-#ifdef __linux__
-  struct iwreq _ifr;
-  struct ifreq _ifr2;
-#else
-  struct ifreq _ifr;
-#endif
+// #ifdef __linux__
+//   struct iwreq _ifr;
+//   struct ifreq _ifr2;
+// #else
+//   struct ifreq _ifr;
+// #endif
 
 };
 

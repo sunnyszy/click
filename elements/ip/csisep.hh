@@ -13,6 +13,17 @@ extern "C"
 }
 #endif
 
+struct my_test_struct {
+  uint8_t mac[6];
+  int8_t signal;
+  int8_t noise;
+  // uint32_t inactive;
+  // uint32_t rx_packets;
+  // uint32_t tx_packets;
+  // struct iwinfo_rate_entry rx_rate;
+  // struct iwinfo_rate_entry tx_rate;
+};
+
 
 CLICK_DECLS
 
@@ -29,7 +40,6 @@ class CSISep : public Element { public:
   
   void push(int, Packet *);
   void fragment(Packet *);
-  int get_rssi();
 
  private:
 
@@ -40,7 +50,7 @@ class CSISep : public Element { public:
   int len;
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];
-  const char ifname[6] = "wlan1";
+  char ifname[6];
 #endif 
 
 
