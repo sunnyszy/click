@@ -166,6 +166,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   // printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   // printf("next_score_id[a]: %x\n", next_score_id[a]);
   score[a][next_score_id[a]] = ap_score(p_in);
+  printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
 

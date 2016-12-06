@@ -28,7 +28,7 @@ CLICK_DECLS
 #define pkt_type(p) *(p->data()+9)
 #define ip_id(p) *(p->data()+20)
 #define ap_id(p) *(p->data()+15)
-#define ap_score(p) *(p->data()+20)
+#define ap_score(p) *(p->data()+26)
 
 
 
