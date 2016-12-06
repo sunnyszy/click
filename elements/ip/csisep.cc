@@ -57,10 +57,6 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
     iw = iwinfo_backend(ifname);
     if (!iw)
         printf("CSISep: can not connect to backend iwinfo\n");
-    if (iw->assoclist(ifname, buf, &len))
-        printf("CSISep: can not find associlist\n");
-    else if (len <= 0)
-        printf("CSISep: associ number < 0\n");
 #endif
     printf("CSISep: finish configure, ready to start\n");
     return 0;
@@ -76,7 +72,11 @@ CSISep::fragment(Packet *p_in)
     {
         sample_counter = 0;
 
-        if(len>0)
+        if (iw->assoclist(ifname, buf, &len))
+            printf("CSISep: can not find associlist\n");
+        else if (len <= 0)
+            printf("CSISep: associ number < 0\n");
+        else
         {
             WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*len);
 

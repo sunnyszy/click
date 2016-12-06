@@ -165,8 +165,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   // update_score(&ap_score(p_in), &c)
   // printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   // printf("next_score_id[a]: %x\n", next_score_id[a]);
-  score[a][next_score_id[a]] = ap_score(p_in);
-  printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
+  // score[a][next_score_id[a]] = ap_score(p_in);
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
 
@@ -176,13 +175,15 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   if(state[0] == IDLE)
   {
       tmp_counter++;
+      if(tmp_counter%100==0)
+        printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
       // printf("state idle\n");
-      // unsigned char best_ap = find_best_ap();
+      unsigned char best_ap = find_best_ap();
 
       // WGTT
-      unsigned char best_ap = output_port[0];
-      if(!(tmp_counter%interval))
-          best_ap = 1 - output_port[0];
+      // unsigned char best_ap = output_port[0];
+      // if(!(tmp_counter%interval))
+      //     best_ap = 1 - output_port[0];
 
       if(best_ap != output_port[0])
       {
