@@ -5,6 +5,7 @@
 #include <click/atomic.hh>
 #include <fcntl.h>
 #include <unistd.h>
+#include <clicknet/wgtt.h>
 
 #ifndef __APPLE__
 extern "C"
@@ -49,6 +50,7 @@ class CSISep : public Element { public:
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];
   char ifname[6];
+  struct iwinfo_assoclist_entry *e;
 #endif 
 
 

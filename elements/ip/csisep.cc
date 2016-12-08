@@ -91,14 +91,16 @@ CSISep::fragment(Packet *p_in)
             for (i = 0; i < N_CLIENT; i += sizeof(struct iwinfo_assoclist_entry))
             {
                     e = (struct iwinfo_assoclist_entry *) &buf[i];
-                    memcpy(p_csi->data()+j, &(e->signal), sizeof(my_test_struct.signal));
-                    j += sizeof(my_test_struct.signal);
-                    memcpy(p_csi->data()+j, &(e->noise), sizeof(my_test_struct.noise));
-                    j += sizeof(my_test_struct.noise);
-                    memcpy(p_csi->data()+j, &((e->rx_rate).rate), sizeof(my_test_struct.rx_rate));
-                    j += sizeof(my_test_struct.rx_rate);
-                    memcpy(p_csi->data()+j, &((e->tx_rate).rate), sizeof(my_test_struct.tx_rate));
-                    j += sizeof(my_test_struct.tx_rate);
+                    memcpy(p_csi->data()+j, &(e->mac[5]), sizeof(uint8_t));
+                    j += sizeof(uint8_t);
+                    memcpy(p_csi->data()+j, &(e->signal), sizeof(int8_t));
+                    j += sizeof(int8_t);
+                    memcpy(p_csi->data()+j, &(e->noise), sizeof(int8_t));
+                    j += sizeof(int8_t);
+                    memcpy(p_csi->data()+j, &((e->rx_rate).rate), sizeof(uint32_t));
+                    j += sizeof(uint32_t);
+                    memcpy(p_csi->data()+j, &((e->tx_rate).rate), sizeof(uint32_t));
+                    j += sizeof(uint32_t);
 
                     printf("RateSignal: %d\n", e->signal);
                     printf("RateNoise: %d\n", e->noise);
