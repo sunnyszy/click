@@ -33,7 +33,6 @@ IDAdder::IDAdder()
 {
 	// printf("idadder in init\n");
 	counter = 0;
-	_iph = (click_ip*)CLICK_LALLOC(sizeof(click_ip));
 	
 	printf("idadder init finish\n");
 
@@ -49,18 +48,6 @@ IDAdder::~IDAdder()
 int
 IDAdder::initialize(ErrorHandler *errh)
 {
-
-	memset(_iph, 0, sizeof(click_ip));
-	_iph->ip_v = 4;
-	_iph->ip_hl = sizeof(click_ip) >> 2;
-	_iph->ip_ttl = 250;
-	_iph->ip_src.s_addr = CONTROLLER_IP;
-	_iph->ip_p = DATA;//data msg   
-	_iph->ip_tos = 0;
-	_iph->ip_off = 0;
-	_iph->ip_sum = 0;
-	
-
     
     printf("idadder initial finish, ready to start\n");
     return 0;
@@ -70,52 +57,40 @@ IDAdder::initialize(ErrorHandler *errh)
 void IDAdder::push(int port, Packet *p_in)
 {
 	// printf("idadder in push\n");
-	static unsigned char tmp_counter = 0;
-	if(tmp_counter ==0)
+	static bool lock = false;
+	if(!false)
 	{
-		tmp_counter++;
-		_ethh.ether_type = htons(0x0800);
-		cp_ethernet_address(CONTROLLER_MAC, _ethh.ether_shost);
-		
+		lock = true;
+		_ethh.ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
+		cp_ethernet_address(CONTROLLER_IN_MAC, _ethh.ether_shost);
 	}
 	// printf("IDadder: counter: %X\n", counter);
 
-
-	_iph->ip_len = p_in->length()+sizeof(click_ip)+1;
-	p_in->push(sizeof(click_ip)+sizeof(click_ether)+1);
-	for(int i = 0;i<1;i++)
+	p_in->push(sizeof(click_ether)+1);
+	for(int i = 1;i<N_AP;i++)
 	{	
 		Packet *p_tmp = p_in->clone();
 		WritablePacket *p = p_tmp->uniqueify();
 
-		if(i == 0)
-		{
-			_iph->ip_dst.s_addr = AP1_IP;
-			cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);
-		}
-		else
-		{
-			_iph->ip_dst.s_addr = AP2_IP;
-			cp_ethernet_address(AP2_MAC, _ethh.ether_dhost);
-		}
-		memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &counter, 1);
-		memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
+		switch(i)
+        {
+          case 0:cp_ethernet_address(AP0_MAC, _ethh.ether_dhost);break;
+          case 1:cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);break;
+          case 2:cp_ethernet_address(AP2_MAC, _ethh.ether_dhost);break;
+        }
+
+		memcpy(p->data()+sizeof(click_ether), &counter, 1);
 		memcpy(p->data(), &_ethh, sizeof(click_ether));
 		// printf("idadder push %dth\n", i);
 		output(0).push(p);
 	}
 
 	WritablePacket *p = p_in->uniqueify();
-	_iph->ip_dst.s_addr = AP2_IP;
-	cp_ethernet_address(AP2_MAC, _ethh.ether_dhost);
-	memcpy(p->data()+sizeof(click_ether)+sizeof(click_ip), &counter, 1);
-	memcpy(p->data()+sizeof(click_ether), _iph, sizeof(click_ip));
+	cp_ethernet_address(AP0_MAC, _ethh.ether_dhost);
+	memcpy(p->data()+sizeof(click_ether), &counter, 1);
 	memcpy(p->data(), &_ethh, sizeof(click_ether));
 	counter ++;
 	output(0).push(p);
-
-	
-  
 }
 
 

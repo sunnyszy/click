@@ -14,14 +14,12 @@ extern "C"
 #endif
 
 struct my_test_struct {
-  uint8_t mac[6];
+  uint8_t mac;
   int8_t signal;
   int8_t noise;
-  // uint32_t inactive;
-  // uint32_t rx_packets;
-  // uint32_t tx_packets;
-  // struct iwinfo_rate_entry rx_rate;
-  // struct iwinfo_rate_entry tx_rate;
+  uint32_t rx_rate;
+  uint32_t tx_rate;
+  
 };
 
 
