@@ -74,9 +74,9 @@ void IDAdder::push(int port, Packet *p_in)
 
 		switch(i)
         {
-          case 0:cp_ethernet_address(AP0_MAC, _ethh.ether_dhost);break;
-          case 1:cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);break;
-          case 2:cp_ethernet_address(AP2_MAC, _ethh.ether_dhost);break;
+          case 0:cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);break;
+          case 1:cp_ethernet_address(AP2_MAC, _ethh.ether_dhost);break;
+          case 2:cp_ethernet_address(AP3_MAC, _ethh.ether_dhost);break;
         }
 
 		memcpy(p->data()+sizeof(click_ether), &counter, 1);
@@ -86,7 +86,7 @@ void IDAdder::push(int port, Packet *p_in)
 	}
 
 	WritablePacket *p = p_in->uniqueify();
-	cp_ethernet_address(AP0_MAC, _ethh.ether_dhost);
+	cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);
 	memcpy(p->data()+sizeof(click_ether), &counter, 1);
 	memcpy(p->data(), &_ethh, sizeof(click_ether));
 	counter ++;

@@ -66,9 +66,9 @@ WGTTQueue::initialize(ErrorHandler *errh)
     {
         switch(identity)
         {
-            case 0: cp_ethernet_address(AP0_MAC, _ethh[i].ether_shost);break;
-            case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
-            case 2: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+            case 0: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
+            case 1: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+            case 2: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
         }
     }
 
@@ -97,7 +97,7 @@ void WGTTQueue::push_control(Packet *p_in)
 {
     if(status_ap(p_in) == CONTROLLER_IN_MAC_SUFFIX)//stop
     {
-        if(client_ip(p_in) == 0xff)
+        if(client_ip(p_in) == RESET_CONTENT)
         {
             printf("wgttQueue: receive reset req\n");
             _tail = 0;

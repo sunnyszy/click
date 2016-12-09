@@ -113,9 +113,9 @@ void PacketSelectionSerial::reset_ap()
   //ether part
   switch(i)
   {
-    case 0:cp_ethernet_address(AP0_MAC, _ethh->ether_dhost);break;
-    case 1:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
-    case 2:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+    case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+    case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+    case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_dhost);break;
   }
   
   memcpy(p->data(), _ethh, sizeof(click_ether));
@@ -129,7 +129,7 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 {
   const unsigned char & c = client_ip(p_in);
   printf("switch request ack ip: %X.\n", c);
-  state[c-CLIENT0_IP_SUFFIX] = IDLE;
+  state[c-CLIENT1_IP_SUFFIX] = IDLE;
   printf("switch request ack.\n");
   p_in -> kill();
 }
@@ -137,7 +137,7 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 void PacketSelectionSerial::push_status(Packet *p_in)
 {
   //printf("In push status.\n");
-  const unsigned char &a = status_ap(p_in);
+  unsigned char a = status_ap(p_in) - 1;
   // printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   // printf("next_score_id[a]: %x\n", next_score_id[a]);
   //since the score are minus, we minus again
@@ -169,20 +169,20 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
         // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
         // // data part
-        control_content[0] = 0;
+        control_content[0] = 135;
         control_content[1] = best_ap;
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         //ether part
         switch(best_ap)
         {
-          case 0:cp_ethernet_address(AP0_MAC, _ethh->ether_dhost);break;
-          case 1:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
-          case 2:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+          case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+          case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+          case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_dhost);break;
         }
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
 
-        printf("controller issu switch to ap %X\n", best_ap);
+        printf("controller issu switch to ap %X\n", best_ap+1);
         state[0] = SWITCH_REQ;
         output_port[0] = best_ap;
         output(0).push(p);

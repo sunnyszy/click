@@ -18,24 +18,25 @@
 #define SWITCH_REQ 1
 
 // client 1 ip
-#define CLIENT0_IP_SUFFIX 135
+#define N_CLIENT 1
+#define CLIENT1_IP_SUFFIX 135
 
 // ap 
-#define AP0_IP_SUFFIX 0
+#define N_AP 3
 #define AP1_IP_SUFFIX 1
 #define AP2_IP_SUFFIX 2
+#define AP3_IP_SUFFIX 3
 
 // controller
 #define CONTROLLER_IN_IP_SUFFIX 68
-#define AP0_MAC "70:88:6b:80:60:00"
 #define AP1_MAC "70:88:6b:80:60:01"
 #define AP2_MAC "70:88:6b:80:60:02"
+#define AP3_MAC "70:88:6b:80:60:03"
 #define CONTROLLER_IN_MAC "70:88:6b:80:60:7d"
 #define CONTROLLER_IN_MAC_SUFFIX 0x7d
 
 #define RING_SIZE 256
-#define N_CLIENT 1
-#define N_AP 3
+
 
 #define RESET_CONTENT 0xff
 
