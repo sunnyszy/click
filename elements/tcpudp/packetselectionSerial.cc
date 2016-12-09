@@ -158,9 +158,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
       unsigned char best_ap = find_best_ap();
 
       // WGTT
-      // unsigned char best_ap = output_port[0];
-      // if(!(tmp_counter%interval))
-      //     best_ap = 1 - output_port[0];
+      if(interval>0)
+      {
+        best_ap = output_port[0];
+        if(!(tmp_counter%interval))
+            best_ap = 1 - output_port[0];
+      }
 
       if(best_ap != output_port[0])
       {

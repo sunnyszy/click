@@ -22,7 +22,7 @@
 #define CLIENT1_IP_SUFFIX 135
 
 // ap 
-#define N_AP 3
+#define N_AP 2
 #define AP1_IP_SUFFIX 1
 #define AP2_IP_SUFFIX 2
 #define AP3_IP_SUFFIX 3
