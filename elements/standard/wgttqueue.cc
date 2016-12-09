@@ -66,9 +66,9 @@ WGTTQueue::initialize(ErrorHandler *errh)
     {
         switch(identity)
         {
-            case 0: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
-            case 1: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
-            case 2: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
+            case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
+            case 2: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+            case 3: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
         }
     }
 

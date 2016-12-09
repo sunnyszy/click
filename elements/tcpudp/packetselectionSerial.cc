@@ -141,8 +141,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   // printf("ap id: %x, score: %x\n", ap_id(p_in), ap_score(p_in));
   // printf("next_score_id[a]: %x\n", next_score_id[a]);
   //since the score are minus, we minus again
-  score[a][next_score_id[a]] = - ap_score(p_in);
+  score[a][next_score_id[a]] = - status_score(p_in);
+  printf("current mac: %X\n", status_mac(p_in));
   printf("current score: %d\n", score[a][next_score_id[a]]);
+  printf("current noise: %d\n", status_noise(p_in));
+  printf("current rx_rate: %d\n", status_rxrate(p_in));
+  printf("current tx_rate: %d\n", status_txrate(p_in));
   next_score_id[a] = (next_score_id[a] + 1)%n_compare;
   // able to change state
 
@@ -153,7 +157,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   {
       tmp_counter++;
       if(tmp_counter%100==0)
-        printf("ap id: %x, score: %x\n", status_ap(p_in), ap_score(p_in));
+        printf("ap id: %x, score: %x\n", status_ap(p_in), status_score(p_in));
       // printf("state idle\n");
       unsigned char best_ap = find_best_ap();
 

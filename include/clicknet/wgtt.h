@@ -45,9 +45,12 @@
 #define client_ip(p) *(p->data()+14)
 #define status_ap(p) *(p->data()+11)
 
-#define ap_score(p) *((char *)(p->data()+15))
-#define ap_noise(p) *((char *)(p->data()+16))
-// #define ip_id(p) *(p->data()+20)
+#define status_mac(p) *((unsigned char *)(p->data()+14))
+#define status_score(p) *((char *)(p->data()+15))
+#define status_noise(p) *((char *)(p->data()+16))
+#define status_rxrate(p) *((int *)(p->data()+17))
+#define status_txrate(p) *((int *)(p->data()+21))
+#define ip_id(p) *(p->data()+20)
 
 
 #define start_ap(p) *(p->data()+15)

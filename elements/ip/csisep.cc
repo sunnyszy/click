@@ -57,7 +57,7 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
     if(wlan_port == 0)
         strcpy(ifname, "wlan0");
     else if(wlan_port == 1)
-        strcpy(ifname, "wlan0");
+        strcpy(ifname, "wlan1");
     else
         printf("Invalid wlan_port argument\n");
     iw = iwinfo_backend(ifname);
@@ -84,29 +84,50 @@ CSISep::fragment(Packet *p_in)
             printf("CSISep: associ number < 0\n");
         else
         {
-            WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
-
-            
-            output(1).push(p_csi);
+            // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
+            WritablePacket *p_csi = Packet::make(11*N_CLIENT);
             for (i = 0; i < N_CLIENT; i += sizeof(struct iwinfo_assoclist_entry))
             {
-                    e = (struct iwinfo_assoclist_entry *) &buf[i];
-                    memcpy(p_csi->data()+j, &(e->mac[5]), sizeof(uint8_t));
-                    j += sizeof(uint8_t);
-                    memcpy(p_csi->data()+j, &(e->signal), sizeof(int8_t));
-                    j += sizeof(int8_t);
-                    memcpy(p_csi->data()+j, &(e->noise), sizeof(int8_t));
-                    j += sizeof(int8_t);
-                    memcpy(p_csi->data()+j, &((e->rx_rate).rate), sizeof(uint32_t));
-                    j += sizeof(uint32_t);
-                    memcpy(p_csi->data()+j, &((e->tx_rate).rate), sizeof(uint32_t));
-                    j += sizeof(uint32_t);
+                e = (struct iwinfo_assoclist_entry *) &buf[i];
+                uint8_t & mac = e->mac[5];
+                int8_t & signal = e->signal;
+                int8_t & noise = e->noise;
+                uint32_t & rx_rate = e->rx_rate;
+                uint32_t & tx_rate = e->tx_rate;
 
+                memcpy(p_csi->data()+j, &(mac), 1);
+                j += 1;
+                memcpy(p_csi->data()+j, &(signal), 1);
+                j += 1;
+                memcpy(p_csi->data()+j, &(noise), 1);
+                j += 1;
+                memcpy(p_csi->data()+j, &(tx_rate), 4);
+                j += 4;
+                memcpy(p_csi->data()+j, &(rx_rate), 4);
+                j += 4;
+
+
+                    
+                    // memcpy(p_csi->data()+j, &(e->mac[5]), sizeof(uint8_t));
+                    // j += sizeof(uint8_t);
+                    // memcpy(p_csi->data()+j, &(e->signal), sizeof(int8_t));
+                    // j += sizeof(int8_t);
+                    // memcpy(p_csi->data()+j, &(e->noise), sizeof(int8_t));
+                    // j += sizeof(int8_t);
+                    // memcpy(p_csi->data()+j, &((e->rx_rate).rate), sizeof(uint32_t));
+                    // j += sizeof(uint32_t);
+                    // memcpy(p_csi->data()+j, &((e->tx_rate).rate), sizeof(uint32_t));
+                    // j += sizeof(uint32_t);
+
+                    // printf("Status[0]: %X\n", p_csi->data());
                     printf("RateSignal: %d\n", e->signal);
+                    // printf("Status[1]: %X\n", p_csi->data()+1);
                     printf("RateNoise: %d\n", e->noise);
+                    // printf("Status[2]: %X\n", p_csi->data()+1);
                     printf("RateRXRaw: %d\n", e->rx_rate);
                     printf("RateTXRaw: %d\n", e->tx_rate);
-            }    
+            }   
+            output(1).push(p_csi); 
         }
     }
 #endif    
