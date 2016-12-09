@@ -20,18 +20,31 @@
 // client 1 ip
 #define N_CLIENT 1
 #define CLIENT1_IP_SUFFIX 135
+#define CLIENT2_IP_SUFFIX 136
 
 // ap 
-#define N_AP 2
+#define MAX_N_AP 8
+#define N_AP 3
 #define AP1_IP_SUFFIX 1
 #define AP2_IP_SUFFIX 2
 #define AP3_IP_SUFFIX 3
+#define AP4_IP_SUFFIX 4
+#define AP5_IP_SUFFIX 5
+#define AP6_IP_SUFFIX 6
+#define AP7_IP_SUFFIX 7
+#define AP8_IP_SUFFIX 8
 
 // controller
 #define CONTROLLER_IN_IP_SUFFIX 68
 #define AP1_MAC "70:88:6b:80:60:01"
 #define AP2_MAC "70:88:6b:80:60:02"
 #define AP3_MAC "70:88:6b:80:60:03"
+#define AP4_MAC "70:88:6b:80:60:04"
+#define AP5_MAC "70:88:6b:80:60:05"
+#define AP6_MAC "70:88:6b:80:60:06"
+#define AP7_MAC "70:88:6b:80:60:07"
+#define AP8_MAC "70:88:6b:80:60:08"
+
 #define CONTROLLER_IN_MAC "70:88:6b:80:60:7d"
 #define CONTROLLER_IN_MAC_SUFFIX 0x7d
 

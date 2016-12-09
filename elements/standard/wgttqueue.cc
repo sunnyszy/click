@@ -26,7 +26,7 @@ WGTTQueue::WGTTQueue()
 {
     _head = 0;
     _tail = 0;
-    _ethh = new click_ether[N_AP+1];
+    _ethh = new click_ether[M_N_AP+1];
     _q = (Packet **) CLICK_LALLOC(sizeof(Packet *) * RING_SIZE);
     printf("wgtt init succeed\n");
 }
@@ -62,13 +62,18 @@ WGTTQueue::initialize(ErrorHandler *errh)
     _ethh->ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
     // printf("identity: %X\n", identity);
 
-    for(int i=0; i < N_AP+1; i++)
+    for(int i=0; i < M_N_AP+1; i++)
     {
         switch(identity)
         {
             case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
             case 2: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
             case 3: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
+            case 4: cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
+            case 5: cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
+            case 6: cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
+            case 7: cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
+            case 8: cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
         }
     }
 
@@ -121,12 +126,7 @@ void WGTTQueue::push_control(Packet *p_in)
         printf("wgttQueue: switch id: %X\n", _head);
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         // //ip part
-        switch(dst_ap)
-        {
-            case 0: memcpy(p->data(), &(_ethh[0]), sizeof(click_ether));break;
-            case 1: memcpy(p->data(), &(_ethh[1]), sizeof(click_ether));break;
-            case 2: memcpy(p->data(), &(_ethh[2]), sizeof(click_ether));break;
-        }
+        memcpy(p->data(), &(_ethh[dst_ap]), sizeof(click_ether));
 
         p_in -> kill();
         printf("wgttQueue send ap-ap seq\n");
@@ -158,7 +158,7 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         
         //ether part
-        memcpy(p->data(), &(_ethh[N_AP]), sizeof(click_ether));
+        memcpy(p->data(), &(_ethh[M_N_AP]), sizeof(click_ether));
 
         p_in -> kill();
         // printf("ap-c packet push\n");
