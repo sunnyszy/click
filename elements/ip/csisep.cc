@@ -92,9 +92,11 @@ CSISep::fragment(Packet *p_in)
                 uint8_t & mac = e->mac[5];
                 int8_t & signal = e->signal;
                 int8_t & noise = e->noise;
-                uint32_t & rx_rate = e->rx_rate;
-                uint32_t & tx_rate = e->tx_rate;
+                uint32_t & rx_rate = (e->rx_rate).rate;
+                uint32_t & tx_rate = (e->tx_rate).rate;
 
+                // printf("rx_rate: %d\n", rx_rate);
+                // printf("tx_rate: %d\n", tx_rate);
                 memcpy(p_csi->data()+j, &(mac), 1);
                 j += 1;
                 memcpy(p_csi->data()+j, &(signal), 1);
@@ -105,27 +107,10 @@ CSISep::fragment(Packet *p_in)
                 j += 4;
                 memcpy(p_csi->data()+j, &(rx_rate), 4);
                 j += 4;
-
-
-                    
-                    // memcpy(p_csi->data()+j, &(e->mac[5]), sizeof(uint8_t));
-                    // j += sizeof(uint8_t);
-                    // memcpy(p_csi->data()+j, &(e->signal), sizeof(int8_t));
-                    // j += sizeof(int8_t);
-                    // memcpy(p_csi->data()+j, &(e->noise), sizeof(int8_t));
-                    // j += sizeof(int8_t);
-                    // memcpy(p_csi->data()+j, &((e->rx_rate).rate), sizeof(uint32_t));
-                    // j += sizeof(uint32_t);
-                    // memcpy(p_csi->data()+j, &((e->tx_rate).rate), sizeof(uint32_t));
-                    // j += sizeof(uint32_t);
-
-                    // printf("Status[0]: %X\n", p_csi->data());
-                    printf("RateSignal: %d\n", e->signal);
-                    // printf("Status[1]: %X\n", p_csi->data()+1);
-                    printf("RateNoise: %d\n", e->noise);
-                    // printf("Status[2]: %X\n", p_csi->data()+1);
-                    printf("RateRXRaw: %d\n", e->rx_rate);
-                    printf("RateTXRaw: %d\n", e->tx_rate);
+                // printf("RateSignal: %d\n", e->signal);
+                // printf("RateNoise: %d\n", e->noise);
+                // printf("RateRXRaw: %d\n", (e->rx_rate).rate);
+                // printf("RateTXRaw: %d\n", (e->tx_rate).rate);
             }   
             output(1).push(p_csi); 
         }
