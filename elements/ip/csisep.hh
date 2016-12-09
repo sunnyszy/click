@@ -7,11 +7,11 @@
 #include <unistd.h>
 #include <clicknet/wgtt.h>
 
-#ifndef __APPLE__
-extern "C"
-{
-    #include "iwinfo.h"
-}
+#ifdef __arm__
+  extern "C"
+  {
+      #include "iwinfo.h"
+  }
 #endif
 
 struct my_test_struct {
@@ -45,7 +45,7 @@ class CSISep : public Element { public:
   int sample_rate;
   int sample_counter;
 
-#ifndef __APPLE__
+#ifdef __arm__
   int len;
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];

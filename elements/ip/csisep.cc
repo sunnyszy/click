@@ -29,7 +29,7 @@ CLICK_DECLS
 
 CSISep::CSISep()
 {
-#ifndef __APPLE__
+#ifdef __arm__
     printf("CSISep: finish init\n");
     // total_msg_cnt = 0;
 #endif 
@@ -38,7 +38,7 @@ CSISep::CSISep()
 
 CSISep::~CSISep()
 {
-#ifndef __APPLE__ 
+#ifdef __arm__ 
     iwinfo_finish();
 #endif
 }
@@ -53,7 +53,7 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
       .complete() < 0)
     return -1;
 
-#ifndef __APPLE__ 
+#ifdef __arm__ 
     if(wlan_port == 0)
         strcpy(ifname, "wlan0");
     else if(wlan_port == 1)
@@ -71,7 +71,7 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
 void
 CSISep::fragment(Packet *p_in)
 {
-#ifndef __APPLE__ 
+#ifdef __arm__ 
     int i, j=0;
     sample_counter ++;
     if(sample_counter>sample_rate)
@@ -117,7 +117,7 @@ CSISep::fragment(Packet *p_in)
 void
 CSISep::push(int, Packet *p)
 {
-#ifndef __APPLE__ 
+#ifdef __arm__ 
     // printf("CSISep: in push\n");
 	fragment(p);
 #endif
@@ -127,7 +127,4 @@ CSISep::push(int, Packet *p)
 CLICK_ENDDECLS
 EXPORT_ELEMENT(CSISep)
 ELEMENT_MT_SAFE(CSISep)
-#ifndef __APPLE__ 
-ELEMENT_LIBS(-L/Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib -liwinfo)
-#endif
 

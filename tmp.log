@@ -1,0 +1,137 @@
+rm: ./bin/click: No such file or directory
+  LINK click
+ld: warning: ld: warning: ignoring file /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libpcap.so, file was built for unsupported file format ( 0x7F 0x45 0x4C 0x46 0x01 0x01 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 ) which is not the architecture being linked (x86_64): /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libpcap.soignoring file /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libiwinfo.so, file was built for unsupported file format ( 0x7F 0x45 0x4C 0x46 0x01 0x01 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 ) which is not the architecture being linked (x86_64): /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libiwinfo.so
+
+Undefined symbols for architecture x86_64:
+  "_pcap_activate", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_close", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+      FromDevice::cleanup(Element::CleanupStage) in fromdevice.o
+      IPFlowRawSockets::Flow::~Flow() in ipflowrawsockets.o
+      IPFlowRawSockets::Flow::~Flow() in ipflowrawsockets.o
+      IPFlowRawSockets::end_flow(IPFlowRawSockets::Flow*, ErrorHandler*) in ipflowrawsockets.o
+      IPFlowRawSockets::find_aggregate(unsigned int, Packet const*) in ipflowrawsockets.o
+      ToDevice::cleanup(Element::CleanupStage) in todevice.o
+      ...
+  "_pcap_compile", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_create", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_datalink", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_dispatch", referenced from:
+      FromDevice::selected(int, int) in fromdevice.o
+      FromDevice::run_task(Task*) in fromdevice.o
+      IPFlowRawSockets::selected(int, int) in ipflowrawsockets.o
+  "_pcap_fileno", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+      ToDevice::initialize(ErrorHandler*) in todevice.o
+  "_pcap_geterr", referenced from:
+      FromDevice::fetch_pcap_error(pcap*, char const*) in fromdevice.o
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      FromDevice::selected(int, int) in fromdevice.o
+      FromDevice::run_task(Task*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_inject", referenced from:
+      ToDevice::send_packet(Packet*) in todevice.o
+  "_pcap_lookupnet", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_open_live", referenced from:
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_set_datalink", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_set_immediate_mode", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_promisc", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_snaplen", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_timeout", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_setdirection", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_setfilter", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_setnonblock", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_stats", referenced from:
+      FromDevice::kernel_drops(bool&, int&) const in fromdevice.o
+      FromDevice::read_handler(Element*, void*) in fromdevice.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [click] Error 1
+make: *** [userlevel] Error 2
+  LINK click
+ld: warning: ignoring file /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libpcap.so, file was built for unsupported file format ( 0x7F 0x45 0x4C 0x46 0x01 0x01 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 ) which is not the architecture being linked (x86_64): /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libpcap.so
+ld: warning: ignoring file /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libiwinfo.so, file was built for unsupported file format ( 0x7F 0x45 0x4C 0x46 0x01 0x01 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 ) which is not the architecture being linked (x86_64): /Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib/libiwinfo.so
+Undefined symbols for architecture x86_64:
+  "_pcap_activate", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_close", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+      FromDevice::cleanup(Element::CleanupStage) in fromdevice.o
+      IPFlowRawSockets::Flow::~Flow() in ipflowrawsockets.o
+      IPFlowRawSockets::Flow::~Flow() in ipflowrawsockets.o
+      IPFlowRawSockets::end_flow(IPFlowRawSockets::Flow*, ErrorHandler*) in ipflowrawsockets.o
+      IPFlowRawSockets::find_aggregate(unsigned int, Packet const*) in ipflowrawsockets.o
+      ToDevice::cleanup(Element::CleanupStage) in todevice.o
+      ...
+  "_pcap_compile", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_create", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_datalink", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_dispatch", referenced from:
+      FromDevice::selected(int, int) in fromdevice.o
+      FromDevice::run_task(Task*) in fromdevice.o
+      IPFlowRawSockets::selected(int, int) in ipflowrawsockets.o
+  "_pcap_fileno", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+      ToDevice::initialize(ErrorHandler*) in todevice.o
+  "_pcap_geterr", referenced from:
+      FromDevice::fetch_pcap_error(pcap*, char const*) in fromdevice.o
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      FromDevice::selected(int, int) in fromdevice.o
+      FromDevice::run_task(Task*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_inject", referenced from:
+      ToDevice::send_packet(Packet*) in todevice.o
+  "_pcap_lookupnet", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_open_live", referenced from:
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_set_datalink", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_set_immediate_mode", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_promisc", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_snaplen", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_set_timeout", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_setdirection", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+  "_pcap_setfilter", referenced from:
+      FromDevice::initialize(ErrorHandler*) in fromdevice.o
+      IPFlowRawSockets::Flow::initialize(ErrorHandler*, int, bool) in ipflowrawsockets.o
+  "_pcap_setnonblock", referenced from:
+      FromDevice::open_pcap(String, int, bool, ErrorHandler*) in fromdevice.o
+  "_pcap_stats", referenced from:
+      FromDevice::kernel_drops(bool&, int&) const in fromdevice.o
+      FromDevice::read_handler(Element*, void*) in fromdevice.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [click] Error 1
+make: *** [install-userlevel] Error 2
