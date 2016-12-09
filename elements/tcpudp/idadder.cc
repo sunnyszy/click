@@ -61,7 +61,7 @@ void IDAdder::push(int port, Packet *p_in)
 	if(!false)
 	{
 		lock = true;
-		_ethh.ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
+		_ethh.ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
 		cp_ethernet_address(CONTROLLER_IN_MAC, _ethh.ether_shost);
 	}
 	// printf("IDadder: counter: %X\n", counter);
