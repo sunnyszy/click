@@ -184,7 +184,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
       {
         best_ap = output_port[0];
         if(!(tmp_counter%interval))
-            best_ap = 1 - output_port[0];
+            best_ap = (best_ap + 1)% MAX_N_AP;
       }
 
       if(best_ap != output_port[0])
