@@ -41,6 +41,7 @@ class PacketSelectionSerial : public Element { public:
     unsigned char control_content[2];
     int interval;
     int first_start;
+    int print_interval;
 
     click_ether * _ethh;
 

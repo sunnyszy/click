@@ -73,6 +73,7 @@ int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
   if (Args(conf, this, errh)
       .read_p("INTERVAL", IntArg(), interval)
       .read_p("FIRSTSTART", IntArg(), first_start)
+      .read_p("PRINTINTERVAL", IntArg(), print_interval)
       .complete() < 0)
     return -1;
 
@@ -167,7 +168,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   if(state[0] == IDLE)
   {
       tmp_counter++;
-      if(tmp_counter%100==0)
+      if(!(tmp_counter%print_interval))
       {
         printf("ap id: %X\n", status_ap(p_in));
         // printf("current mac: %X\n", status_mac(p_in));
