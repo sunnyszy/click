@@ -65,7 +65,6 @@
 #define status_txrate(p) *((int *)(p->data()+21))
 #define ip_id(p) *(p->data()+20)
 
-
 #define start_ap(p) *(p->data()+15)
 #define start_seq(p) *(p->data()+15)
 #define queue_seq(p) *(p->data()+14)

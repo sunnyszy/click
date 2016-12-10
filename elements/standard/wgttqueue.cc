@@ -59,11 +59,12 @@ WGTTQueue::initialize(ErrorHandler *errh)
         _block = true;
 
     
-    _ethh->ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
+    
     // printf("identity: %X\n", identity);
 
     for(int i=0; i < MAX_N_AP+1; i++)
     {
+        _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
         switch(identity)
         {
             case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
@@ -74,6 +75,18 @@ WGTTQueue::initialize(ErrorHandler *errh)
             case 6: cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
             case 7: cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
             case 8: cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
+        }
+        switch(i)
+        {
+            case 0: cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
+            case 1: cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
+            case 2: cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
+            case 3: cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
+            case 4: cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
+            case 5: cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
+            case 6: cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
+            case 7: cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
+            case 8: cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;    
         }
     }
 
@@ -121,11 +134,11 @@ void WGTTQueue::push_control(Packet *p_in)
         const unsigned char & dst_ap = start_ap(p_in);
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
         // // data part
-        control_content[0] = 0;
+        control_content[0] = client_ip(p_in);
         control_content[1] = _head;
+        printf("wgttQueue: switch to internal ap: %u\n", dst_ap);
         printf("wgttQueue: switch id: %X\n", _head);
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
-        // //ip part
         memcpy(p->data(), &(_ethh[dst_ap]), sizeof(click_ether));
 
         p_in -> kill();
@@ -153,7 +166,7 @@ void WGTTQueue::push_control(Packet *p_in)
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
         // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
         // // data part
-        control_content[0] = 0;
+        control_content[0] = client_ip(p_in);
         control_content[1] = 0;
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         

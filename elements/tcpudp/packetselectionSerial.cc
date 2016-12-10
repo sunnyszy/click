@@ -134,7 +134,16 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 {
   const unsigned char & c = client_ip(p_in);
   printf("switch request ack ip: %X.\n", c);
-  state[c-CLIENT1_IP_SUFFIX] = IDLE;
+  if(c == CLIENT1_IP_SUFFIX)
+  {
+      printf("PacketSelection: set client %X state to IDLE\n", c);
+      state[c-CLIENT1_IP_SUFFIX] = IDLE;
+  }
+  else
+  {
+      printf("PacketSelection: I didn't find the client you ack\n");
+  }
+  
   printf("switch request ack.\n");
   p_in -> kill();
 }
@@ -183,7 +192,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
         // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
         // // data part
-        control_content[0] = 135;
+        control_content[0] = CLIENT1_IP_SUFFIX;
         control_content[1] = best_ap;
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         //ether part
