@@ -121,7 +121,7 @@ void WGTTQueue::push_control(Packet *p_in)
             printf("wgttQueue: receive reset req\n");
             _tail = 0;
             _head = 0;
-            _block = (identity == 1)? false:true;
+            _block = (identity == first_start)? false:true;
             for(unsigned int i=0;i<256;i++)
             {   
                 if(_q[i] != 0)
