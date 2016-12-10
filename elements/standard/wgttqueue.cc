@@ -26,7 +26,7 @@ WGTTQueue::WGTTQueue()
 {
     _head = 0;
     _tail = 0;
-    _ethh = new click_ether[M_N_AP+1];
+    _ethh = new click_ether[MAX_N_AP+1];
     _q = (Packet **) CLICK_LALLOC(sizeof(Packet *) * RING_SIZE);
     printf("wgtt init succeed\n");
 }
@@ -62,7 +62,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
     _ethh->ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
     // printf("identity: %X\n", identity);
 
-    for(int i=0; i < M_N_AP+1; i++)
+    for(int i=0; i < MAX_N_AP+1; i++)
     {
         switch(identity)
         {
@@ -158,7 +158,7 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         
         //ether part
-        memcpy(p->data(), &(_ethh[M_N_AP]), sizeof(click_ether));
+        memcpy(p->data(), &(_ethh[MAX_N_AP]), sizeof(click_ether));
 
         p_in -> kill();
         // printf("ap-c packet push\n");

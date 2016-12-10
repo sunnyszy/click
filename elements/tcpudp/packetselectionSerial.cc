@@ -187,7 +187,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         control_content[1] = best_ap;
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         //ether part
-        switch(best_ap)
+        switch(output_port[0])
         {
           case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
           case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;

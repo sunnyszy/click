@@ -59,7 +59,7 @@ WGTTQueue::enRing(Packet *p)
         _head = (_head+1)%RING_SIZE;
     }
     // printf("WGTTQueue before _q[_tail] = p\n");
-    Packet *tmp = _q[_tail];
+    // Packet *tmp = _q[_tail];
     // printf("_tail: %x\n", _tail);
     _q[_tail] = p;
     // printf("WGTTQueue finish _q[_tail] = p\n");
