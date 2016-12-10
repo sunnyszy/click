@@ -46,11 +46,6 @@ PacketSelectionSerial::PacketSelectionSerial()
     }
     next_score_id[i] = 0;//a pointer
   }
-  
-  for(i=0; i<N_CLIENT; i++)
-  {
-    output_port[i] = 0;
-  }
 
   state = new unsigned char[N_CLIENT];
   state[0] = IDLE; 
@@ -73,11 +68,18 @@ PacketSelectionSerial::~PacketSelectionSerial()
 
 int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
 {
+  int i;
   printf("PacketSelectionSerial in\n");
   if (Args(conf, this, errh)
       .read_p("INTERVAL", IntArg(), interval)
+      .read_p("FIRSTSTART", IntArg(), first_start)
       .complete() < 0)
     return -1;
+
+  for(i=0; i<N_CLIENT; i++)
+  {
+    output_port[first_start-1] = 0;
+  }
 
   printf("PacketSelectionSerial out. interval: %X\n", interval);
   return 0;

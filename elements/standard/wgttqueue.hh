@@ -41,7 +41,8 @@ class WGTTQueue : public Element, public Storage { public:
     volatile unsigned char _tail;
 
     volatile bool _block;
-    unsigned char identity;
+    int identity;
+    int first_start;
     unsigned char control_content[2];
 
     click_ether * _ethh;

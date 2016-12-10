@@ -39,6 +39,7 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
     //printf("In configure\n");
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
+        .read_p("FIRSTSTART", IntArg(), first_start)
         .complete() < 0)
     return -1;
     
@@ -53,7 +54,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
     //printf("wgtt in initialize\n");
 
 
-    if(identity==1)
+    if(identity==first_start)
         _block = false;
     else
         _block = true;
