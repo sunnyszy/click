@@ -53,7 +53,14 @@ PacketSelectionSerial::PacketSelectionSerial()
   _ethh = new click_ether;
   
   _ethh->ether_type = htons(CONTROL_SUFFIX+ETHER_PROTO_BASE);
-  bool result = cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_shost);
+  cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_shost);
+
+  //set the time lock to be false
+  time_lock = false;
+  gettimeofday(&tv, NULL);
+  double tmp_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+  printf("Tmp_time: %f\n", tmp_time);
+
 
   printf("Packetselection: init finish, ready to start\n");
 
@@ -163,20 +170,25 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   // able to change state
 
   static unsigned int tmp_counter = 0;
-
-
-  if(state[0] == IDLE)
+  tmp_counter++;
+  if(!(tmp_counter%print_interval))
   {
-      tmp_counter++;
-      if(!(tmp_counter%print_interval))
-      {
-        printf("ap id: %X\n", status_ap(p_in));
-        // printf("current mac: %X\n", status_mac(p_in));
-        printf("current score: %d\n", status_score(p_in));
-        printf("current noise: %d\n", status_noise(p_in));
-        printf("current rx_rate: %d\n", status_rxrate(p_in));
-        printf("current tx_rate: %d\n", status_txrate(p_in));
-      }
+    printf("ap id: %X\n", status_ap(p_in));
+    // printf("current mac: %X\n", status_mac(p_in));
+    printf("current score: %d\n", status_score(p_in));
+    printf("current noise: %d\n", status_noise(p_in));
+    printf("current rx_rate: %d\n", status_rxrate(p_in));
+    printf("current tx_rate: %d\n", status_txrate(p_in));
+  }
+
+  gettimeofday(&tv, NULL);
+  double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+  if(now_time - last_time > 1000)
+    time_lock = false;
+
+
+  if(state[0] == IDLE && !time_lock)
+  {
       // printf("state idle\n");
       unsigned char best_ap = find_best_ap();
 
@@ -219,6 +231,11 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         printf("controller issu switch to ap %X\n", best_ap+1);
         state[0] = SWITCH_REQ;
         output_port[0] = best_ap;
+
+        // after issue switch, time lock will be turn on, and turned off after 1 s
+        time_lock = true;
+        gettimeofday(&tv, NULL);
+        last_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
         output(0).push(p);
         
       }

@@ -24,11 +24,11 @@ CLICK_DECLS
 
 WGTTQueue::WGTTQueue()
 {
-    // _head = 0;
-    // _tail = 0;
-    // _ethh = new click_ether[MAX_N_AP+1];
-    // _q = (Packet **) CLICK_LALLOC(sizeof(Packet *) * RING_SIZE);
-    // printf("wgtt init succeed\n");
+    _head = 0;
+    _tail = 0;
+    _ethh = new click_ether[MAX_N_AP+1];
+    _q = (Packet **) CLICK_LALLOC(sizeof(Packet *) * RING_SIZE);
+    printf("wgtt init succeed\n");
 }
 
 
@@ -44,58 +44,58 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
     return -1;
     
 
-    // printf("wgtt configure succeed\n");
+    printf("wgtt configure succeed\n");
     return 0;
 }
 
 int
 WGTTQueue::initialize(ErrorHandler *errh)
 {
-    // //printf("wgtt in initialize\n");
+    //printf("wgtt in initialize\n");
 
 
-    // if(identity==first_start)
-    //     _block = false;
-    // else
-    //     _block = true;
+    if(identity==first_start)
+        _block = false;
+    else
+        _block = true;
 
     
     
-    // // printf("identity: %X\n", identity);
+    // printf("identity: %X\n", identity);
 
-    // for(int i=0; i < MAX_N_AP+1; i++)
-    // {
-    //     _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
-    //     switch(identity)
-    //     {
-    //         case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
-    //         case 2: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
-    //         case 3: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
-    //         case 4: cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
-    //         case 5: cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
-    //         case 6: cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
-    //         case 7: cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
-    //         case 8: cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
-    //     }
-    //     switch(i)
-    //     {
-    //         case 0: cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
-    //         case 1: cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
-    //         case 2: cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
-    //         case 3: cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
-    //         case 4: cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
-    //         case 5: cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
-    //         case 6: cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
-    //         case 7: cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
-    //         case 8: cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;    
-    //     }
-    // }
+    for(int i=0; i < MAX_N_AP+1; i++)
+    {
+        _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
+        switch(identity)
+        {
+            case 1: cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
+            case 2: cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+            case 3: cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
+            case 4: cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
+            case 5: cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
+            case 6: cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
+            case 7: cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
+            case 8: cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
+        }
+        switch(i)
+        {
+            case 0: cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
+            case 1: cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
+            case 2: cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
+            case 3: cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
+            case 4: cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
+            case 5: cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
+            case 6: cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
+            case 7: cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
+            case 8: cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;    
+        }
+    }
 
-    // assert(_head == 0 && _tail == 0);
-    // // printf("wgtt after !_q\n");
-    // if (_q == 0)
-    // return errh->error("out of memory");
-    // printf("wgtt initialize succeed, ready to start\n");
+    assert(_head == 0 && _tail == 0);
+    // printf("wgtt after !_q\n");
+    if (_q == 0)
+    return errh->error("out of memory");
+    printf("wgtt initialize succeed, ready to start\n");
     return 0;
 }
 
@@ -104,12 +104,12 @@ WGTTQueue::initialize(ErrorHandler *errh)
 void
 WGTTQueue::push(int, Packet *p_in)
 {
-    // // printf("wgttQueue in push\n");
-    // switch(pkt_type(p_in))
-    // {
-    // case CONTROL_SUFFIX:  push_control(p_in);break;
-    // case DATA_SUFFIX:   push_data(p_in);break;
-    // }
+    // printf("wgttQueue in push\n");
+    switch(pkt_type(p_in))
+    {
+    case CONTROL_SUFFIX:  push_control(p_in);break;
+    case DATA_SUFFIX:   push_data(p_in);break;
+    }
 }
 
 void WGTTQueue::push_control(Packet *p_in)
@@ -201,7 +201,7 @@ void WGTTQueue::push_data(Packet *p_in)
 Packet *
 WGTTQueue::pull(int port)
 {
-    // return deRing();
+    return deRing();
     return NULL;
 }
 

@@ -24,7 +24,7 @@
 
 // ap 
 #define MAX_N_AP 8
-#define N_AP 3
+#define N_AP 8
 #define AP1_IP_SUFFIX 1
 #define AP2_IP_SUFFIX 2
 #define AP3_IP_SUFFIX 3
@@ -49,6 +49,7 @@
 #define CONTROLLER_IN_MAC_SUFFIX 0x7d
 
 #define RING_SIZE 256
+#define SWITCH_MIN 1000
 
 
 #define RESET_CONTENT 0xff

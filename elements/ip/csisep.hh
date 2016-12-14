@@ -7,11 +7,13 @@
 #include <unistd.h>
 #include <clicknet/wgtt.h>
 
-
+#ifdef __arm__
 extern "C"
 {
   #include "iwinfo.h"
 }
+#endif 
+
 
 struct my_test_struct {
   uint8_t mac;

@@ -6,6 +6,7 @@
 #include <clicknet/ether.h>
 #include <click/confparse.hh>
 #include <clicknet/wgtt.h>
+#include <sys/time.h>
 
 CLICK_DECLS
 
@@ -42,6 +43,11 @@ class PacketSelectionSerial : public Element { public:
     int interval;
     int first_start;
     int print_interval;
+
+    // after issue switch, a time lock will be set for 1 second
+    bool time_lock;
+    double last_time;
+    struct timeval tv;
 
     click_ether * _ethh;
 
