@@ -177,12 +177,11 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     // printf("current mac: %X\n", status_mac(p_in));
     printf("current score: %d\n", status_score(p_in));
     printf("current noise: %d\n", status_noise(p_in));
-    printf("current rx_rate: %d\n", status_rxrate(p_in));
-    printf("current tx_rate: %d\n", status_txrate(p_in));
+    printf("current rx_rate: %d.%d MBit/s\n", 
+      status_rxrate(p_in) / 1000, status_rxrate(p_in) / 100);
+    printf("current tx_rate: %d.%d MBit/s\n", 
+      status_txrate(p_in) / 1000, status_txrate(p_in) / 100);
   }
-  printf("current rx_rate: %d\n", status_rxrate(p_in));
-  printf("%d.%d MBit/s\n",status_rxrate(p_in) / 1000, status_rxrate(p_in) / 100);
-  printf("current rx_rate: %X\n", status_rxrate(p_in));
 
   gettimeofday(&tv, NULL);
   double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;

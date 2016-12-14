@@ -76,7 +76,6 @@ CSISep::fragment(Packet *p_in)
     sample_counter ++;
     if(sample_counter>sample_rate)
     {
-        // for debug
         sample_counter = 0;
 
         if (iw->assoclist(ifname, buf, &len))
@@ -96,8 +95,8 @@ CSISep::fragment(Packet *p_in)
                 uint32_t & rx_rate = (e->rx_rate).rate;
                 uint32_t & tx_rate = (e->tx_rate).rate;
 
-                printf("rx_rate: %d\n", rx_rate);
-                printf("rx_rate: %X\n", rx_rate);
+                // printf("rx_rate: %d\n", rx_rate);
+                // printf("rx_rate: %X\n", rx_rate);
                 // printf("tx_rate: %d\n", tx_rate);
                 memcpy(p_csi->data()+j, &(mac), 1);
                 j += 1;
