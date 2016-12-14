@@ -132,5 +132,7 @@ CSISep::push(int, Packet *p)
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(CSISep)
-ELEMENT_MT_SAFE(CSISep)
+#ifdef __arm__ 
+    ELEMENT_LIBS(-L/Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib -liwinfo)
+#endif
 
