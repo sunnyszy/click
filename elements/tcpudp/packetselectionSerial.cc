@@ -57,9 +57,9 @@ PacketSelectionSerial::PacketSelectionSerial()
 
   //set the time lock to be false
   time_lock = false;
-  gettimeofday(&tv, NULL);
-  double tmp_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
-  printf("Tmp_time: %f\n", tmp_time);
+  // gettimeofday(&tv, NULL);
+  // double tmp_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+  // printf("Tmp_time: %f\n", tmp_time);
 
 
   printf("Packetselection: init finish, ready to start\n");
@@ -180,6 +180,9 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     printf("current rx_rate: %d\n", status_rxrate(p_in));
     printf("current tx_rate: %d\n", status_txrate(p_in));
   }
+  printf("current rx_rate: %d\n", status_rxrate(p_in));
+  printf("%d.%d MBit/s\n",status_rxrate(p_in) / 1000, status_rxrate(p_in) / 100);
+  printf("current rx_rate: %X\n", status_rxrate(p_in));
 
   gettimeofday(&tv, NULL);
   double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;

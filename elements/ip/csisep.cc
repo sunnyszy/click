@@ -31,6 +31,7 @@ CSISep::CSISep()
 #ifdef __arm__
     printf("CSISep: finish init\n");
     // total_msg_cnt = 0;
+    sample_counter = 0;
 #endif 
 
 }
@@ -75,6 +76,7 @@ CSISep::fragment(Packet *p_in)
     sample_counter ++;
     if(sample_counter>sample_rate)
     {
+        // for debug
         sample_counter = 0;
 
         if (iw->assoclist(ifname, buf, &len))
@@ -94,7 +96,8 @@ CSISep::fragment(Packet *p_in)
                 uint32_t & rx_rate = (e->rx_rate).rate;
                 uint32_t & tx_rate = (e->tx_rate).rate;
 
-                // printf("rx_rate: %d\n", rx_rate);
+                printf("rx_rate: %d\n", rx_rate);
+                printf("rx_rate: %X\n", rx_rate);
                 // printf("tx_rate: %d\n", tx_rate);
                 memcpy(p_csi->data()+j, &(mac), 1);
                 j += 1;
@@ -102,9 +105,9 @@ CSISep::fragment(Packet *p_in)
                 j += 1;
                 memcpy(p_csi->data()+j, &(noise), 1);
                 j += 1;
-                memcpy(p_csi->data()+j, &(tx_rate), 4);
-                j += 4;
                 memcpy(p_csi->data()+j, &(rx_rate), 4);
+                j += 4;
+                memcpy(p_csi->data()+j, &(tx_rate), 4);
                 j += 4;
                 // printf("RateSignal: %d\n", e->signal);
                 // printf("RateNoise: %d\n", e->noise);
