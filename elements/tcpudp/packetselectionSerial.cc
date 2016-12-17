@@ -95,7 +95,17 @@ void PacketSelectionSerial::reset_ap()
   // // data part
   memcpy(p->data()+sizeof(click_ether), &control_content, 2);
   //ether part
-  cp_ethernet_address(AP_MAC[i], _ethh->ether_dhost);break;
+  switch(i)
+  {
+    case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+    case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+    case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_dhost);break;
+    case 3:cp_ethernet_address(AP4_MAC, _ethh->ether_dhost);break;
+    case 4:cp_ethernet_address(AP5_MAC, _ethh->ether_dhost);break;
+    case 5:cp_ethernet_address(AP6_MAC, _ethh->ether_dhost);break;
+    case 6:cp_ethernet_address(AP7_MAC, _ethh->ether_dhost);break;
+    case 7:cp_ethernet_address(AP8_MAC, _ethh->ether_dhost);break;
+  }
   memcpy(p->data(), _ethh, sizeof(click_ether));
 
   printf("controller reset ap %X\n", i);
@@ -108,7 +118,7 @@ void PacketSelectionSerial::push_control(Packet *p_in)
 {
   const unsigned char & c = client_ip(p_in);
   
-  state[c-CLIENT_IP_SUFFIX[0]] = IDLE;
+  state[c-CLIENT1_IP_SUFFIX] = IDLE;
 
   printf("switch request ack, ip: %d.\n", c);
   p_in -> kill();
@@ -120,10 +130,10 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   unsigned char c;
   switch(status_mac(p_in))
   {
-    case CLIENT_MAC_SUFFIX[0]: c = 0;break;
-    case CLIENT_MAC_SUFFIX[1]: c = 1;break;
-    case CLIENT_MAC_SUFFIX[2]: c = 2;break;
-    case CLIENT_MAC_SUFFIX[3]: c = 3;break;
+    case CLIENT1_MAC_SUFFIX: c = 0;break;
+    case CLIENT2_MAC_SUFFIX: c = 1;break;
+    case CLIENT3_MAC_SUFFIX: c = 2;break;
+    case CLIENT4_MAC_SUFFIX: c = 3;break;
   }
   //since the score are minus, we minus again
   score[c][a][next_score_id[c][a]] = - status_score(p_in);
@@ -134,11 +144,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   tmp_counter++;
   if(!(tmp_counter%print_interval))
   {
+    int rx_rate = status_rxrate(p_in);
+    int tx_rate = status_txrate(p_in);
     printf("client mac: %X, ap id: %X\n", status_mac(p_in), status_ap(p_in));
     printf("signal: %d, noise: %d\n", status_score(p_in), status_noise(p_in));
     printf("rx_rate: %d.%dMb/s, tx_rate: %d.%d Mb/s\n", 
-      status_rxrate(p_in) / 1000, status_rxrate(p_in) / 100
-      status_txrate(p_in) / 1000, status_txrate(p_in) / 100);
+      rx_rate / 1000, rx_rate / 100, tx_rate / 1000, tx_rate / 100);
   }
 
   gettimeofday(&tv, NULL);
@@ -167,11 +178,21 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
         // click_ip *ip = reinterpret_cast<click_ip *>(p->data()+sizeof(click_ether));
         // // data part
-        control_content[0] = CLIENT_IP_SUFFIX[c];
+        control_content[0] = CLIENT1_IP_SUFFIX + c;
         control_content[1] = best_ap;
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         //ether part
-        cp_ethernet_address(AP_MAC[output_port[c]], _ethh->ether_dhost);
+        switch(output_port[c])
+        {
+            case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_dhost);break;
+            case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_dhost);break;
+            case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_dhost);break;
+            case 3:cp_ethernet_address(AP4_MAC, _ethh->ether_dhost);break;
+            case 4:cp_ethernet_address(AP5_MAC, _ethh->ether_dhost);break;
+            case 5:cp_ethernet_address(AP6_MAC, _ethh->ether_dhost);break;
+            case 6:cp_ethernet_address(AP7_MAC, _ethh->ether_dhost);break;
+            case 7:cp_ethernet_address(AP8_MAC, _ethh->ether_dhost);break;
+        }
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
         printf("Issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);

@@ -1,3 +1,10 @@
+/*
+ idadder program, add id and push for queue ring in ap processing. 
+ Input: [data pkt]
+ Output:[eth][id][data pkt], id is one Byte
+ Created by Zhenyu Song: sunnyszy@gmail.com
+ */
+
 #ifndef CLICK_IDADDER_HH
 #define CLICK_IDADDER_HH
 #include <click/element.hh>
@@ -13,20 +20,17 @@ class IDAdder : public Element { public:
 
 
     IDAdder() CLICK_COLD;
-    ~IDAdder() CLICK_COLD;
 
     const char *class_name() const	{ return "IDAdder"; }
-    const char *port_count() const	{ return "1/1"; }
+    const char *port_count() const	{ return "4/1"; }
     const char *flags() const		{ return "A"; }
 
-    // int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
-  	int initialize(ErrorHandler*) CLICK_COLD;
     void push(int port, Packet *p_in);
 
     
   private:
     
-    unsigned char counter;
+    unsigned char counter[MAX_N_CLIENT];
     click_ether _ethh;
 
 

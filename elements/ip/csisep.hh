@@ -1,3 +1,10 @@
+/*
+ sample rssi/noise/txrate/rxrate
+ Input: data pkt
+ Output: port 0: data pkt, port 1: status
+ Created by Zhenyu Song: sunnyszy@gmail.com
+ */
+
 #ifndef CLICK_CSISEP_HH
 #define CLICK_CSISEP_HH
 #include <click/element.hh>
@@ -5,9 +12,8 @@
 #include <click/atomic.hh>
 #include <fcntl.h>
 #include <unistd.h>
-#include <clicknet/wgtt.h>
-
 #ifdef __arm__
+#include <clicknet/wgtt.h>
 extern "C"
 {
   #include "iwinfo.h"

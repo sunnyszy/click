@@ -1,3 +1,9 @@
+/*
+ idadder program, add id and push for queue ring in ap processing. 
+ Input: [data pkt]
+ Output:[eth][id][data pkt], id is one Byte
+ Created by Zhenyu Song: sunnyszy@gmail.com
+ */
 // -*- c-basic-offset: 4 -*-
 #ifndef CLICK_WGTTQUEUE_HH
 #define CLICK_WGTTQUEUE_HH
@@ -6,17 +12,14 @@
 #include <clicknet/ether.h>
 #include <click/confparse.hh>
 #include <clicknet/wgtt.h>
+
 CLICK_DECLS
-
-
-
-
 
 class WGTTQueue : public Element, public Storage { public:
 
     WGTTQueue() CLICK_COLD;
 
-    inline void enRing(Packet*);//flag: whether override
+    inline void enRing(unsigned char, Packet*);//flag: whether override
     inline Packet* deRing();
     inline void enque(Packet*);//flag: whether override
     inline Packet* deque();
@@ -35,14 +38,15 @@ class WGTTQueue : public Element, public Storage { public:
 
   protected:
 
-    Packet* volatile * _q;
+    Packet** volatile * _q;
 
-    volatile unsigned char _head;
-    volatile unsigned char _tail;
+    volatile unsigned char _head[MAX_N_CLIENT];
+    volatile unsigned char _tail[MAX_N_CLIENT];
+    volatile bool _block[MAX_N_CLIENT];
+    volatile unsigned char next_client;
 
-    volatile bool _block;
     int identity;
-    int first_start;
+    int first_start[MAX_N_CLIENT];
     unsigned char control_content[2];
 
     click_ether * _ethh;
@@ -50,37 +54,47 @@ class WGTTQueue : public Element, public Storage { public:
 };
 
 inline void
-WGTTQueue::enRing(Packet *p)
+WGTTQueue::enRing(unsigned char c, Packet *p)
 {
-    if((_tail+1)%RING_SIZE == _head)//override
+    if((_tail[c]+1)%RING_SIZE == _head[c])//override
     {
         // printf("WGTTQueue override\n");
-        if(_q[_head] != 0)
-            _q[_head] -> kill();
-        _head = (_head+1)%RING_SIZE;
+        if(_q[c][_head[c]] != 0)
+            _q[c][_head[c]] -> kill();
+        _head[c] = (_head[c]+1)%RING_SIZE;
     }
     // printf("WGTTQueue before _q[_tail] = p\n");
     // Packet *tmp = _q[_tail];
     // printf("_tail: %x\n", _tail);
-    _q[_tail] = p;
+    _q[c][_tail[c]] = p;
     // printf("WGTTQueue finish _q[_tail] = p\n");
-    _tail = (_tail+1)%RING_SIZE;
+    _tail[c] = (_tail[c]+1)%RING_SIZE;
     // printf("WGTTQueue finish enRing\n");
 }
 
 inline Packet *
 WGTTQueue::deRing()
 {
-    if(_block || _head==_tail)
+    int i;
+    bool flag = false;//no pick out
+    Packet *p;
+    //next_client after function
+    unsigned char next_client_after = (next_client+1)%MAX_N_CLIENT; 
+    for(i=0; i<MAX_N_CLIENT; i++, next_client = (next_client+1)%MAX_N_CLIENT)
+    {
+        if(_block[next_client] || _head[next_client]==_tail[next_client])
+            continue;
+        flag = true;
+        p = _q[next_client][_head[next_client]];
+        break;
+    }
+
+    next_client = next_client_after;
+
+    if(flag)
+        return p;
+    else
         return 0;
-    Packet *p = _q[_head];
-    _head = (_head+1)%RING_SIZE;
-    // if(p != 0)
-    // {
-    //     printf("wgttQueue in pull\n");
-    //     printf("wgttQueue _head: %X, _tail: %X\n", _head, _tail);
-    // }
-    return p;
 }
 
 

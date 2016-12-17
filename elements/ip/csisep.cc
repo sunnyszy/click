@@ -1,20 +1,8 @@
-// -*- c-basic-offset: 4 -*-
 /*
- * ipfragmenter.{cc,hh} -- element fragments IP packets
- * Robert Morris, Eddie Kohler
- *
- * Copyright (c) 1999-2000 Massachusetts Institute of Technology
- * Copyright (c) 2002 International Computer Science Institute
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, subject to the conditions
- * listed in the Click LICENSE file. These conditions include: you must
- * preserve this copyright notice, and you cannot mention the copyright
- * holders in advertising related to the Software without their permission.
- * The Software is provided WITHOUT ANY WARRANTY, EXPRESS OR IMPLIED. This
- * notice is a summary of the Click LICENSE file; the license in that file is
- * legally binding.
+ sample rssi/noise/txrate/rxrate
+ Input: data pkt
+ Output: port 0: data pkt, port 1: status
+ Created by Zhenyu Song: sunnyszy@gmail.com
  */
 
 #include <click/config.h>
@@ -22,7 +10,6 @@
 #include <click/args.hh>
 #include <click/error.hh>
 #include <click/glue.hh>
-
 
 CLICK_DECLS
 
@@ -95,9 +82,6 @@ CSISep::fragment(Packet *p_in)
                 uint32_t & rx_rate = (e->rx_rate).rate;
                 uint32_t & tx_rate = (e->tx_rate).rate;
 
-                // printf("rx_rate: %d\n", rx_rate);
-                // printf("rx_rate: %X\n", rx_rate);
-                // printf("tx_rate: %d\n", tx_rate);
                 memcpy(p_csi->data()+j, &(mac), 1);
                 j += 1;
                 memcpy(p_csi->data()+j, &(signal), 1);
@@ -133,7 +117,3 @@ CSISep::push(int, Packet *p)
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(CSISep)
-// #ifdef __arm__ 
-//     ELEMENT_LIBS(-L/Volumes/BasicWrt/openwrt_linksys/staging_dir/target-arm_cortex-a9+vfpv3_uClibc-0.9.33.2_eabi/usr/lib -liwinfo)
-// #endif
-

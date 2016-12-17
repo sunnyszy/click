@@ -21,6 +21,11 @@
 // client 1 ip
 #define MAX_N_CLIENT 4
 
+#define CLIENT1_MAC_SUFFIX 0x01
+#define CLIENT2_MAC_SUFFIX 0x02
+#define CLIENT3_MAC_SUFFIX 0x03
+#define CLIENT4_MAC_SUFFIX 0x04
+
 // ap 
 #define MAX_N_AP 8
 
@@ -56,15 +61,19 @@
 #define start_seq(p) *(p->data()+15)
 // seq in data pkt
 #define queue_seq(p) *(p->data()+14)
+#define data_client(p) *(p->data()+20)
 
-unsigned char CLIENT_IP_SUFFIX[MAX_N_CLIENT] = {135, 136, 137, 138};
-unsigned short SERVER_PORT[MAX_N_CLIENT] = {5201, 5202, 5203, 5204};
-unsigned char AP_IP_SUFFIX[MAX_N_AP] = {1, 2, 3, 4, 5, 6, 7, 8};
-char *AP_MAC[MAX_N_AP] = {"70:88:6b:80:60:01", "70:88:6b:80:60:02", "70:88:6b:80:60:03"
-	"70:88:6b:80:60:04", "70:88:6b:80:60:05", "70:88:6b:80:60:06", "70:88:6b:80:60:07"
-	"70:88:6b:80:60:08"};
-//made up last two client mac 
-unsigned char CLIENT_MAC_SUFFIX[MAX_N_CLIENT] = {0x07, 0xac, 0x01, 0x02};
+#define CLIENT1_IP_SUFFIX 135
+#define AP1_MAC "70:88:6b:80:60:01"
+#define AP2_MAC "70:88:6b:80:60:02"
+#define AP3_MAC "70:88:6b:80:60:03"
+#define AP4_MAC "70:88:6b:80:60:04"
+#define AP5_MAC "70:88:6b:80:60:05"
+#define AP6_MAC "70:88:6b:80:60:06"
+#define AP7_MAC "70:88:6b:80:60:07"
+#define AP8_MAC "70:88:6b:80:60:08"
 
+// char *CLIENT_MAC[MAX_N_CLIENT] = {"44:c3:06:31:5b:01", "44:c3:06:31:5b:02", "44:c3:06:31:5b:03",
+// 	"44:c3:06:31:5b:04"};
 
-#endif /* !_WGTT_H_ */
+#endif _WGTT_H_
