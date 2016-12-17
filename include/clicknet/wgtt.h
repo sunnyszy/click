@@ -21,10 +21,10 @@
 // client 1 ip
 #define MAX_N_CLIENT 4
 
-#define CLIENT1_MAC_SUFFIX 0x01
-#define CLIENT2_MAC_SUFFIX 0x02
-#define CLIENT3_MAC_SUFFIX 0x03
-#define CLIENT4_MAC_SUFFIX 0x04
+#define CLIENT1_MAC_SUFFIX 0x07
+#define CLIENT2_MAC_SUFFIX 0x08
+#define CLIENT3_MAC_SUFFIX 0x09
+#define CLIENT4_MAC_SUFFIX 0x0a
 
 // ap 
 #define MAX_N_AP 8
