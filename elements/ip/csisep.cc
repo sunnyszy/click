@@ -72,8 +72,8 @@ CSISep::fragment(Packet *p_in)
         else
         {
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
-            WritablePacket *p_csi = Packet::make(11*N_CLIENT);
-            for (i = 0; i < N_CLIENT; i += sizeof(struct iwinfo_assoclist_entry))
+            WritablePacket *p_csi = Packet::make(11*MAX_N_CLIENT);
+            for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
             {
                 e = (struct iwinfo_assoclist_entry *) &buf[i];
                 uint8_t & mac = e->mac[5];
