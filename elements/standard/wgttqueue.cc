@@ -63,25 +63,26 @@ WGTTQueue::initialize(ErrorHandler *errh)
         _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
         switch(identity-1)
         {
-            case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_shost);break;
-            case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_shost);break;
-            case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_shost);break;
-            case 3:cp_ethernet_address(AP4_MAC, _ethh->ether_shost);break;
-            case 4:cp_ethernet_address(AP5_MAC, _ethh->ether_shost);break;
-            case 5:cp_ethernet_address(AP6_MAC, _ethh->ether_shost);break;
-            case 6:cp_ethernet_address(AP7_MAC, _ethh->ether_shost);break;
-            case 7:cp_ethernet_address(AP8_MAC, _ethh->ether_shost);break;
+            case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
+            case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+            case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
+            case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
+            case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
+            case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
+            case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
+            case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
         }
         switch(i)
         {
-            case 0:cp_ethernet_address(AP1_MAC, _ethh->ether_shost);break;
-            case 1:cp_ethernet_address(AP2_MAC, _ethh->ether_shost);break;
-            case 2:cp_ethernet_address(AP3_MAC, _ethh->ether_shost);break;
-            case 3:cp_ethernet_address(AP4_MAC, _ethh->ether_shost);break;
-            case 4:cp_ethernet_address(AP5_MAC, _ethh->ether_shost);break;
-            case 5:cp_ethernet_address(AP6_MAC, _ethh->ether_shost);break;
-            case 6:cp_ethernet_address(AP7_MAC, _ethh->ether_shost);break;
-            case 7:cp_ethernet_address(AP8_MAC, _ethh->ether_shost);break;
+            case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
+            case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
+            case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
+            case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
+            case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
+            case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
+            case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
+            case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
+            case 8:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;
         }
     }
 

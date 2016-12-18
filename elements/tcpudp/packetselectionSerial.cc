@@ -155,7 +155,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
 
   gettimeofday(&tv, NULL);
   double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
-  if(now_time - last_time[c] > 1000)
+  if(now_time - last_time[c] > SWITCH_MIN)
     time_lock[c] = false;
 
   if(state[c] == IDLE && !time_lock[c])
