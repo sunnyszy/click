@@ -32,14 +32,19 @@ int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
     //printf("In configure\n");
+    int tmp[4], i;
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
-        .read_p("FIRSTSTART1", IntArg(), first_start[0])
-        .read_p("FIRSTSTART2", IntArg(), first_start[1])
-        .read_p("FIRSTSTART3", IntArg(), first_start[2])
-        .read_p("FIRSTSTART4", IntArg(), first_start[3])
+        .read_p("FIRSTSTART1", IntArg(), tmp[0])
+        .read_p("FIRSTSTART2", IntArg(), tmp[1])
+        .read_p("FIRSTSTART3", IntArg(), tmp[2])
+        .read_p("FIRSTSTART4", IntArg(), tmp[3])
         .complete() < 0)
     return -1;
+    for(i=0;i<MAX_N_CLIENT;i++)
+    {
+        first_start[i] = tmp[i];
+    }
     
     printf("wgtt configure succeed\n");
     return 0;
