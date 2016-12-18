@@ -56,7 +56,11 @@ WGTTQueue::initialize(ErrorHandler *errh)
     //printf("wgtt in initialize\n");
     int i;
     for(i=0; i<MAX_N_CLIENT; i++)
+    {
         _block[i] = (identity!=first_start[i]);
+        printf("wgttqueue: block[%d] is %d.\n", i, _block[i]);
+        printf("wgttqueue: identity is %d, first_start is%d.\n", identity, first_start[i]);
+    }
 
     for(i=0; i < MAX_N_AP+1; i++)
     {
@@ -189,7 +193,10 @@ void WGTTQueue::push_data(Packet *p_in)
         case CLIENT3_MAC_SUFFIX: c=2;break;
         case CLIENT4_MAC_SUFFIX: c=3;break;
     }
-    // printf("wgttQueue in push data for client: %d\n", c+1);
+    // if(_tail[c])
+    //     printf("wgttQueue in push data for active client: %d\n", c+1);
+    // else
+    //     printf("wgttQueue in push data for inactive client: %d\n", c+1);
     while(_tail[c] != seq)
     {
         // printf("wgttQueue: before for client: %d\n", c+1);

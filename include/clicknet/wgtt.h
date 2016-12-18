@@ -37,7 +37,7 @@
 
 #define RING_SIZE 256
 // 1000 ms
-#define SWITCH_MIN 100000
+#define SWITCH_MIN 1000
 // content encapsulated in mac header
 #define RESET_CONTENT 0xff
 

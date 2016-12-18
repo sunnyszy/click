@@ -83,13 +83,20 @@ WGTTQueue::deRing()
     for(i=0; i<MAX_N_CLIENT; i++, next_client = (next_client+1)%MAX_N_CLIENT)
     {
         if(_block[next_client] || _head[next_client]==_tail[next_client])
+        {
+            // if(_block[next_client])
+            //     printf("wgttQueue: queue %d is inactive\n", next_client+1);
+            // if(_head[next_client]==_tail[next_client])
+            //     printf("wgttQueue: queue %d is empty\n", next_client+1);
             continue;
+        }
         while((_head[next_client]+1)%MAX_N_CLIENT != _tail[next_client]
              && !_head[next_client])
             _head[next_client] = (_head[next_client]+1)%RING_SIZE;
         flag = true;
         p = _q[next_client][_head[next_client]];
         _head[next_client] = (_head[next_client]+1)%RING_SIZE;
+        // printf("wgttQueue: deque pkt from queue: %d\n", next_client+1);
         break;
     }
 
