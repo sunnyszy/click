@@ -151,7 +151,7 @@ void WGTTQueue::push_control(Packet *p_in)
                 _q[c][_head[c]] -> kill();
             _head[c] = (_head[c]+1)%RING_SIZE;
         }
-        printf("wgttQueue finish ap-ap dequeue\n");
+        // printf("wgttQueue finish ap-ap dequeue\n");
         
 
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
@@ -175,14 +175,22 @@ void WGTTQueue::push_control(Packet *p_in)
 void WGTTQueue::push_data(Packet *p_in)
 {
     const unsigned char & seq = queue_seq(p_in);
-    unsigned char c = data_client(p_in) - 1;
-    printf("wgttQueue in push data for client: %d\n", c+1);
+    unsigned char c;
+    switch(data_client(p_in))
+    {
+        case CLIENT1_MAC_SUFFIX: c=0;break;
+        case CLIENT2_MAC_SUFFIX: c=1;break;
+        case CLIENT3_MAC_SUFFIX: c=2;break;
+        case CLIENT4_MAC_SUFFIX: c=3;break;
+    }
+    // printf("wgttQueue in push data for client: %d\n", c+1);
     while(_tail[c] != seq)
     {
+        // printf("wgttQueue: before for client: %d\n", c+1);
         enRing(c, 0);
     }
     p_in -> pull(15);
-    printf("wgttQueue after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
+    // printf("wgttQueue after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
     enRing(c, p_in);
 }
 

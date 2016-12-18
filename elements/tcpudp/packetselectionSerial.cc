@@ -63,7 +63,7 @@ int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
     output_port[i] = first_start[i]-1;
   }
 
-  printf("PacketSelectionSerial out. interval: %d\n", interval);
+  printf("PacketSelectionSerial out. Switch interval: %d\n", interval);
   return 0;
 }
 

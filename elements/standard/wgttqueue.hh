@@ -59,7 +59,7 @@ WGTTQueue::enRing(unsigned char c, Packet *p)
     if((_tail[c]+1)%RING_SIZE == _head[c])//override
     {
         // printf("WGTTQueue override\n");
-        if(_q[c][_head[c]] != 0)
+        if(_q[c][_head[c]])
             _q[c][_head[c]] -> kill();
         _head[c] = (_head[c]+1)%RING_SIZE;
     }
@@ -84,15 +84,22 @@ WGTTQueue::deRing()
     {
         if(_block[next_client] || _head[next_client]==_tail[next_client])
             continue;
+        while((_head[next_client]+1)%MAX_N_CLIENT != _tail[next_client]
+             && !_head[next_client])
+            _head[next_client] = (_head[next_client]+1)%RING_SIZE;
         flag = true;
         p = _q[next_client][_head[next_client]];
+        _head[next_client] = (_head[next_client]+1)%RING_SIZE;
         break;
     }
 
     next_client = next_client_after;
 
     if(flag)
+    {
+        // printf("wgttQueue: deque succeed\n");
         return p;
+    }
     else
         return 0;
 }
