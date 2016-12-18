@@ -65,11 +65,11 @@ CSISep::fragment(Packet *p_in)
     {
         sample_counter = 0;
 
-        if (iw->assoclist(ifname, buf, &len))
-            // printf("CSISep: can not find associlist\n");
-        else if (len <= 0)
-            // printf("CSISep: associ number < 0\n");
-        else
+        if(!(iw->assoclist(ifname, buf, &len)))
+        //     // printf("CSISep: can not find associlist\n");
+        // else if (len <= 0)
+        //     // printf("CSISep: associ number < 0\n");
+        // else if (len)
         {
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
             WritablePacket *p_csi = Packet::make(11*MAX_N_CLIENT);
