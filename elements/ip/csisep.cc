@@ -59,7 +59,7 @@ void
 CSISep::fragment(Packet *p_in)
 {
 #ifdef __arm__ 
-    int i, j=0;
+    int i,j;
     sample_counter ++;
     if(sample_counter>sample_rate)
     {
@@ -72,9 +72,12 @@ CSISep::fragment(Packet *p_in)
         // else if (len)
         {
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
-            WritablePacket *p_csi = Packet::make(11*MAX_N_CLIENT);
+            
             for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
             {
+                //one pkt per client
+                WritablePacket *p_csi = Packet::make(11);
+                j=0;
                 e = (struct iwinfo_assoclist_entry *) &buf[i];
                 uint8_t & mac = e->mac[5];
                 int8_t & signal = e->signal;
@@ -92,12 +95,9 @@ CSISep::fragment(Packet *p_in)
                 j += 4;
                 memcpy(p_csi->data()+j, &(tx_rate), 4);
                 j += 4;
-                // printf("RateSignal: %d\n", e->signal);
-                // printf("RateNoise: %d\n", e->noise);
-                // printf("RateRXRaw: %d\n", (e->rx_rate).rate);
-                // printf("RateTXRaw: %d\n", (e->tx_rate).rate);
+                output(1).push(p_csi); 
             }   
-            output(1).push(p_csi); 
+            
         }
     }
 #endif    

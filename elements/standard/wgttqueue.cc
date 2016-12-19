@@ -21,6 +21,7 @@ WGTTQueue::WGTTQueue()
         _head[i] = 0;
         _tail[i] = 0;
     }
+    // 0: controller, 1-MAX_N_AP: ap
     _ethh = new click_ether[MAX_N_AP+1];
     next_client = 0;
     printf("wgtt init succeed\n");
@@ -78,15 +79,16 @@ WGTTQueue::initialize(ErrorHandler *errh)
         }
         switch(i)
         {
-            case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
-            case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
-            case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
-            case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
-            case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
-            case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
-            case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
-            case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
-            case 8:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;
+            case 0:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_dhost);break;
+            case 1:cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
+            case 2:cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
+            case 3:cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
+            case 4:cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
+            case 5:cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
+            case 6:cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
+            case 7:cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
+            case 8:cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
+            
         }
     }
 
@@ -142,7 +144,7 @@ void WGTTQueue::push_control(Packet *p_in)
             printf("wgttQueue: switch to ap: %d\n", dst_ap+1);
             printf("wgttQueue: switch id: %X\n", _head[c]);
             memcpy(p->data()+sizeof(click_ether), &control_content, 2);
-            memcpy(p->data(), &(_ethh[dst_ap]), sizeof(click_ether));
+            memcpy(p->data(), &(_ethh[dst_ap+1]), sizeof(click_ether));
 
             p_in -> kill();
             printf("wgttQueue send ap-ap seq\n");
@@ -172,7 +174,7 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data()+sizeof(click_ether), &control_content, 2);
         
         //ether part
-        memcpy(p->data(), &(_ethh[MAX_N_AP]), sizeof(click_ether));
+        memcpy(p->data(), &(_ethh[0]), sizeof(click_ether));
 
         p_in -> kill();
         // printf("ap-c packet push\n");
