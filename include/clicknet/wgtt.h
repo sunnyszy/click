@@ -27,7 +27,7 @@
 #define CLIENT4_MAC_SUFFIX 0x0a
 
 // ap 
-#define MAX_N_AP 2
+#define MAX_N_AP 8
 
 // controller
 #define CONTROLLER_IN_IP_SUFFIX 68
