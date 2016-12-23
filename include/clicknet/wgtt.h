@@ -19,7 +19,7 @@
 #define SWITCH_REQ 1
 
 // client 1 ip
-#define MAX_N_CLIENT 2
+#define MAX_N_CLIENT 1
 
 #define CLIENT1_MAC_SUFFIX 0x07
 #define CLIENT2_MAC_SUFFIX 0xb1
@@ -27,7 +27,7 @@
 #define CLIENT4_MAC_SUFFIX 0x0a
 
 // ap 
-#define MAX_N_AP 8
+#define MAX_N_AP 6
 
 // controller
 #define CONTROLLER_IN_IP_SUFFIX 68
