@@ -24,7 +24,7 @@ WGTTQueue::WGTTQueue()
     // 0: controller, 1-MAX_N_AP: ap
     _ethh = new click_ether[MAX_N_AP+1];
     next_client = 0;
-    printf("wgtt init succeed\n");
+    syslog (LOG_INFO, "wgtt init succeed\n");
 }
 
 
@@ -32,7 +32,7 @@ WGTTQueue::WGTTQueue()
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-    //printf("In configure\n");
+    //syslog (LOG_INFO, "In configure\n");
     int tmp[4], i;
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
@@ -47,20 +47,20 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         first_start[i] = tmp[i];
     }
     
-    printf("wgtt configure succeed\n");
+    syslog (LOG_INFO, "wgtt configure succeed\n");
     return 0;
 }
 
 int
 WGTTQueue::initialize(ErrorHandler *errh)
 {
-    //printf("wgtt in initialize\n");
+    syslog (LOG_INFO, "wgtt in initialize\n");
     int i;
     for(i=0; i<MAX_N_CLIENT; i++)
     {
         _block[i] = (identity!=first_start[i]);
-        printf("wgttqueue: block[%d] is %d.\n", i, _block[i]);
-        printf("wgttqueue: identity is %d, first_start is%d.\n", identity, first_start[i]);
+        syslog (LOG_INFO, "wgttqueue: block[%d] is %d.\n", i, _block[i]);
+        syslog (LOG_INFO, "wgttqueue: identity is %d, first_start is%d.\n", identity, first_start[i]);
     }
 
     for(i=0; i < MAX_N_AP+1; i++)
@@ -94,21 +94,80 @@ WGTTQueue::initialize(ErrorHandler *errh)
 
     if (_q == 0)
         return errh->error("out of memory");
-    printf("wgtt initialize succeed, ready to start\n");
+    syslog (LOG_INFO, "wgtt initialize succeed, ready to start\n");
     return 0;
 }
 
+
+inline void
+WGTTQueue::enRing(unsigned char c, Packet *p)
+{
+    if((_tail[c]+1)%RING_SIZE == _head[c])//override
+    {
+        // syslog (LOG_INFO, "WGTTQueue override\n");
+        if(_q[c][_head[c]])
+            _q[c][_head[c]] -> kill();
+        _head[c] = (_head[c]+1)%RING_SIZE;
+    }
+    // syslog (LOG_INFO, "WGTTQueue before _q[_tail] = p\n");
+    // Packet *tmp = _q[_tail];
+    // syslog (LOG_INFO, "_tail: %x\n", _tail);
+    _q[c][_tail[c]] = p;
+    // syslog (LOG_INFO, "WGTTQueue finish _q[_tail] = p\n");
+    _tail[c] = (_tail[c]+1)%RING_SIZE;
+    // syslog (LOG_INFO, "WGTTQueue finish enRing\n");
+}
+
+inline Packet *
+WGTTQueue::deRing()
+{
+    int i;
+    bool flag = false;//no pick out
+    Packet *p;
+    //next_client after function
+    unsigned char next_client_after = (next_client+1)%MAX_N_CLIENT; 
+    for(i=0; i<MAX_N_CLIENT; i++, next_client = (next_client+1)%MAX_N_CLIENT)
+    {
+        if(_block[next_client] || _head[next_client]==_tail[next_client])
+        {
+            // if(_block[next_client])
+            //     syslog (LOG_INFO, "wgttQueue: queue %d is inactive\n", next_client+1);
+            // if(_head[next_client]==_tail[next_client])
+            //     syslog (LOG_INFO, "wgttQueue: queue %d is empty\n", next_client+1);
+            continue;
+        }
+        while((_head[next_client]+1)%MAX_N_CLIENT != _tail[next_client]
+             && !_head[next_client])
+            _head[next_client] = (_head[next_client]+1)%RING_SIZE;
+        flag = true;
+        p = _q[next_client][_head[next_client]];
+        _head[next_client] = (_head[next_client]+1)%RING_SIZE;
+        syslog (LOG_INFO, "wgttQueue: deque pkt from queue: %d\n", next_client+1);
+        break;
+    }
+
+    next_client = next_client_after;
+
+    if(flag)
+    {
+        // syslog (LOG_INFO, "wgttQueue: deque succeed\n");
+        return p;
+    }
+    else
+        return 0;
+}
 
 
 void
 WGTTQueue::push(int, Packet *p_in)
 {
-    // printf("wgttQueue in push\n");
+    syslog (LOG_INFO, "wgttQueue in push\n");
     switch(pkt_type(p_in))
     {
     case CONTROL_SUFFIX:  push_control(p_in);break;
     case DATA_SUFFIX:   push_data(p_in);break;
     }
+    syslog (LOG_INFO, "wgttQueue out push\n");
 }
 
 void WGTTQueue::push_control(Packet *p_in)
@@ -119,7 +178,7 @@ void WGTTQueue::push_control(Packet *p_in)
     {
         if(client_ip(p_in) == RESET_CONTENT) //reset
         {
-            printf("wgttQueue: receive reset req for client: %d\n", c+1);
+            syslog (LOG_INFO, "wgttQueue: receive reset req for client: %d\n", c+1);
             for(i=0; i<MAX_N_CLIENT;i++)
             {
                 _tail[i] = 0;
@@ -134,27 +193,27 @@ void WGTTQueue::push_control(Packet *p_in)
         }
         else
         {
-            printf("wgttQueue: receive switch req for client: %d\n", c+1);
+            syslog (LOG_INFO, "wgttQueue: receive switch req for client: %d\n", c+1);
             _block[c] = true;
             const unsigned char & dst_ap = start_ap(p_in);
             WritablePacket *p = Packet::make(sizeof(click_ether)+2);
             // // data part
             control_content[0] = client_ip(p_in);
             control_content[1] = _head[c];
-            printf("wgttQueue: switch to ap: %d\n", dst_ap+1);
-            printf("wgttQueue: switch id: %X\n", _head[c]);
+            syslog (LOG_INFO, "wgttQueue: switch to ap: %d\n", dst_ap+1);
+            syslog (LOG_INFO, "wgttQueue: switch id: %X\n", _head[c]);
             memcpy(p->data()+sizeof(click_ether), &control_content, 2);
             memcpy(p->data(), &(_ethh[dst_ap+1]), sizeof(click_ether));
 
             p_in -> kill();
-            printf("wgttQueue send ap-ap seq\n");
+            syslog (LOG_INFO, "wgttQueue send ap-ap seq\n");
             checked_output_push(1, p);
         }
         
     }
     else //from ap
     {
-        printf("wgttQueue receive ap-ap seq for client: %d\n", c+1);
+        syslog (LOG_INFO, "wgttQueue receive ap-ap seq for client: %d\n", c+1);
 
         const unsigned char & start_seq = start_seq(p_in);
         while(_head[c] != start_seq)
@@ -163,7 +222,7 @@ void WGTTQueue::push_control(Packet *p_in)
                 _q[c][_head[c]] -> kill();
             _head[c] = (_head[c]+1)%RING_SIZE;
         }
-        // printf("wgttQueue finish ap-ap dequeue\n");
+        // syslog (LOG_INFO, "wgttQueue finish ap-ap dequeue\n");
         
 
         WritablePacket *p = Packet::make(sizeof(click_ether)+2);
@@ -177,9 +236,9 @@ void WGTTQueue::push_control(Packet *p_in)
         memcpy(p->data(), &(_ethh[0]), sizeof(click_ether));
 
         p_in -> kill();
-        // printf("ap-c packet push\n");
+        // syslog (LOG_INFO, "ap-c packet push\n");
         _block[c] = false;
-        printf("wgttQueue send switch ack\n");
+        syslog (LOG_INFO, "wgttQueue send switch ack\n");
         checked_output_push(1, p);
     }
 }
@@ -196,16 +255,16 @@ void WGTTQueue::push_data(Packet *p_in)
         case CLIENT4_MAC_SUFFIX: c=3;break;
     }
     // if(_tail[c])
-    //     printf("wgttQueue in push data for active client: %d\n", c+1);
+    //     syslog (LOG_INFO, "wgttQueue in push data for active client: %d\n", c+1);
     // else
-    //     printf("wgttQueue in push data for inactive client: %d\n", c+1);
+    //     syslog (LOG_INFO, "wgttQueue in push data for inactive client: %d\n", c+1);
     while(_tail[c] != seq)
     {
-        // printf("wgttQueue: before for client: %d\n", c+1);
+        // syslog (LOG_INFO, "wgttQueue: before for client: %d\n", c+1);
         enRing(c, 0);
     }
     p_in -> pull(15);
-    // printf("wgttQueue after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
+    syslog (LOG_INFO, "wgttQueue after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
     enRing(c, p_in);
 }
 

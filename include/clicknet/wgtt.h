@@ -5,6 +5,15 @@
 #ifndef _WGTT_H_
 #define _WGTT_H_
 
+struct my_test_struct {
+  uint8_t mac;
+  int8_t signal;
+  int8_t noise;
+  uint32_t rx_rate;
+  uint32_t tx_rate;
+  
+};
+
 // ether type
 #define ETHER_PROTO_BASE 0x0800
 #define CONTROL_SUFFIX 0x1
@@ -17,17 +26,29 @@
 // controller state
 #define IDLE 0
 #define SWITCH_REQ 1
+#define INACTIVE 2
+#define ANT 3
 
 // client 1 ip
-#define MAX_N_CLIENT 1
+#define MAX_N_CLIENT 2
+#define RSSI_THRESHOLD -67
 
 #define CLIENT1_MAC_SUFFIX 0x07
 #define CLIENT2_MAC_SUFFIX 0xb1
 #define CLIENT3_MAC_SUFFIX 0x09
 #define CLIENT4_MAC_SUFFIX 0x0a
-
+#define CLIENT1_MAC "44:c3:06:31:5b:07"
 // ap 
 #define MAX_N_AP 6
+#define CLIENT1_IP_SUFFIX 135
+#define AP1_MAC "70:88:6b:80:60:01"
+#define AP2_MAC "70:88:6b:80:60:02"
+#define AP3_MAC "70:88:6b:80:60:03"
+#define AP4_MAC "70:88:6b:80:60:04"
+#define AP5_MAC "70:88:6b:80:60:05"
+#define AP6_MAC "70:88:6b:80:60:06"
+#define AP7_MAC "70:88:6b:80:60:07"
+#define AP8_MAC "70:88:6b:80:60:08"
 
 // controller
 #define CONTROLLER_IN_IP_SUFFIX 68
@@ -63,17 +84,12 @@
 #define queue_seq(p) *(p->data()+14)
 #define data_client(p) *(p->data()+20)
 
-#define CLIENT1_IP_SUFFIX 135
-#define AP1_MAC "70:88:6b:80:60:01"
-#define AP2_MAC "70:88:6b:80:60:02"
-#define AP3_MAC "70:88:6b:80:60:03"
-#define AP4_MAC "70:88:6b:80:60:04"
-#define AP5_MAC "70:88:6b:80:60:05"
-#define AP6_MAC "70:88:6b:80:60:06"
-#define AP7_MAC "70:88:6b:80:60:07"
-#define AP8_MAC "70:88:6b:80:60:08"
+//for 80211r
+#define	r_control_type(p) *(p->data()+14)
+#define	r_control_client(p) *(p->data()+15)
+#define	r_control_ori(p) *(p->data()+16)
+#define	r_control_tar(p) *(p->data()+17)
+#define r_src_mac_suffix(p) *(p->data()+11)
+#define r_dst_mac_suffix(p) *(p->data()+5)
 
-// char *CLIENT_MAC[MAX_N_CLIENT] = {"44:c3:06:31:5b:01", "44:c3:06:31:5b:02", "44:c3:06:31:5b:03",
-// 	"44:c3:06:31:5b:04"};
-
-#endif _WGTT_H_
+#endif

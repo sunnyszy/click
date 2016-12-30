@@ -16,7 +16,7 @@ CLICK_DECLS
 CSISep::CSISep()
 {
 #ifdef __arm__
-    printf("CSISep: finish init\n");
+    syslog (LOG_INFO, "CSISep: finish init\n");
     // total_msg_cnt = 0;
     sample_counter = 0;
 #endif 
@@ -46,12 +46,12 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
     else if(wlan_port == 1)
         strcpy(ifname, "wlan1");
     else
-        printf("Invalid wlan_port argument\n");
+        syslog (LOG_INFO, "Invalid wlan_port argument\n");
     iw = iwinfo_backend(ifname);
     if (!iw)
-        printf("CSISep: can not connect to backend iwinfo\n");
+        syslog (LOG_INFO, "CSISep: can not connect to backend iwinfo\n");
 #endif
-    printf("CSISep: finish configure, ready to start\n");
+    syslog (LOG_INFO, "CSISep: finish configure, ready to start\n");
     return 0;
 }
 
@@ -66,9 +66,9 @@ CSISep::fragment(Packet *p_in)
         sample_counter = 0;
 
         if(!(iw->assoclist(ifname, buf, &len)))
-        //     // printf("CSISep: can not find associlist\n");
+        //     // syslog (LOG_INFO, "CSISep: can not find associlist\n");
         // else if (len <= 0)
-        //     // printf("CSISep: associ number < 0\n");
+        //     // syslog (LOG_INFO, "CSISep: associ number < 0\n");
         // else if (len)
         {
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
@@ -109,7 +109,7 @@ void
 CSISep::push(int, Packet *p)
 {
 #ifdef __arm__ 
-    // printf("CSISep: in push\n");
+    // syslog (LOG_INFO, "CSISep: in push\n");
 	fragment(p);
 #endif
 }

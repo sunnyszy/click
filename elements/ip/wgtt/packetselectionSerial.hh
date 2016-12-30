@@ -13,7 +13,7 @@
 #include <click/confparse.hh>
 #include <clicknet/wgtt.h>
 #include <sys/time.h>
-
+#include <syslog.h>
 CLICK_DECLS
 
 class PacketSelectionSerial : public Element { public:

@@ -12,6 +12,7 @@
 #include <click/atomic.hh>
 #include <fcntl.h>
 #include <unistd.h>
+#include <syslog.h>
 #ifdef __arm__
 #include <clicknet/wgtt.h>
 extern "C"
@@ -19,16 +20,6 @@ extern "C"
   #include "iwinfo.h"
 }
 #endif 
-
-
-struct my_test_struct {
-  uint8_t mac;
-  int8_t signal;
-  int8_t noise;
-  uint32_t rx_rate;
-  uint32_t tx_rate;
-  
-};
 
 
 CLICK_DECLS

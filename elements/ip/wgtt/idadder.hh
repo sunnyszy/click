@@ -12,7 +12,7 @@
 #include <click/atomic.hh>
 #include <clicknet/ether.h>
 #include <clicknet/wgtt.h>
-
+#include <syslog.h>
 CLICK_DECLS
 
 

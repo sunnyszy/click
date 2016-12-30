@@ -9,10 +9,9 @@
 #define CLICK_DEDUPTCPPACKET_HH
 #include <click/element.hh>
 #include <click/atomic.hh>
-
 #include <set>
 #include <queue>
-
+#include <syslog.h>
 CLICK_DECLS
 
 
