@@ -37,22 +37,22 @@ DeDupTCPPacket::drop(Packet *p)
 void
 DeDupTCPPacket::push(int port, Packet *p_in)
 {
-  // syslog (LOG_INFO, "Packet in\n");
+  // syslog (LOG_DEBUG, "Packet in\n");
   // construct link_key
   WritablePacket *p = p_in->uniqueify();
   struct click_ip *iph = p->ip_header();
 
-  // syslog (LOG_INFO, "IP id: %x", iph->ip_id);
+  // syslog (LOG_DEBUG, "IP id: %x", iph->ip_id);
   uint64_t tmp_link_key = ((((uint64_t)(iph->ip_id))&0x000000000000ffff)<<32)+
     (((uint64_t)((iph->ip_src).s_addr))&0x00000000ffffffff);
-  // syslog (LOG_INFO, "key: %lx\n", tmp_link_key);
+  // syslog (LOG_DEBUG, "key: %lx\n", tmp_link_key);
   std::set<uint64_t>::iterator it;
   it = _set.find(tmp_link_key);
   if((iph -> ip_id) != 0)
   {
     if( it != _set.end())
     {
-        // syslog (LOG_INFO, "Packet out.drop\n");
+        // syslog (LOG_DEBUG, "Packet out.drop\n");
         drop(p);
         return;
     }
@@ -61,7 +61,7 @@ DeDupTCPPacket::push(int port, Packet *p_in)
       //if (_set.size() >= max_elem_num)
       if (_queue.size() >= max_elem_num)
       {
-        // syslog (LOG_INFO, "exceed the max size\n");
+        // syslog (LOG_DEBUG, "exceed the max size\n");
         uint64_t & link_key_tobe_delete = _queue.front();
         _queue.pop();
          it = _set.find(link_key_tobe_delete);
@@ -72,7 +72,7 @@ DeDupTCPPacket::push(int port, Packet *p_in)
         _queue.push(tmp_link_key);
     }
   }
-  // syslog (LOG_INFO, "Packet out.push\n");
+  // syslog (LOG_DEBUG, "Packet out.push\n");
   output(0).push(p);
 }
 

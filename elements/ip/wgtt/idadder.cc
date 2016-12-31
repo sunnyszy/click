@@ -18,7 +18,7 @@ IDAdder::IDAdder()
 	int i;
 	for(i=0; i<MAX_N_CLIENT; i++)
 		counter[i] = 0;
-	syslog (LOG_INFO, "idadder init finish\n");
+	syslog (LOG_DEBUG, "idadder init finish\n");
 }
 
 void IDAdder::push(int port, Packet *p_in)
@@ -31,7 +31,7 @@ void IDAdder::push(int port, Packet *p_in)
 		_ethh.ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
 		cp_ethernet_address(CONTROLLER_IN_MAC, _ethh.ether_shost);
 	}
-	// syslog (LOG_INFO, "IDadder: counter: %X\n", counter);
+	// syslog (LOG_DEBUG, "IDadder: counter: %X\n", counter);
 
 	p_in->push(sizeof(click_ether)+1);
 	for(int i = 1;i<MAX_N_AP;i++)
@@ -54,7 +54,7 @@ void IDAdder::push(int port, Packet *p_in)
 			case 7:cp_ethernet_address(AP8_MAC, _ethh.ether_dhost);break;
 		}
 		memcpy(p->data(), &_ethh, sizeof(click_ether));
-		// syslog (LOG_INFO, "idadder push %dth\n", i);
+		// syslog (LOG_DEBUG, "idadder push %dth\n", i);
 		output(0).push(p);
 	}
 	WritablePacket *p = p_in->uniqueify();

@@ -85,7 +85,7 @@ void RControlerControl::push_up_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[tar]), sizeof(click_ether));
 
-    syslog (LOG_INFO, "controller pass deassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller pass deassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(t == 0x07)
@@ -101,7 +101,7 @@ void RControlerControl::push_up_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[ori]), sizeof(click_ether));
 
-    syslog (LOG_INFO, "controller pass deassociation ack for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller pass deassociation ack for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(t == 0x0b)
@@ -118,7 +118,7 @@ void RControlerControl::push_up_control(Packet*p_in)
     memcpy(p->data(), &(_ethh[tar]), sizeof(click_ether));
 
     outport[c] = tar;
-    syslog (LOG_INFO, "controller ack reassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller ack reassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   p_in -> kill();
