@@ -17,6 +17,7 @@ int
 RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   int i, tmp_start[4],tmp_id;
+  openlog("RClientControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   for(i=0;i<MAX_N_AP;i++)
   {
     rssi[i] = -127;//quite large

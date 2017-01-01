@@ -18,7 +18,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   int i, tmp_start[4],tmp_id;
 
-  openlog ("RAPControl", LOG_CONS | LOG_NDELAY, 0);
+  openlog("RAPControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
 
   _ethh = new click_ether[MAX_N_CLIENT+1];//first MAX_N_CLIENT: ap->client; ap->controller
   if (Args(conf, this, errh)

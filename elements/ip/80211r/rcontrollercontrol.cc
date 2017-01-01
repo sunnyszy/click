@@ -16,8 +16,8 @@
 int
 RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-
   int i, tmp_start[4];
+  openlog("RControlerControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   _ethh = new click_ether[MAX_N_AP*2];
   if (Args(conf, this, errh)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])

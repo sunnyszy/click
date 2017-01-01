@@ -17,6 +17,7 @@ CLICK_DECLS
 PacketSelectionSerial::PacketSelectionSerial()
 {
   int i,j,k;
+  openlog("PacketSelectionSerial", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   score = new int**[MAX_N_CLIENT];
   next_score_id = new unsigned char*[MAX_N_CLIENT];
   for(i=0; i<MAX_N_CLIENT; i++)
@@ -64,7 +65,7 @@ int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
     output_port[i] = first_start[i]-1;
   }
 
-  syslog (LOG_DEBUG, "PacketSelectionSerial out. Switch interval: %d\n", interval);
+  syslog (LOG_DEBUG, "Packetselection: finish configure. Switch interval: %d\n", interval);
   return 0;
 }
 
@@ -109,7 +110,7 @@ void PacketSelectionSerial::reset_ap()
   }
   memcpy(p->data(), _ethh, sizeof(click_ether));
 
-  syslog (LOG_DEBUG, "controller reset ap %X\n", i);
+  syslog (LOG_DEBUG, "Packetselection: controller reset ap %X\n", i);
   output(0).push(p);
   }
 }
@@ -121,7 +122,7 @@ void PacketSelectionSerial::push_control(Packet *p_in)
   
   state[c-CLIENT1_IP_SUFFIX] = IDLE;
 
-  syslog (LOG_DEBUG, "switch request ack, ip: %d.\n", c);
+  syslog (LOG_DEBUG, "Packetselection: switch request ack, ip: %d.\n", c);
   p_in -> kill();
 }
 
@@ -147,9 +148,9 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   {
     int rx_rate = status_rxrate(p_in);
     int tx_rate = status_txrate(p_in);
-    syslog (LOG_DEBUG, "client mac: %X, ap id: %X\n", status_mac(p_in), status_ap(p_in));
-    syslog (LOG_DEBUG, "signal: %d, noise: %d\n", status_score(p_in), status_noise(p_in));
-    syslog (LOG_DEBUG, "rx_rate: %d.%dMb/s, tx_rate: %d.%d Mb/s\n", 
+    syslog (LOG_DEBUG, "Packetselection: client mac: %X, ap id: %X\n", status_mac(p_in), status_ap(p_in));
+    syslog (LOG_DEBUG, "Packetselection: signal: %d, noise: %d\n", status_score(p_in), status_noise(p_in));
+    syslog (LOG_DEBUG, "Packetselection: rx_rate: %d.%dMb/s, tx_rate: %d.%d Mb/s\n", 
       rx_rate / 1000, rx_rate / 100, tx_rate / 1000, tx_rate / 100);
   }
 
@@ -170,7 +171,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         if(!(tmp_counter%interval))
         {
             best_ap = (best_ap + 1)% 2;
-            syslog (LOG_DEBUG, "prepare manually switch to ap %X\n", best_ap+1);
+            syslog (LOG_DEBUG, "Packetselection: prepare manually switch to ap %X\n", best_ap+1);
         }
       }
       if(best_ap != output_port[c])
@@ -196,7 +197,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         }
         memcpy(p->data(), _ethh, sizeof(click_ether));
 
-        syslog (LOG_DEBUG, "Issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
+        syslog (LOG_DEBUG, "Packetselection: Issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
         state[c] = SWITCH_REQ;
         output_port[c] = best_ap;
 

@@ -16,6 +16,7 @@ CLICK_DECLS
 CSISep::CSISep()
 {
 #ifdef __arm__
+    openlog("CSISep", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     syslog (LOG_DEBUG, "CSISep: finish init\n");
     // total_msg_cnt = 0;
     sample_counter = 0;
@@ -46,7 +47,7 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
     else if(wlan_port == 1)
         strcpy(ifname, "wlan1");
     else
-        syslog (LOG_DEBUG, "Invalid wlan_port argument\n");
+        syslog (LOG_DEBUG, "CSISep: Invalid wlan_port argument\n");
     iw = iwinfo_backend(ifname);
     if (!iw)
         syslog (LOG_DEBUG, "CSISep: can not connect to backend iwinfo\n");

@@ -14,6 +14,7 @@ CLICK_DECLS
 WGTTQueue::WGTTQueue()
 {
     int i;
+    openlog("WGTTQueue", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     _q = new Packet **[MAX_N_CLIENT];
     for(i=0; i<MAX_N_CLIENT; i++)
     {
@@ -24,7 +25,7 @@ WGTTQueue::WGTTQueue()
     // 0: controller, 1-MAX_N_AP: ap
     _ethh = new click_ether[MAX_N_AP+1];
     next_client = 0;
-    syslog (LOG_DEBUG, "wgtt init succeed\n");
+    syslog (LOG_DEBUG, "WGTTQueue: init succeed\n");
 }
 
 
@@ -32,7 +33,6 @@ WGTTQueue::WGTTQueue()
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-    //syslog (LOG_DEBUG, "In configure\n");
     int tmp[4], i;
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
@@ -47,20 +47,19 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         first_start[i] = tmp[i];
     }
     
-    syslog (LOG_DEBUG, "wgtt configure succeed\n");
+    syslog (LOG_DEBUG, "WGTTQueue: configure succeed\n");
     return 0;
 }
 
 int
 WGTTQueue::initialize(ErrorHandler *errh)
 {
-    syslog (LOG_DEBUG, "wgtt in initialize\n");
     int i;
     for(i=0; i<MAX_N_CLIENT; i++)
     {
         _block[i] = (identity!=first_start[i]);
-        syslog (LOG_DEBUG, "wgttqueue: block[%d] is %d.\n", i, _block[i]);
-        syslog (LOG_DEBUG, "wgttqueue: identity is %d, first_start is%d.\n", identity, first_start[i]);
+        syslog (LOG_DEBUG, "WGTTQueue: block[%d] is %d.\n", i, _block[i]);
+        syslog (LOG_DEBUG, "WGTTQueue: identity is %d, first_start is%d.\n", identity, first_start[i]);
     }
 
     for(i=0; i < MAX_N_AP+1; i++)
@@ -94,7 +93,7 @@ WGTTQueue::initialize(ErrorHandler *errh)
 
     if (_q == 0)
         return errh->error("out of memory");
-    syslog (LOG_DEBUG, "wgtt initialize succeed, ready to start\n");
+    syslog (LOG_DEBUG, "WGTTQueue: initialize succeed, ready to start\n");
     return 0;
 }
 
@@ -142,7 +141,7 @@ WGTTQueue::deRing()
         flag = true;
         p = _q[next_client][_head[next_client]];
         _head[next_client] = (_head[next_client]+1)%RING_SIZE;
-        syslog (LOG_DEBUG, "wgttQueue: deque pkt from queue: %d\n", next_client+1);
+        syslog (LOG_DEBUG, "WGTTQueue: deque pkt from queue: %d\n", next_client+1);
         break;
     }
 
@@ -161,13 +160,13 @@ WGTTQueue::deRing()
 void
 WGTTQueue::push(int, Packet *p_in)
 {
-    syslog (LOG_DEBUG, "wgttQueue in push\n");
+    syslog (LOG_DEBUG, "WGTTQueue: in push\n");
     switch(pkt_type(p_in))
     {
     case CONTROL_SUFFIX:  push_control(p_in);break;
     case DATA_SUFFIX:   push_data(p_in);break;
     }
-    syslog (LOG_DEBUG, "wgttQueue out push\n");
+    syslog (LOG_DEBUG, "WGTTQueue: out push\n");
 }
 
 void WGTTQueue::push_control(Packet *p_in)
@@ -178,7 +177,7 @@ void WGTTQueue::push_control(Packet *p_in)
     {
         if(client_ip(p_in) == RESET_CONTENT) //reset
         {
-            syslog (LOG_DEBUG, "wgttQueue: receive reset req for client: %d\n", c+1);
+            syslog (LOG_DEBUG, "WGTTQueue: receive reset req for client: %d\n", c+1);
             for(i=0; i<MAX_N_CLIENT;i++)
             {
                 _tail[i] = 0;
@@ -193,27 +192,27 @@ void WGTTQueue::push_control(Packet *p_in)
         }
         else
         {
-            syslog (LOG_DEBUG, "wgttQueue: receive switch req for client: %d\n", c+1);
+            syslog (LOG_DEBUG, "WGTTQueue: receive switch req for client: %d\n", c+1);
             _block[c] = true;
             const unsigned char & dst_ap = start_ap(p_in);
             WritablePacket *p = Packet::make(sizeof(click_ether)+2);
             // // data part
             control_content[0] = client_ip(p_in);
             control_content[1] = _head[c];
-            syslog (LOG_DEBUG, "wgttQueue: switch to ap: %d\n", dst_ap+1);
-            syslog (LOG_DEBUG, "wgttQueue: switch id: %X\n", _head[c]);
+            syslog (LOG_DEBUG, "WGTTQueue: switch to ap: %d\n", dst_ap+1);
+            syslog (LOG_DEBUG, "WGTTQueue: switch id: %X\n", _head[c]);
             memcpy(p->data()+sizeof(click_ether), &control_content, 2);
             memcpy(p->data(), &(_ethh[dst_ap+1]), sizeof(click_ether));
 
             p_in -> kill();
-            syslog (LOG_DEBUG, "wgttQueue send ap-ap seq\n");
+            syslog (LOG_DEBUG, "WGTTQueue: send ap-ap seq\n");
             checked_output_push(1, p);
         }
         
     }
     else //from ap
     {
-        syslog (LOG_DEBUG, "wgttQueue receive ap-ap seq for client: %d\n", c+1);
+        syslog (LOG_DEBUG, "WGTTQueue: receive ap-ap seq for client: %d\n", c+1);
 
         const unsigned char & start_seq = start_seq(p_in);
         while(_head[c] != start_seq)
@@ -238,7 +237,7 @@ void WGTTQueue::push_control(Packet *p_in)
         p_in -> kill();
         // syslog (LOG_DEBUG, "ap-c packet push\n");
         _block[c] = false;
-        syslog (LOG_DEBUG, "wgttQueue send switch ack\n");
+        syslog (LOG_DEBUG, "WGTTQueue: send switch ack\n");
         checked_output_push(1, p);
     }
 }
@@ -264,7 +263,7 @@ void WGTTQueue::push_data(Packet *p_in)
         enRing(c, 0);
     }
     p_in -> pull(15);
-    syslog (LOG_DEBUG, "wgttQueue after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
+    syslog (LOG_DEBUG, "WGTTQueue: after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
     enRing(c, p_in);
 }
 

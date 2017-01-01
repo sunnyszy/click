@@ -14,6 +14,7 @@ CLICK_DECLS
 RSSIBecon::RSSIBecon()
 {
 #ifdef __arm__
+    openlog("RSSIBecon", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     syslog (LOG_DEBUG, "RSSIBecon: finish init\n");
 #endif 
 
