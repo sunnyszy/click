@@ -148,7 +148,7 @@ void RControlerControl::push_down_data(Packet*p_in, int port)
     p->push(sizeof(click_ether));
     
     //eth
-    memcpy(p->data(), &(_ethh[outport[port-2]+MAX_N_AP]), sizeof(click_ether));
+    memcpy(p->data(), &(_ethh[outport[port-1]+MAX_N_AP]), sizeof(click_ether));
     output(0).push(p);
 }
 
