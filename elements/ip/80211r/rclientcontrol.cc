@@ -19,7 +19,7 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
   int i, tmp_start[4],tmp_id;
   for(i=0;i<MAX_N_AP;i++)
   {
-    rssi[i] = 255;//quite large
+    rssi[i] = -127;//quite large
   }
   if (Args(conf, this, errh)
       .read_p("IDENTITY", IntArg(), tmp_id)
@@ -125,11 +125,11 @@ void RClientControl::push_80211(Packet*p_in)
   if(c == identity)
     rssi[ap] = rssi_this;
   // if IDLE, considering switching
-  if(c == identity && state == IDLE && rssi[current_ap] < RSSI_THRESHOLD)
+  if(c == identity && state == IDLE && rssi[current_ap] < -67)
   {
     unsigned i;
     unsigned max_id;
-    char max_rssi = -255;
+    char max_rssi = -127;
     // find max rssi
     for(i=0;i<MAX_N_AP;i++)
       if(rssi[i] > max_rssi)

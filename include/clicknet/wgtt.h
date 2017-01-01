@@ -31,7 +31,8 @@ struct my_test_struct {
 
 // client 1 ip
 #define MAX_N_CLIENT 2
-#define RSSI_THRESHOLD -67
+//currently unused
+// #define RSSI_THRESHOLD -67
 
 #define CLIENT1_MAC_SUFFIX 0x07
 #define CLIENT2_MAC_SUFFIX 0xb1

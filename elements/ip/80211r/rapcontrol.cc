@@ -20,7 +20,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
 
   openlog ("RAPControl", LOG_CONS | LOG_NDELAY, 0);
 
-  _ethh = new click_ether[MAX_N_CLIENT];
+  _ethh = new click_ether[MAX_N_CLIENT+1];//first MAX_N_CLIENT: ap->client; ap->controller
   if (Args(conf, this, errh)
       .read_p("IDENTITY", IntArg(), tmp_id)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])
@@ -37,21 +37,40 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
     state[i] = (identity==tmp_start[i])? IDLE:INACTIVE;
     _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
     switch(identity-1)
-        {
-            case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
-            case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
-            case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
-            case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
-            case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
-            case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
-            case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
-            case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
-        }
-        switch(i)
-        {
-            case 0:cp_ethernet_address(CLIENT1_MAC, _ethh[i].ether_dhost);break;
-        }
+    {
+      case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_shost);break;
+      case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_shost);break;
+      case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_shost);break;
+      case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_shost);break;
+      case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_shost);break;
+      case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_shost);break;
+      case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_shost);break;
+      case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_shost);break;
     }
+    switch(i)
+    {
+      case 0:cp_ethernet_address(CLIENT1_MAC, _ethh[i].ether_dhost);break;
+    }
+  }
+
+  _ethh[i].ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
+  switch(identity-1)
+  {
+    case 0:cp_ethernet_address(AP1_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 1:cp_ethernet_address(AP2_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 2:cp_ethernet_address(AP3_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 3:cp_ethernet_address(AP4_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 4:cp_ethernet_address(AP5_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 5:cp_ethernet_address(AP6_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 6:cp_ethernet_address(AP7_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+    case 7:cp_ethernet_address(AP8_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;
+  }
+  switch(i)
+  {
+    case 0:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[MAX_N_CLIENT].ether_dhost);break;
+  }
+
+
 
 
   return 0;
@@ -197,7 +216,12 @@ void RAPControl::push_up_data(Packet*p_in)
   if(state[c] == INACTIVE)
     p_in -> kill();
   else
-    output(1).push(p_in);
+  {
+    WritablePacket *p = p_in->uniqueify();
+    p->push(sizeof(click_ether));
+    memcpy(p->data(), &(_ethh[MAX_N_CLIENT]), sizeof(click_ether));
+    output(1).push(p);
+  }
 }
 
 

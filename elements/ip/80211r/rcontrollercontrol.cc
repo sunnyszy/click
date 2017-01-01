@@ -18,7 +18,7 @@ RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
 
   int i, tmp_start[4];
-  _ethh = new click_ether[MAX_N_AP];
+  _ethh = new click_ether[MAX_N_AP*2];
   if (Args(conf, this, errh)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])
       .read_p("FIRSTSTART2", IntArg(), tmp_start[1])
@@ -33,9 +33,26 @@ RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
   }
 
 
-  for(i=0;i<MAX_N_AP;i++)
+  for(i=0;i<MAX_N_AP;i++)//control pkt
   {
     _ethh[i].ether_type = htons(ETHER_PROTO_BASE+CONTROL_SUFFIX);
+    cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_shost);
+    switch(i)
+    {
+            case 0:cp_ethernet_address(AP1_MAC, _ethh[i].ether_dhost);break;
+            case 1:cp_ethernet_address(AP2_MAC, _ethh[i].ether_dhost);break;
+            case 2:cp_ethernet_address(AP3_MAC, _ethh[i].ether_dhost);break;
+            case 3:cp_ethernet_address(AP4_MAC, _ethh[i].ether_dhost);break;
+            case 4:cp_ethernet_address(AP5_MAC, _ethh[i].ether_dhost);break;
+            case 5:cp_ethernet_address(AP6_MAC, _ethh[i].ether_dhost);break;
+            case 6:cp_ethernet_address(AP7_MAC, _ethh[i].ether_dhost);break;
+            case 7:cp_ethernet_address(AP8_MAC, _ethh[i].ether_dhost);break;
+    }
+  }
+
+  for(i=MAX_N_AP;i<MAX_N_AP*2;i++)//data pkt
+  {
+    _ethh[i].ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
     cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[i].ether_shost);
     switch(i)
     {
@@ -131,7 +148,7 @@ void RControlerControl::push_down_data(Packet*p_in, int port)
     p->push(sizeof(click_ether));
     
     //eth
-    memcpy(p->data(), &(_ethh[outport[port-2]]), sizeof(click_ether));
+    memcpy(p->data(), &(_ethh[outport[port-2]+MAX_N_AP]), sizeof(click_ether));
     output(0).push(p);
 }
 
