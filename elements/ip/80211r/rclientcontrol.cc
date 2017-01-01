@@ -124,10 +124,10 @@ void RClientControl::push_80211(Packet*p_in)
   static unsigned char c;
   switch(status_mac(p_in))
   {
-    case CLIENT1_MAC_SUFFIX: c = 1;
-    case CLIENT2_MAC_SUFFIX: c = 2;
-    case CLIENT3_MAC_SUFFIX: c = 3;
-    case CLIENT4_MAC_SUFFIX: c = 4;
+    case CLIENT1_MAC_SUFFIX: c = 1;break;
+    case CLIENT2_MAC_SUFFIX: c = 2;break;
+    case CLIENT3_MAC_SUFFIX: c = 3;break;
+    case CLIENT4_MAC_SUFFIX: c = 4;break;
   }
   syslog (LOG_DEBUG, "RClientControl: receive becon, ap %d, client %d, rssi %d\n",
       ap+1, c, rssi_this);
