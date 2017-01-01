@@ -66,6 +66,7 @@ RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
             case 7:cp_ethernet_address(AP8_MAC, _ethh[i+MAX_N_AP].ether_dhost);break;
     }
   }
+  syslog (LOG_DEBUG, "RControllerControl: finish configure, ready to start\n");
 
   return 0;
 }
@@ -102,7 +103,7 @@ void RControlerControl::push_up_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[tar]), sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "controller pass deassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller pass ant req for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(t == 0x07)
@@ -118,7 +119,7 @@ void RControlerControl::push_up_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[ori]), sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "controller pass deassociation ack for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller pass ant ack for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(t == 0x0b)
@@ -135,7 +136,7 @@ void RControlerControl::push_up_control(Packet*p_in)
     memcpy(p->data(), &(_ethh[tar]), sizeof(click_ether));
 
     outport[c] = tar;
-    syslog (LOG_DEBUG, "controller ack reassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "controller ack reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   p_in -> kill();
@@ -149,8 +150,8 @@ void RControlerControl::push_down_data(Packet*p_in, int port)
     
     //eth
     memcpy(p->data(), &(_ethh[outport[port-1]+MAX_N_AP]), sizeof(click_ether));
-    syslog (LOG_DEBUG, "port: %d\n", port);
-    syslog (LOG_DEBUG, "outport: %d\n", outport[port-1]);
+    //syslog (LOG_DEBUG, "port: %d\n", port);
+    //syslog (LOG_DEBUG, "outport: %d\n", outport[port-1]);
     output(0).push(p);
 }
 

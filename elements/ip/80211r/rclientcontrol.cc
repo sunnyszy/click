@@ -31,7 +31,7 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
     return -1;
 
   identity = tmp_id;
-  current_ap = tmp_start[identity-1];
+  current_ap = tmp_start[identity-1] - 1;
   state = IDLE;
 
 
@@ -43,7 +43,7 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
     case 1: cp_ethernet_address(CLIENT1_MAC, _ethh->ether_shost);break;
   }
   cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_dhost);
-
+  syslog (LOG_DEBUG, "RClientControl: finish configure, ready to start\n");
   return 0;
 }
 
@@ -70,7 +70,7 @@ void RClientControl::push_control(Packet*p_in)
   if(state == ANT && t == 0x09)
   {
     state = INACTIVE;
-    control_content[0] = 0x09;
+    control_content[0] = 0x0a;
     control_content[1] = c;
     control_content[2] = ori;
     control_content[3] = tar;
@@ -81,13 +81,13 @@ void RClientControl::push_control(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_INFO, "client receive deassociation for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "client send reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state == INACTIVE && t == 0x0d)
   {
     state = IDLE;
-    syslog (LOG_INFO, "client become inactive for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "client finish reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
   }
   p_in -> kill();
   
@@ -96,7 +96,7 @@ void RClientControl::push_control(Packet*p_in)
 void RClientControl::push_downdata(Packet*p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  printf("RClientControl: ether type: %u\n", r_ether_type_suffix(p));
+  //printf("RClientControl: ether type: %u\n", r_ether_type_suffix(p));
   if(r_ether_type_suffix(p) == 0x03)
   {
     memcpy(p->data()+13, &ether_type_ip_suffix, 1);
@@ -129,11 +129,14 @@ void RClientControl::push_80211(Packet*p_in)
     case CLIENT3_MAC_SUFFIX: c = 3;
     case CLIENT4_MAC_SUFFIX: c = 4;
   }
+  syslog (LOG_DEBUG, "RClientControl: receive becon, ap %d, client %d, rssi %d\n",
+      ap+1, c, rssi_this);
   if(c == identity)
     rssi[ap] = rssi_this;
   // if IDLE, considering switching
   if(c == identity && state == IDLE && rssi[current_ap] < -67)
   {
+    syslog (LOG_DEBUG, "Considering to switch\n");
     unsigned i;
     unsigned max_id;
     char max_rssi = -127;
@@ -158,7 +161,7 @@ void RClientControl::push_80211(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_INFO, "client send anthentication for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap, max_id);
+    syslog (LOG_DEBUG, "client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
     current_ap = max_id;
     state = ANT;
     output(0).push(p);

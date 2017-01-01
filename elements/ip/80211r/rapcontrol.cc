@@ -70,7 +70,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
     case 0:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[MAX_N_CLIENT].ether_dhost);break;
   }
 
-
+  syslog (LOG_DEBUG, "RAPControl: finish configure, ready to start\n");
 
 
   return 0;
@@ -108,7 +108,7 @@ void RAPControl::push_up_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "ap %d pass deassociation for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass ant req for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state[c-1] == INACTIVE && t == 0x0a && tar == identity - 1)
@@ -122,7 +122,7 @@ void RAPControl::push_up_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "ap %d pass reassociation for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass reas for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   p_in -> kill();
@@ -147,7 +147,7 @@ void RAPControl::push_down_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "ap %d ack authetication for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d send ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state[c-1] == IDLE && t == 0x08 && ori == identity-1)
@@ -163,7 +163,7 @@ void RAPControl::push_down_control(Packet*p_in)
     memcpy(p->data()+sizeof(click_ether), &control_content, 4);
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
-    syslog (LOG_DEBUG, "ap %d pass authetication ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(1).push(p);
   }
   else if(state[c-1] == INACTIVE && t == 0x0c && tar == identity-1)
@@ -179,7 +179,7 @@ void RAPControl::push_down_control(Packet*p_in)
     memcpy(p->data()+sizeof(click_ether), &control_content, 4);
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
-    syslog (LOG_DEBUG, "ap %d pass reassociation ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass reas ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(1).push(p);
   }
   p_in -> kill();
