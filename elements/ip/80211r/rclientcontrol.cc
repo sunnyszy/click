@@ -137,6 +137,8 @@ void RClientControl::push_80211(Packet*p_in)
   
   if(c == identity)
     rssi[ap] = rssi_this;
+  else
+    return;
   // if IDLE, considering switching
   static unsigned int tmp_counter = 0;
   tmp_counter++;
@@ -152,7 +154,7 @@ void RClientControl::push_80211(Packet*p_in)
     time_lock = false;
 
 
-  if(c == identity && state == IDLE)
+  if(c == identity && state == IDLE && !time_lock)
   {
     unsigned i;
     unsigned max_id;
@@ -178,7 +180,7 @@ void RClientControl::push_80211(Packet*p_in)
           max_id = i;
         }
     }
-    if(max_id == current_ap || time_lock)
+    if(max_id == current_ap)
       return;
     syslog (LOG_DEBUG, "RClientControl: Considering to switch\n");
     control_content[0] = 0x04;

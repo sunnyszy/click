@@ -30,6 +30,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .complete() < 0)
     return -1;
 
+  //down control pkt
   identity = tmp_id;
   for(i=0;i<MAX_N_CLIENT;i++)
   {
@@ -92,12 +93,13 @@ RAPControl::push(int port, Packet *p_in)
 
 void RAPControl::push_up_control(Packet*p_in)
 {
+
   const unsigned char & t = r_control_type(p_in);
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
   const unsigned char & tar = r_control_tar(p_in);
-
-  if(state[c-1] == IDLE && t == 0x04 && ori == identity - 1)
+  syslog (LOG_DEBUG, "RAPControl: AP %d receive up control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
+  if(state[c] == IDLE && t == 0x04 && ori == identity - 1)
   {
     control_content[0] = 0x05;
     control_content[1] = c;
@@ -111,7 +113,7 @@ void RAPControl::push_up_control(Packet*p_in)
     syslog (LOG_DEBUG, "RAPControl: ap %d pass ant req for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
-  else if(state[c-1] == INACTIVE && t == 0x0a && tar == identity - 1)
+  else if(state[c] == INACTIVE && t == 0x0a && tar == identity - 1)
   {
     control_content[0] = 0x0b;
     control_content[1] = c;
@@ -135,8 +137,9 @@ void RAPControl::push_down_control(Packet*p_in)
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
   const unsigned char & tar = r_control_tar(p_in);
+  syslog (LOG_DEBUG, "RAPControl: AP %d receive down control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
 
-  if(state[c-1] == IDLE && t == 0x06 && tar == identity-1)
+  if(state[c] == INACTIVE && t == 0x06 && tar == identity-1)
   {
     control_content[0] = 0x07;
     control_content[1] = c;
@@ -150,7 +153,7 @@ void RAPControl::push_down_control(Packet*p_in)
     syslog (LOG_DEBUG, "RAPControl: ap %d send ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
-  else if(state[c-1] == IDLE && t == 0x08 && ori == identity-1)
+  else if(state[c] == IDLE && t == 0x08 && ori == identity-1)
   {
     state[c] = INACTIVE;
     control_content[0] = 0x09;
@@ -164,9 +167,9 @@ void RAPControl::push_down_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
     syslog (LOG_DEBUG, "RAPControl: ap %d pass ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
-    output(1).push(p);
+    output(2).push(p);
   }
-  else if(state[c-1] == INACTIVE && t == 0x0c && tar == identity-1)
+  else if(state[c] == INACTIVE && t == 0x0c && tar == identity-1)
   {
     state[c] = IDLE;
     control_content[0] = 0x0d;
@@ -180,7 +183,7 @@ void RAPControl::push_down_control(Packet*p_in)
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
     syslog (LOG_DEBUG, "RAPControl: ap %d pass reas ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
-    output(1).push(p);
+    output(2).push(p);
   }
   p_in -> kill();
   
@@ -200,7 +203,6 @@ void RAPControl::push_down_data(Packet*p_in)
     p_in -> kill();
   else
     output(2).push(p_in);
-  
 }
 
 void RAPControl::push_up_data(Packet*p_in)
