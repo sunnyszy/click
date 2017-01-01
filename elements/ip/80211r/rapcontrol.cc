@@ -53,7 +53,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
     }
   }
 
-  _ethh[i].ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
+  _ethh[MAX_N_CLIENT].ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
   switch(identity-1)
   {
     case 0:cp_ethernet_address(AP1_MAC, _ethh[MAX_N_CLIENT].ether_shost);break;

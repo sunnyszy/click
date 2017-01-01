@@ -149,6 +149,8 @@ void RControlerControl::push_down_data(Packet*p_in, int port)
     
     //eth
     memcpy(p->data(), &(_ethh[outport[port-1]+MAX_N_AP]), sizeof(click_ether));
+    syslog (LOG_DEBUG, "port: %d\n", port);
+    syslog (LOG_DEBUG, "outport: %d\n", outport[port-1]);
     output(0).push(p);
 }
 
