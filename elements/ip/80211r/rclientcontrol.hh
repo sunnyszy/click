@@ -37,6 +37,8 @@ class RClientControl : public Element { public:
 
     click_ether * _ethh;
     unsigned char control_content[4];
+    int interval;
+    int print_interval
 
     const unsigned char ether_type_ip_suffix = 0x00;
 

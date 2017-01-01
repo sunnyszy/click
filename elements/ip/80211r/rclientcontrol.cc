@@ -27,6 +27,8 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("FIRSTSTART2", IntArg(), tmp_start[1])
       .read_p("FIRSTSTART3", IntArg(), tmp_start[2])
       .read_p("FIRSTSTART4", IntArg(), tmp_start[3])
+      .read_p("INTERVAL", IntArg(), interval)
+      .read_p("PRINTINTERVAL", IntArg(), print_interval)
       .complete() < 0)
     return -1;
 
@@ -129,27 +131,48 @@ void RClientControl::push_80211(Packet*p_in)
     case CLIENT3_MAC_SUFFIX: c = 3;break;
     case CLIENT4_MAC_SUFFIX: c = 4;break;
   }
-  syslog (LOG_DEBUG, "RClientControl: receive becon, ap %d, client %d, rssi %d\n",
-      ap+1, c, rssi_this);
+  
   if(c == identity)
     rssi[ap] = rssi_this;
   // if IDLE, considering switching
-  if(c == identity && state == IDLE && rssi[current_ap] < -67)
+  static unsigned int tmp_counter = 0;
+  tmp_counter++;
+  if(!(tmp_counter%print_interval))
   {
-    syslog (LOG_DEBUG, "Considering to switch\n");
+    syslog (LOG_DEBUG, "RClientControl: receive becon, ap %d, client %d, rssi %d\n",
+      ap+1, c, rssi_this);
+  }
+
+
+  if(c == identity && state == IDLE)
+  {
     unsigned i;
     unsigned max_id;
-    char max_rssi = -127;
-    // find max rssi
-    for(i=0;i<MAX_N_AP;i++)
-      if(rssi[i] > max_rssi)
+    
+    if(interval > 0)
+    {
+      max_id = current_ap;
+      if(!(tmp_counter%interval))
       {
-        max_rssi = rssi[i];
-        max_id = i;
+          max_id = (max_id + 1)% 2;
+          syslog (LOG_DEBUG, "RClientControl: manually switch to ap %X\n", max_id+1);
       }
+    }
+    else
+    {
+    
+      char max_rssi = -127;
+      // find max rssi
+      for(i=0;i<MAX_N_AP;i++)
+        if(rssi[i] > max_rssi)
+        {
+          max_rssi = rssi[i];
+          max_id = i;
+        }
+    }
     if(max_id == current_ap)
       return;
-    
+    syslog (LOG_DEBUG, "RClientControl: Considering to switch\n");
     control_content[0] = 0x04;
     control_content[1] = identity-1;
     control_content[2] = current_ap;
