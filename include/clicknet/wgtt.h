@@ -92,5 +92,6 @@ struct my_test_struct {
 #define	r_control_tar(p) *(p->data()+17)
 #define r_src_mac_suffix(p) *(p->data()+11)
 #define r_dst_mac_suffix(p) *(p->data()+5)
+#define r_ether_type_suffix(p) *(p->data()+13)
 
 #endif

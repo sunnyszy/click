@@ -38,6 +38,8 @@ class RClientControl : public Element { public:
     click_ether * _ethh;
     unsigned char control_content[4];
 
+    const unsigned char ether_type_ip_suffix = 0x00;
+
     
 
 };

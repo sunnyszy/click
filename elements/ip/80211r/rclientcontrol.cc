@@ -95,10 +95,17 @@ void RClientControl::push_control(Packet*p_in)
 
 void RClientControl::push_downdata(Packet*p_in)
 {
+  WritablePacket *p = p_in->uniqueify();
+  printf("RClientControl: ether type: %u\n", r_ether_type_suffix(p));
+  if(r_ether_type_suffix(p) == 0x03)
+  {
+    memcpy(p->data()+13, &ether_type_ip_suffix, 1);
+  }  
+
   if(state == INACTIVE)
-    p_in -> kill();
+    p -> kill();
   else
-    output(1).push(p_in);
+    output(1).push(p);
   
 }
 
