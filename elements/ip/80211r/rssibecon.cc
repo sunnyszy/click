@@ -41,7 +41,7 @@ RSSIBecon::configure(Vector<String> &conf, ErrorHandler *errh)
     else if(wlan_port == 1)
         strcpy(ifname, "wlan1");
     else
-        syslog (LOG_DEBUG, "Invalid wlan_port argument\n");
+        syslog (LOG_DEBUG, "RSSIBecon: Invalid wlan_port argument\n");
     iw = iwinfo_backend(ifname);
     if (!iw)
         syslog (LOG_DEBUG, "RSSIBecon: can not connect to backend iwinfo\n");

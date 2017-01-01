@@ -86,13 +86,13 @@ void RClientControl::push_control(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "client send reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "RClientControl: client send reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state == INACTIVE && t == 0x0d)
   {
     state = IDLE;
-    syslog (LOG_DEBUG, "client finish reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "RClientControl: client finish reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
   }
   p_in -> kill();
   
@@ -192,7 +192,7 @@ void RClientControl::push_80211(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
+    syslog (LOG_DEBUG, "RClientControl: client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
     current_ap = max_id;
     state = ANT;
     time_lock = true;
