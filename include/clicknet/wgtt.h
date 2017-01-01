@@ -58,8 +58,8 @@ struct my_test_struct {
 #define CONTROLLER_IN_MAC_SUFFIX 0x7d
 
 #define RING_SIZE 256
-// 1000 ms
-#define SWITCH_MIN 500
+// unit ms
+#define SWITCH_MIN 100000
 // content encapsulated in mac header
 #define RESET_CONTENT 0xff
 

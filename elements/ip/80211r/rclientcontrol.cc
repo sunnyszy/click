@@ -45,6 +45,9 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
     case 1: cp_ethernet_address(CLIENT1_MAC, _ethh->ether_shost);break;
   }
   cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_dhost);
+
+  time_lock = false;
+  last_time = 0;
   syslog (LOG_DEBUG, "RClientControl: finish configure, ready to start\n");
   return 0;
 }
@@ -143,6 +146,11 @@ void RClientControl::push_80211(Packet*p_in)
       ap+1, c, rssi_this);
   }
 
+  gettimeofday(&tv, NULL);
+  double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+  if(now_time - last_time > SWITCH_MIN)
+    time_lock = false;
+
 
   if(c == identity && state == IDLE)
   {
@@ -170,7 +178,7 @@ void RClientControl::push_80211(Packet*p_in)
           max_id = i;
         }
     }
-    if(max_id == current_ap)
+    if(max_id == current_ap || time_lock)
       return;
     syslog (LOG_DEBUG, "RClientControl: Considering to switch\n");
     control_content[0] = 0x04;
@@ -187,6 +195,10 @@ void RClientControl::push_80211(Packet*p_in)
     syslog (LOG_DEBUG, "client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
     current_ap = max_id;
     state = ANT;
+    time_lock = true;
+    gettimeofday(&tv, NULL);
+    last_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+
     output(0).push(p);
   }
 

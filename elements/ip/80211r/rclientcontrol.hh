@@ -10,6 +10,7 @@
 #include <clicknet/wgtt.h>
 #include <clicknet/ether.h>
 #include <syslog.h>
+#include <sys/time.h>
 
 CLICK_DECLS
 
@@ -37,10 +38,16 @@ class RClientControl : public Element { public:
 
     click_ether * _ethh;
     unsigned char control_content[4];
+    
+    const unsigned char ether_type_ip_suffix = 0x00;
+
+
     int interval;
     int print_interval;
-
-    const unsigned char ether_type_ip_suffix = 0x00;
+    // after issue switch, a time lock will be set for 1 second
+    bool time_lock;
+    double last_time;
+    struct timeval tv;
 
     
 
