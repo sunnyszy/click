@@ -49,7 +49,7 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
 
   time_lock = false;
   last_time = 0;
-  syslog (LOG_DEBUG, "RClientControl: finish configure, ready to start\n");
+  syslog (LOG_DEBUG, "finish configure, ready to start\n");
   return 0;
 }
 
@@ -87,13 +87,13 @@ void RClientControl::push_control(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "RClientControl: client send reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "client send reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state == INACTIVE && t == 0x0d)
   {
     state = IDLE;
-    syslog (LOG_DEBUG, "RClientControl: client finish reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "client finish reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
   }
   p_in -> kill();
   
@@ -102,7 +102,7 @@ void RClientControl::push_control(Packet*p_in)
 void RClientControl::push_downdata(Packet*p_in)
 {
   WritablePacket *p = p_in->uniqueify();
-  //printf("RClientControl: ether type: %u\n", r_ether_type_suffix(p));
+  //printf("ether type: %u\n", r_ether_type_suffix(p));
   if(r_ether_type_suffix(p) == 0x03)
   {
     memcpy(p->data()+13, &ether_type_ip_suffix, 1);
@@ -145,7 +145,7 @@ void RClientControl::push_80211(Packet*p_in)
   tmp_counter++;
   if(!(tmp_counter%print_interval))
   {
-    syslog (LOG_DEBUG, "RClientControl: receive becon, ap %d, client %d, rssi %d\n",
+    syslog (LOG_DEBUG, "receive becon, ap %d, client %d, rssi %d\n",
       ap+1, c, rssi_this);
   }
 
@@ -166,7 +166,7 @@ void RClientControl::push_80211(Packet*p_in)
       if(!(tmp_counter%interval))
       {
           max_id = (max_id + 1)% 2;
-          syslog (LOG_DEBUG, "RClientControl: manually switch to ap %X\n", max_id+1);
+          syslog (LOG_DEBUG, "manually switch to ap %X\n", max_id+1);
       }
     }
     else
@@ -184,7 +184,7 @@ void RClientControl::push_80211(Packet*p_in)
     }
     if(max_id == current_ap)
       return;
-    syslog (LOG_DEBUG, "RClientControl: Considering to switch\n");
+    syslog (LOG_DEBUG, "Considering to switch\n");
     control_content[0] = 0x04;
     control_content[1] = identity-1;
     control_content[2] = current_ap;
@@ -196,7 +196,7 @@ void RClientControl::push_80211(Packet*p_in)
   
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "RClientControl: client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
+    syslog (LOG_DEBUG, "client send ant req for client %d, ap_ori %d, ap_tar %d\n", identity, current_ap+1, max_id+1);
     current_ap = max_id;
     state = ANT;
     time_lock = true;

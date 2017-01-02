@@ -71,7 +71,7 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
     case 0:cp_ethernet_address(CONTROLLER_IN_MAC, _ethh[MAX_N_CLIENT].ether_dhost);break;
   }
 
-  syslog (LOG_DEBUG, "RAPControl: finish configure, ready to start\n");
+  syslog (LOG_DEBUG, "finish configure, ready to start\n");
 
 
   return 0;
@@ -98,7 +98,7 @@ void RAPControl::push_up_control(Packet*p_in)
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
   const unsigned char & tar = r_control_tar(p_in);
-  syslog (LOG_DEBUG, "RAPControl: AP %d receive up control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
+  syslog (LOG_DEBUG, "AP %d receive up control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
   if(state[c] == IDLE && t == 0x04 && ori == identity - 1)
   {
     control_content[0] = 0x05;
@@ -110,7 +110,7 @@ void RAPControl::push_up_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "RAPControl: ap %d pass ant req for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass ant req for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state[c] == INACTIVE && t == 0x0a && tar == identity - 1)
@@ -124,7 +124,7 @@ void RAPControl::push_up_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "RAPControl: ap %d pass reas for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass reas for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   p_in -> kill();
@@ -137,7 +137,7 @@ void RAPControl::push_down_control(Packet*p_in)
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
   const unsigned char & tar = r_control_tar(p_in);
-  syslog (LOG_DEBUG, "RAPControl: AP %d receive down control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
+  syslog (LOG_DEBUG, "AP %d receive down control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
 
   if(state[c] == INACTIVE && t == 0x06 && tar == identity-1)
   {
@@ -150,7 +150,7 @@ void RAPControl::push_down_control(Packet*p_in)
     // // data part
     memcpy(p->data(), &control_content, 4);
 
-    syslog (LOG_DEBUG, "RAPControl: ap %d send ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d send ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
   else if(state[c] == IDLE && t == 0x08 && ori == identity-1)
@@ -166,7 +166,7 @@ void RAPControl::push_down_control(Packet*p_in)
     memcpy(p->data()+sizeof(click_ether), &control_content, 4);
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
-    syslog (LOG_DEBUG, "RAPControl: ap %d pass ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass ant ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(2).push(p);
   }
   else if(state[c] == INACTIVE && t == 0x0c && tar == identity-1)
@@ -182,7 +182,7 @@ void RAPControl::push_down_control(Packet*p_in)
     memcpy(p->data()+sizeof(click_ether), &control_content, 4);
   
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
-    syslog (LOG_DEBUG, "RAPControl: ap %d pass reas ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
+    syslog (LOG_DEBUG, "ap %d pass reas ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(2).push(p);
   }
   p_in -> kill();

@@ -15,7 +15,7 @@ RSSIBecon::RSSIBecon()
 {
 #ifdef __arm__
     openlog("RSSIBecon", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
-    syslog (LOG_DEBUG, "RSSIBecon: finish init\n");
+    syslog (LOG_DEBUG, "finish init\n");
 #endif 
 
 }
@@ -42,12 +42,12 @@ RSSIBecon::configure(Vector<String> &conf, ErrorHandler *errh)
     else if(wlan_port == 1)
         strcpy(ifname, "wlan1");
     else
-        syslog (LOG_DEBUG, "RSSIBecon: Invalid wlan_port argument\n");
+        syslog (LOG_DEBUG, "Invalid wlan_port argument\n");
     iw = iwinfo_backend(ifname);
     if (!iw)
-        syslog (LOG_DEBUG, "RSSIBecon: can not connect to backend iwinfo\n");
+        syslog (LOG_DEBUG, "can not connect to backend iwinfo\n");
 #endif
-    syslog (LOG_DEBUG, "RSSIBecon: finish configure, ready to start\n");
+    syslog (LOG_DEBUG, "finish configure, ready to start\n");
     return 0;
 }
 
@@ -58,9 +58,9 @@ RSSIBecon::fragment(Packet *p_in)
     int i,j;
 
     if(!(iw->assoclist(ifname, buf, &len)))
-    //     // syslog (LOG_DEBUG, "RSSIBecon: can not find associlist\n");
+    //     // syslog (LOG_DEBUG, "can not find associlist\n");
     // else if (len <= 0)
-    //     // syslog (LOG_DEBUG, "RSSIBecon: associ number < 0\n");
+    //     // syslog (LOG_DEBUG, "associ number < 0\n");
     // else if (len)
     {
         // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
@@ -99,7 +99,7 @@ void
 RSSIBecon::push(int, Packet *p)
 {
 #ifdef __arm__ 
-    // syslog (LOG_DEBUG, "RSSIBecon: in push\n");
+    // syslog (LOG_DEBUG, "in push\n");
 	fragment(p);
 #endif
 }
