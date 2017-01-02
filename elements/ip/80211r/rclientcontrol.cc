@@ -171,7 +171,8 @@ void RClientControl::push_80211(Packet*p_in)
     }
     else
     {
-    
+      if(rssi[current_ap] >= -70)
+        return;
       char max_rssi = -127;
       // find max rssi
       for(i=0;i<MAX_N_AP;i++)
