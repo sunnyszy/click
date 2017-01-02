@@ -173,6 +173,7 @@ void RClientControl::push_80211(Packet*p_in)
     {
       if(rssi[current_ap] >= -70)
         return;
+
       char max_rssi = -127;
       // find max rssi
       for(i=0;i<MAX_N_AP;i++)
@@ -184,7 +185,7 @@ void RClientControl::push_80211(Packet*p_in)
     }
     if(max_id == current_ap)
       return;
-    syslog (LOG_DEBUG, "Considering to switch\n");
+    syslog (LOG_DEBUG, "Considering to switch, current rssi: %d\n", rssi[current_ap]);
     control_content[0] = 0x04;
     control_content[1] = identity-1;
     control_content[2] = current_ap;
