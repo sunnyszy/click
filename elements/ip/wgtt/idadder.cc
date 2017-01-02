@@ -26,7 +26,7 @@ void IDAdder::push(int port, Packet *p_in)
 {
 	// a bug here, can not set ether net type, src at initialization
 	static bool lock = false;
-	if(!false)
+	if(!lock)
 	{
 		lock = true;
 		_ethh.ether_type = htons(ETHER_PROTO_BASE+DATA_SUFFIX);
