@@ -140,6 +140,10 @@ void RClientControl::push_80211(Packet*p_in)
     rssi[ap] = rssi_this;
   else
     return;
+
+  //if not update, return
+  if(rssi[current]==-127)
+    return;
   // if IDLE, considering switching
   static unsigned int tmp_counter = 0;
   tmp_counter++;
