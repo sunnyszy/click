@@ -290,7 +290,7 @@ unsigned char PacketSelectionSerial::find_best_ap_global(unsigned char c)
       min_value = sum;
     }
   }
-  return i;
+  return min_id;
 }
 
 
