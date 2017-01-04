@@ -110,7 +110,7 @@ void PacketSelectionSerial::reset_ap()
   }
   memcpy(p->data(), _ethh, sizeof(click_ether));
 
-  syslog (LOG_DEBUG, "Controller reset ap %X\n", i);
+  syslog (LOG_DEBUG, "Controller reset ap %X\n", i+1);
   output(0).push(p);
   }
 }
@@ -159,11 +159,12 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   if(now_time - last_time[c] > SWITCH_MIN)
     time_lock[c] = false;
 
+
   if(state[c] == IDLE && !time_lock[c])
   {
       // syslog (LOG_DEBUG, "state idle\n");
       unsigned char best_ap = find_best_ap(c);
-
+      syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
       // WGTT
       if(interval>0)
       {

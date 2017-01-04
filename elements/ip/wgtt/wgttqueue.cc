@@ -141,7 +141,7 @@ WGTTQueue::deRing()
         flag = true;
         p = _q[next_client][_head[next_client]];
         _head[next_client] = (_head[next_client]+1)%RING_SIZE;
-        syslog (LOG_DEBUG, "deque pkt from queue: %d\n", next_client+1);
+        // syslog (LOG_DEBUG, "deque pkt from queue: %d\n", next_client+1);
         break;
     }
 
@@ -160,13 +160,13 @@ WGTTQueue::deRing()
 void
 WGTTQueue::push(int, Packet *p_in)
 {
-    syslog (LOG_DEBUG, "in push\n");
+    // syslog (LOG_DEBUG, "in push\n");
     switch(pkt_type(p_in))
     {
     case CONTROL_SUFFIX:  push_control(p_in);break;
     case DATA_SUFFIX:   push_data(p_in);break;
     }
-    syslog (LOG_DEBUG, "out push\n");
+    // syslog (LOG_DEBUG, "out push\n");
 }
 
 void WGTTQueue::push_control(Packet *p_in)
@@ -263,7 +263,7 @@ void WGTTQueue::push_data(Packet *p_in)
         enRing(c, 0);
     }
     p_in -> pull(15);
-    syslog (LOG_DEBUG, "after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
+    // syslog (LOG_DEBUG, "after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
     enRing(c, p_in);
 }
 
