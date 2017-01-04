@@ -99,7 +99,8 @@ void RAPControl::push_up_control(Packet*p_in)
   const unsigned char & ori = r_control_ori(p_in);
   const unsigned char & tar = r_control_tar(p_in);
   syslog (LOG_DEBUG, "AP %d receive up control: state %d, type %X, client %d, ap_ori %d, ap_tar %d\n", identity, state[c], t, c+1, ori+1, tar+1);
-  if(state[c] == IDLE && t == 0x04 && ori == identity - 1)
+  //if(state[c] == IDLE && t == 0x04 && ori == identity - 1)
+  if(t == 0x04)
   {
     control_content[0] = 0x05;
     control_content[1] = c;
@@ -113,7 +114,7 @@ void RAPControl::push_up_control(Packet*p_in)
     syslog (LOG_DEBUG, "ap %d pass ant req for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
-  else if(state[c] == INACTIVE && t == 0x0a && tar == identity - 1)
+  else if(t == 0x0a) //(state[c] == INACTIVE && t == 0x0a && tar == identity - 1)
   {
     control_content[0] = 0x0b;
     control_content[1] = c;

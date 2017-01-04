@@ -40,7 +40,7 @@ struct my_test_struct {
 #define CLIENT4_MAC_SUFFIX 0x0a
 #define CLIENT1_MAC "44:c3:06:31:5b:07"
 // ap 
-#define MAX_N_AP 6
+#define MAX_N_AP 8
 #define CLIENT1_IP_SUFFIX 135
 #define AP1_MAC "70:88:6b:80:60:01"
 #define AP2_MAC "70:88:6b:80:60:02"
