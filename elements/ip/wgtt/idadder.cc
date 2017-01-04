@@ -19,7 +19,7 @@ IDAdder::IDAdder()
 	openlog("IDAdder", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
 	for(i=0; i<MAX_N_CLIENT; i++)
 		counter[i] = 0;
-	syslog (LOG_DEBUG, "IDAdder: idadder init finish\n");
+	syslog (LOG_DEBUG, "idadder init finish\n");
 }
 
 void IDAdder::push(int port, Packet *p_in)
