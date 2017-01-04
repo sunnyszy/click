@@ -275,7 +275,7 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
 // incomplete version, only for 2 ap and 1 client
 unsigned char PacketSelectionSerial::find_best_ap_global(unsigned char c)
 {
-  int min_id, min_value = 9999;
+  int min_id = 0, min_value = 9999;
   unsigned char i, j;
   for(i=0; i<MAX_N_AP;i++)
   {
