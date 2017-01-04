@@ -32,7 +32,8 @@ class PacketSelectionSerial : public Element { public:
     void push_control(Packet *p_in);
     void push_status(Packet *p_in);
     // find best ap for client c
-    unsigned char find_best_ap(unsigned char c);
+    unsigned char find_best_ap_neighbor(unsigned char c);
+    unsigned char find_best_ap_global(unsigned char c);
     
   private:
     

@@ -163,8 +163,8 @@ void PacketSelectionSerial::push_status(Packet *p_in)
   if(state[c] == IDLE && !time_lock[c])
   {
       // syslog (LOG_DEBUG, "state idle\n");
-      unsigned char best_ap = find_best_ap(c);
-      syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
+      unsigned char best_ap;
+      // syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
       // WGTT
       if(interval>0)
       {
@@ -175,6 +175,9 @@ void PacketSelectionSerial::push_status(Packet *p_in)
             syslog (LOG_DEBUG, "prepare manually switch to ap %X\n", best_ap+1);
         }
       }
+      else
+         best_ap = find_best_ap_global(c);
+
       if(best_ap != output_port[c])
       {
         // send_meg(best_ap)
@@ -214,7 +217,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
 }
 
 // incomplete version, only for 2 ap and 1 client
-unsigned char PacketSelectionSerial::find_best_ap(unsigned char c)
+unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
 {
   unsigned char &current = output_port[c];
   
@@ -268,6 +271,28 @@ unsigned char PacketSelectionSerial::find_best_ap(unsigned char c)
   else
     return current;
 }
+
+// incomplete version, only for 2 ap and 1 client
+unsigned char PacketSelectionSerial::find_best_ap_global(unsigned char c)
+{
+  int min_id, min_value = 9999;
+  unsigned char i, j;
+  for(i=0; i<MAX_N_AP;i++)
+  {
+    int sum = 0;
+    for(j=0; j<n_compare;j++)
+    {
+      sum += score[c][i][j];
+    }
+    if(sum < min_value)
+    {
+      min_id = i;
+      min_value = sum;
+    }
+  }
+  return i;
+}
+
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(PacketSelectionSerial)
