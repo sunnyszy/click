@@ -5,8 +5,8 @@
  Created by Zhenyu Song: sunnyszy@gmail.com
  */
 
-#ifndef CLICK_CSISEP_HH
-#define CLICK_CSISEP_HH
+#ifndef CLICK_STATUSCOLLECT_HH
+#define CLICK_STATUSCOLLECT_HH
 #include <click/element.hh>
 #include <click/glue.hh>
 #include <click/atomic.hh>
@@ -24,12 +24,12 @@ extern "C"
 
 CLICK_DECLS
 
-class CSISep : public Element { public:
+class StatusCollect : public Element { public:
 
-  CSISep() CLICK_COLD;
-  ~CSISep() CLICK_COLD;
+  StatusCollect() CLICK_COLD;
+  ~StatusCollect() CLICK_COLD;
 
-  const char *class_name() const		{ return "CSISep"; }
+  const char *class_name() const		{ return "StatusCollect"; }
   const char *port_count() const		{ return PORTS_1_1X2; }
   const char *processing() const		{ return PUSH; }
 

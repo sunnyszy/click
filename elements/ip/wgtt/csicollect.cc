@@ -1,22 +1,22 @@
 /*
- sample rssi/noise/txrate/rxrate
+ sample csi, rssi from TP-Link router
  Input: data pkt
- Output: port 0: data pkt, port 1: status
+ Output: port 0: csi pkt, port 1: rssi pkt
  Created by Zhenyu Song: sunnyszy@gmail.com
  */
 
 #include <click/config.h>
-#include "csisep.hh"
+#include "csicollect.hh"
 #include <click/args.hh>
 #include <click/error.hh>
 #include <click/glue.hh>
 
 CLICK_DECLS
 
-CSISep::CSISep()
+CSICollect::CSICollect()
 {
-#ifdef __arm__
-    openlog("APControl_CSISep", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
+#ifdef __mips__
+    openlog("APControl_CSICollect", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     syslog (LOG_DEBUG, "finish init\n");
     // total_msg_cnt = 0;
     sample_counter = 0;
@@ -24,24 +24,27 @@ CSISep::CSISep()
 
 }
 
-CSISep::~CSISep()
+CSICollect::~CSICollect()
 {
-#ifdef __arm__ 
+#ifdef __mips__ 
     iwinfo_finish();
 #endif
 }
 
 int
-CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
+CSICollect::configure(Vector<String> &conf, ErrorHandler *errh)
 {
     int wlan_port;
+    int tmp_len;
     if (Args(conf, this, errh)
       .read_p("SAMPLERATE", IntArg(), sample_rate)
       .read_p("WLANPORT", IntArg(), wlan_port)
+      .read_p("PACKETLENGTH", IntArg(), tmp_len)
       .complete() < 0)
     return -1;
 
-#ifdef __arm__ 
+#ifdef __mips__ 
+    packet_length = tmp_len;
     if(wlan_port == 0)
         strcpy(ifname, "wlan0");
     else if(wlan_port == 1)
@@ -57,9 +60,9 @@ CSISep::configure(Vector<String> &conf, ErrorHandler *errh)
 }
 
 void
-CSISep::fragment(Packet *p_in)
+CSICollect::fragment(Packet *p_in)
 {
-#ifdef __arm__ 
+#ifdef __mips__ 
     int i,j;
     sample_counter ++;
     if(sample_counter>sample_rate)
@@ -67,9 +70,9 @@ CSISep::fragment(Packet *p_in)
         sample_counter = 0;
 
         if(!(iw->assoclist(ifname, buf, &len)))
-        //     // syslog (LOG_DEBUG, "CSISep: can not find associlist\n");
+        //     // syslog (LOG_DEBUG, "CSICollect: can not find associlist\n");
         // else if (len <= 0)
-        //     // syslog (LOG_DEBUG, "CSISep: associ number < 0\n");
+        //     // syslog (LOG_DEBUG, "CSICollect: associ number < 0\n");
         // else if (len)
         {
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
@@ -101,20 +104,27 @@ CSISep::fragment(Packet *p_in)
             
         }
     }
-#endif    
-    output(0).push(p_in);
-
+   
+    if(p_in->length() > packet_length)
+    {
+        p_in->pull(p_in->length() - 140);
+        output(0).push(p_in);
+    }
+    else
+        p_in -> kill();
+    
+#endif 
 }
 
 void
-CSISep::push(int, Packet *p)
+CSICollect::push(int, Packet *p)
 {
-#ifdef __arm__ 
-    // syslog (LOG_DEBUG, "CSISep: in push\n");
+#ifdef __mips__ 
+    // syslog (LOG_DEBUG, "CSICollect: in push\n");
 	fragment(p);
 #endif
 }
 
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(CSISep)
+EXPORT_ELEMENT(CSICollect)
