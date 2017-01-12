@@ -127,7 +127,7 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
   }
 
   //data packet
-  WritablePacket *p_data = Packet::make(4);
+  WritablePacket *p_data = Packet::make(1100);
   memcpy(p_data->data(), &tmp_counter, 4);
     //syslog (LOG_DEBUG, "issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
     //output_port = best_ap;
