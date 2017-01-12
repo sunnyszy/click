@@ -75,7 +75,7 @@ void SimpleControllerSwitch::reset_ap()
   memcpy(p->data(), _ethh, sizeof(click_ether));
 
   syslog (LOG_DEBUG, "Controller reset ap %X\n", i+1);
-  output(0).push(p);
+  output(1).push(p);
   }
 }
 
