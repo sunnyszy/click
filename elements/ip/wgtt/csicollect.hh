@@ -49,7 +49,6 @@ class CSICollect : public Element { public:
   char buf[IWINFO_BUFSIZE];
   char ifname[6];
   struct iwinfo_assoclist_entry *e;
-  unsigned int packet_length;
 #endif 
 
 

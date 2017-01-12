@@ -35,16 +35,13 @@ int
 CSICollect::configure(Vector<String> &conf, ErrorHandler *errh)
 {
     int wlan_port;
-    int tmp_len;
     if (Args(conf, this, errh)
       .read_p("SAMPLERATE", IntArg(), sample_rate)
       .read_p("WLANPORT", IntArg(), wlan_port)
-      .read_p("PACKETLENGTH", IntArg(), tmp_len)
       .complete() < 0)
     return -1;
 
 #ifdef __mips__ 
-    packet_length = tmp_len;
     if(wlan_port == 0)
         strcpy(ifname, "wlan0");
     else if(wlan_port == 1)
@@ -105,7 +102,7 @@ CSICollect::fragment(Packet *p_in)
         }
     }
    
-    if(p_in->length() > packet_length)
+    if(p_in->length() > 141)
     {
         p_in->pull(p_in->length() - 140);
         output(0).push(p_in);
