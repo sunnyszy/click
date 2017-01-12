@@ -83,7 +83,7 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
 {
   const unsigned char a = status_ap(p_in) - 1;
   unsigned char c = 0;
-  static unsigned int tmp_counter = 0;
+  static unsigned long long tmp_counter = 0;
   tmp_counter++;
 
   p_in -> kill();
@@ -128,7 +128,7 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
 
   //data packet
   WritablePacket *p_data = Packet::make(1100);
-  memcpy(p_data->data(), &tmp_counter, 4);
+  memcpy(p_data->data(), &tmp_counter, 8);
     //syslog (LOG_DEBUG, "issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
     //output_port = best_ap;
   output(0).push(p_data);
