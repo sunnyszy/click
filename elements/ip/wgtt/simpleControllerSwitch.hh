@@ -12,6 +12,7 @@
 #include <clicknet/ether.h>
 #include <click/confparse.hh>
 #include <clicknet/wgtt.h>
+#include <clicknet/tcp.h>
 #include <sys/time.h>
 #include <syslog.h>
 CLICK_DECLS
@@ -43,6 +44,7 @@ class SimpleControllerSwitch : public Element { public:
     int interval;
 
     click_ether * _ethh;
+    click_tcp _tcp;
 
 
 };
