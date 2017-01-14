@@ -150,6 +150,11 @@ WGTTQueue::deRing()
     if(flag)
     {
         // syslog (LOG_DEBUG, "wgttQueue: deque succeed\n");
+        // WGTT: dont forget this is for debug
+        // this is for debug
+        if(p && identity == 5)
+            _block[0] == true;
+
         return p;
     }
     else
