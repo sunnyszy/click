@@ -9,7 +9,26 @@
 #include "wgttqueue.hh"
 #include <click/args.hh>
 #include <click/error.hh>
+//WGTT
+#include <sys/socket.h>
+#include <linux/netlink.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
 CLICK_DECLS
+
+#define NETLINK_USER 31
+#define MAX_PAYLOAD 2 /* maximum payload size, actually 3 is needed*/
+struct sockaddr_nl src_addr, dest_addr;
+struct nlmsghdr *nlh = NULL;
+struct iovec iov;
+int sock_fd;
+struct msghdr msg;
+struct WGTT_MSG
+{
+    unsigned char client: 4;
+    unsigned short seq: 12;
+} wgtt_msg;
 
 WGTTQueue::WGTTQueue()
 {
@@ -28,12 +47,17 @@ WGTTQueue::WGTTQueue()
     syslog (LOG_DEBUG, "init succeed\n");
 }
 
+WGTTQueue::~WGTTQueue()
+{
+    close(sock_fd);
+}
 
 
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
     int tmp[4], i;
+    syslog (LOG_DEBUG, "enter configure\n");
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
         .read_p("FIRSTSTART1", IntArg(), tmp[0])
@@ -41,12 +65,73 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         .read_p("FIRSTSTART3", IntArg(), tmp[2])
         .read_p("FIRSTSTART4", IntArg(), tmp[3])
         .complete() < 0)
-    return -1;
+    {
+        syslog (LOG_DEBUG, "parse configure fail\n");
+        return -1;
+    }
+    
     for(i=0;i<MAX_N_CLIENT;i++)
     {
         first_start[i] = tmp[i];
     }
     
+
+
+    //WGTT test
+    //WGTT driver test
+    sock_fd=socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
+    if(sock_fd<0)
+    {
+        syslog (LOG_DEBUG, "socket create fail\n");
+        return -1;
+    }
+    syslog (LOG_DEBUG, "socket create succeed\n");
+    memset(&src_addr, 0, sizeof(src_addr));
+    src_addr.nl_family = AF_NETLINK;
+    src_addr.nl_pid = getpid(); /* self pid */
+
+    bind(sock_fd, (struct sockaddr*)&src_addr, sizeof(src_addr));
+
+    memset(&dest_addr, 0, sizeof(dest_addr));
+
+    dest_addr.nl_family = AF_NETLINK;
+    dest_addr.nl_pid = 0; /* For Linux Kernel */
+    dest_addr.nl_groups = 0; /* unicast */
+
+    nlh = (struct nlmsghdr *)malloc(NLMSG_SPACE(MAX_PAYLOAD));
+    memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
+    nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
+    nlh->nlmsg_pid = getpid();
+    nlh->nlmsg_flags = 0;
+
+    // //printf("nlmsg_len: %u, nlmsg_pid: %u\n", nlh->nlmsg_len, nlh->nlmsg_pid);
+    // if(identity == 5)
+    //     wgtt_msg.client = 0;//disable 5
+    // else
+    //     wgtt_msg.client = 4;
+    // wgtt_msg.seq = 0;
+    // memcpy(NLMSG_DATA(nlh), &wgtt_msg, sizeof(wgtt_msg));
+    // syslog (LOG_DEBUG, "Send reset message to driver\n");
+
+    // iov.iov_base = (void *)nlh;
+    // iov.iov_len = nlh->nlmsg_len;
+    // msg.msg_name = (void *)&dest_addr;
+    // msg.msg_namelen = sizeof(dest_addr);
+    // msg.msg_iov = &iov;
+    // msg.msg_iovlen = 1;
+
+    // syslog (LOG_DEBUG, "Sending reset message to kernel\n");
+    // sendmsg(sock_fd,&msg,0);
+    // syslog (LOG_DEBUG, "Waiting for reset ack message from kernel\n");
+
+    // /* Read message from kernel */
+    // recvmsg(sock_fd, &msg, 0);
+    // memcpy(&wgtt_msg, NLMSG_DATA(nlh), sizeof(wgtt_msg));
+    // syslog (LOG_DEBUG, "Received reset ack message client: %u, seq: %u\n", wgtt_msg.client, wgtt_msg.seq);
+
+
+
+
     syslog (LOG_DEBUG, "configure succeed\n");
     return 0;
 }
@@ -147,13 +232,23 @@ WGTTQueue::deRing()
 
     next_client = next_client_after;
 
-    if(flag)
+    if(flag && p)
     {
         // syslog (LOG_DEBUG, "wgttQueue: deque succeed\n");
         // WGTT: dont forget this is for debug
         // this is for debug
-        if(p && identity == 5)
-            _block[0] == true;
+        
+        if(identity == 5)
+        {
+            static unsigned int tmp_counter = 0;
+            tmp_counter ++;
+            if(tmp_counter >= 10)
+            {
+                _block[0] == true;
+                syslog(LOG_DEBUG, "wgttQueue: AP5 disable\n");
+                return 0;
+            }
+        }
 
         return p;
     }
@@ -178,6 +273,7 @@ void WGTTQueue::push_control(Packet *p_in)
 {
     int i,j;
     unsigned char c = client_ip(p_in)- CLIENT1_IP_SUFFIX; //index for client
+    syslog (LOG_DEBUG, "receive control msg\n");
     if(status_ap(p_in) == CONTROLLER_IN_MAC_SUFFIX) //from controller
     {
         if(client_ip(p_in) == RESET_CONTENT) //reset
@@ -199,6 +295,31 @@ void WGTTQueue::push_control(Packet *p_in)
         {
             syslog (LOG_DEBUG, "receive switch req for client: %d\n", c+1);
             _block[c] = true;
+
+
+            //printf("nlmsg_len: %u, nlmsg_pid: %u\n", nlh->nlmsg_len, nlh->nlmsg_pid);
+            wgtt_msg.client = c;
+            wgtt_msg.seq = 1527;
+            memcpy(NLMSG_DATA(nlh), &wgtt_msg, sizeof(wgtt_msg));
+            syslog (LOG_DEBUG, "The size of data load: %u\n", sizeof(wgtt_msg));
+
+            iov.iov_base = (void *)nlh;
+            iov.iov_len = nlh->nlmsg_len;
+            msg.msg_name = (void *)&dest_addr;
+            msg.msg_namelen = sizeof(dest_addr);
+            msg.msg_iov = &iov;
+            msg.msg_iovlen = 1;
+
+            syslog (LOG_DEBUG, "Sending block message to kernel\n");
+            sendmsg(sock_fd,&msg,0);
+            syslog (LOG_DEBUG, "Waiting for block ack message from kernel\n");
+
+            /* Read message from kernel */
+            recvmsg(sock_fd, &msg, 0);
+            memcpy(&wgtt_msg, NLMSG_DATA(nlh), sizeof(wgtt_msg));
+            syslog (LOG_DEBUG, "Received block ack message client: %u, seq: %u\n", wgtt_msg.client, wgtt_msg.seq);
+
+
             const unsigned char & dst_ap = start_ap(p_in);
             WritablePacket *p = Packet::make(sizeof(click_ether)+2);
             // // data part
@@ -211,6 +332,7 @@ void WGTTQueue::push_control(Packet *p_in)
 
             p_in -> kill();
             syslog (LOG_DEBUG, "send ap-ap seq\n");
+
             checked_output_push(1, p);
         }
         

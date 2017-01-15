@@ -18,6 +18,7 @@ CLICK_DECLS
 class WGTTQueue : public Element, public Storage { public:
 
     WGTTQueue() CLICK_COLD;
+    ~WGTTQueue() CLICK_COLD;
 
     inline void enRing(unsigned char, Packet*);//flag: whether override
     inline Packet* deRing();
