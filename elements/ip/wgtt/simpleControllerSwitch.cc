@@ -50,7 +50,7 @@ void SimpleControllerSwitch::push(int port, Packet *p_in)
   switch(pkt_type(p_in))
   {
     case CONTROL_SUFFIX:  push_control(p_in);break;
-    case STATUS_SUFFIX:   push_status(p_in);break;
+    case 0:   push_status(p_in);break;
   }
 }
 
@@ -58,7 +58,7 @@ void SimpleControllerSwitch::push_control(Packet *p_in)
 {
   struct timeval ts;
   gettimeofday(&ts, NULL); 
-  syslog (LOG_DEBUG, "issu switch at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+  syslog (LOG_DEBUG, "receive ack at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
 }
 
 void SimpleControllerSwitch::reset_ap()

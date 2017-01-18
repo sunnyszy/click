@@ -13,6 +13,7 @@
 #include <click/confparse.hh>
 #include <clicknet/wgtt.h>
 #include <syslog.h>
+#include <sys/time.h>
 CLICK_DECLS
 
 class WGTTQueue : public Element, public Storage { public:

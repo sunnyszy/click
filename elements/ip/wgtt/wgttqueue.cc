@@ -240,6 +240,10 @@ void WGTTQueue::push_control(Packet *p_in)
     int i,j;
     unsigned char c = client_ip(p_in)- CLIENT1_IP_SUFFIX; //index for client
     syslog (LOG_DEBUG, "receive control msg\n");
+
+    struct timeval ts;
+    
+
     if(status_ap(p_in) == CONTROLLER_IN_MAC_SUFFIX) //from controller
     {
         if(client_ip(p_in) == RESET_CONTENT) //reset
@@ -260,31 +264,35 @@ void WGTTQueue::push_control(Packet *p_in)
         else
         {
 
-            // syslog (LOG_DEBUG, "receive switch req for client: %d\n", c+1);
+            gettimeofday(&ts, NULL); 
+            syslog (LOG_DEBUG, "click receive cont-ap control at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
             _block[c] = true;
 
-            // if(identity == 4)
-            // {  
-            // // printf("<--- Call MEMDEV_IOCSETDATA --->\n");
-            // cmd = MEMDEV_IOCSETDATA;
-            // arg = 0;
-            // if (ioctl(fd, cmd, &arg) < 0)
-            //     {
-            //         // printf("Call cmd MEMDEV_IOCSETDATA fail\n");
-            //         return;
-            // }
+            if(identity == 4)
+            {  
+            gettimeofday(&ts, NULL); 
+            syslog (LOG_DEBUG, "click tx to kernel at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            cmd = MEMDEV_IOCSETDATA;
+            arg = 0;
+            if (ioctl(fd, cmd, &arg) < 0)
+                {
+                    // printf("Call cmd MEMDEV_IOCSETDATA fail\n");
+                    return;
+            }
 
             
-            // // printf("<--- Call MEMDEV_IOCGETDATA --->\n");
-            // cmd = MEMDEV_IOCGETDATA;
-            // if (ioctl(fd, cmd, &arg) < 0)
-            //     {
-            //         // printf("Call cmd MEMDEV_IOCGETDATA fail\n");
-            //         return;
-            // }
-            // // printf("<--- In User Space MEMDEV_IOCGETDATA Get Data is %d --->\n\n",arg);    
-   
-            // }
+            // printf("<--- Call MEMDEV_IOCGETDATA --->\n");
+            cmd = MEMDEV_IOCGETDATA;
+            if (ioctl(fd, cmd, &arg) < 0)
+                {
+                    // printf("Call cmd MEMDEV_IOCGETDATA fail\n");
+                    return;
+            }
+            // printf("<--- In User Space MEMDEV_IOCGETDATA Get Data is %d --->\n\n",arg);    
+            gettimeofday(&ts, NULL); 
+            syslog (LOG_DEBUG, "click rx from kernel at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            
+            }
 
             const unsigned char & dst_ap = start_ap(p_in);
             WritablePacket *p = Packet::make(sizeof(click_ether)+2);
@@ -298,14 +306,17 @@ void WGTTQueue::push_control(Packet *p_in)
 
             p_in -> kill();
             // syslog (LOG_DEBUG, "send ap-ap seq\n");
-
+            gettimeofday(&ts, NULL); 
+            syslog (LOG_DEBUG, "click tx to ap at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
             checked_output_push(1, p);
         }
         
     }
     else //from ap
     {
-        syslog (LOG_DEBUG, "receive ap-ap seq for client: %d\n", c+1);
+        gettimeofday(&ts, NULL); 
+        syslog (LOG_DEBUG, "click rx from ap at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            
 
         const unsigned char & start_seq = start_seq(p_in);
         while(_head[c] != start_seq)
@@ -330,7 +341,8 @@ void WGTTQueue::push_control(Packet *p_in)
         p_in -> kill();
         // syslog (LOG_DEBUG, "ap-c packet push\n");
         _block[c] = false;
-        syslog (LOG_DEBUG, "send switch ack\n");
+        gettimeofday(&ts, NULL); 
+        syslog (LOG_DEBUG, "click tx to controller at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
         checked_output_push(1, p);
     }
 }
