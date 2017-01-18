@@ -9,26 +9,25 @@
 #include "wgttqueue.hh"
 #include <click/args.hh>
 #include <click/error.hh>
-//WGTT
-#include <sys/socket.h>
-#include <linux/netlink.h>
-#include <stdlib.h>
+//WGTT: ioctl
+//#include <linux/ioctl.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 CLICK_DECLS
 
-#define NETLINK_USER 31
-#define MAX_PAYLOAD 2 /* maximum payload size, actually 3 is needed*/
-struct sockaddr_nl src_addr, dest_addr;
-struct nlmsghdr *nlh = NULL;
-struct iovec iov;
-int sock_fd;
-struct msghdr msg;
-struct WGTT_MSG
-{
-    unsigned char client: 4;
-    unsigned short seq: 12;
-} wgtt_msg;
+// magic number
+#define MEMDEV_IOC_MAGIC  'k'
+
+// command
+#define MEMDEV_IOCGETDATA _IOR(MEMDEV_IOC_MAGIC, 0, int)
+#define MEMDEV_IOCSETDATA _IOW(MEMDEV_IOC_MAGIC, 1, int)
+int fd = 0;
+int cmd;
+int arg = 0;
 
 WGTTQueue::WGTTQueue()
 {
@@ -49,7 +48,10 @@ WGTTQueue::WGTTQueue()
 
 WGTTQueue::~WGTTQueue()
 {
-    close(sock_fd);
+    if(identity == 4)
+    {
+     close(fd);
+    }
 }
 
 
@@ -75,62 +77,26 @@ WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
         first_start[i] = tmp[i];
     }
     
-
-
-    //WGTT test
-    //WGTT driver test
-    sock_fd=socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
-    if(sock_fd<0)
+    if(identity == 4)
     {
-        syslog (LOG_DEBUG, "socket create fail\n");
+    /*打开设备文件*/
+    fd = open("/dev/memdev0",O_RDWR);
+    if (fd < 0)
+    {
+        printf("Open Dev Mem0 Error!\n");
         return -1;
     }
-    syslog (LOG_DEBUG, "socket create succeed\n");
-    memset(&src_addr, 0, sizeof(src_addr));
-    src_addr.nl_family = AF_NETLINK;
-    src_addr.nl_pid = getpid(); /* self pid */
-
-    bind(sock_fd, (struct sockaddr*)&src_addr, sizeof(src_addr));
-
-    memset(&dest_addr, 0, sizeof(dest_addr));
-
-    dest_addr.nl_family = AF_NETLINK;
-    dest_addr.nl_pid = 0; /* For Linux Kernel */
-    dest_addr.nl_groups = 0; /* unicast */
-
-    nlh = (struct nlmsghdr *)malloc(NLMSG_SPACE(MAX_PAYLOAD));
-    memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
-    nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
-    nlh->nlmsg_pid = getpid();
-    nlh->nlmsg_flags = 0;
-
-    // //printf("nlmsg_len: %u, nlmsg_pid: %u\n", nlh->nlmsg_len, nlh->nlmsg_pid);
-    // if(identity == 5)
-    //     wgtt_msg.client = 0;//disable 5
-    // else
-    //     wgtt_msg.client = 4;
-    // wgtt_msg.seq = 0;
-    // memcpy(NLMSG_DATA(nlh), &wgtt_msg, sizeof(wgtt_msg));
-    // syslog (LOG_DEBUG, "Send reset message to driver\n");
-
-    // iov.iov_base = (void *)nlh;
-    // iov.iov_len = nlh->nlmsg_len;
-    // msg.msg_name = (void *)&dest_addr;
-    // msg.msg_namelen = sizeof(dest_addr);
-    // msg.msg_iov = &iov;
-    // msg.msg_iovlen = 1;
-
-    // syslog (LOG_DEBUG, "Sending reset message to kernel\n");
-    // sendmsg(sock_fd,&msg,0);
-    // syslog (LOG_DEBUG, "Waiting for reset ack message from kernel\n");
-
-    // /* Read message from kernel */
-    // recvmsg(sock_fd, &msg, 0);
-    // memcpy(&wgtt_msg, NLMSG_DATA(nlh), sizeof(wgtt_msg));
-    // syslog (LOG_DEBUG, "Received reset ack message client: %u, seq: %u\n", wgtt_msg.client, wgtt_msg.seq);
-
-
-
+    
+    /* 调用命令MEMDEV_IOCSETDATA */
+    printf("<--- Call MEMDEV_IOCSETDATA --->\n");
+    cmd = MEMDEV_IOCSETDATA;
+    arg = 4;
+    if (ioctl(fd, cmd, &arg) < 0)
+        {
+            printf("Call cmd MEMDEV_IOCSETDATA fail\n");
+            return -1;
+    }
+    }
 
     syslog (LOG_DEBUG, "configure succeed\n");
     return 0;
@@ -293,32 +259,32 @@ void WGTTQueue::push_control(Packet *p_in)
         }
         else
         {
-            syslog (LOG_DEBUG, "receive switch req for client: %d\n", c+1);
+
+            // syslog (LOG_DEBUG, "receive switch req for client: %d\n", c+1);
             _block[c] = true;
 
+            // if(identity == 4)
+            // {  
+            // // printf("<--- Call MEMDEV_IOCSETDATA --->\n");
+            // cmd = MEMDEV_IOCSETDATA;
+            // arg = 0;
+            // if (ioctl(fd, cmd, &arg) < 0)
+            //     {
+            //         // printf("Call cmd MEMDEV_IOCSETDATA fail\n");
+            //         return;
+            // }
 
-            //printf("nlmsg_len: %u, nlmsg_pid: %u\n", nlh->nlmsg_len, nlh->nlmsg_pid);
-            wgtt_msg.client = c;
-            wgtt_msg.seq = 1527;
-            memcpy(NLMSG_DATA(nlh), &wgtt_msg, sizeof(wgtt_msg));
-            syslog (LOG_DEBUG, "The size of data load: %u\n", sizeof(wgtt_msg));
-
-            iov.iov_base = (void *)nlh;
-            iov.iov_len = nlh->nlmsg_len;
-            msg.msg_name = (void *)&dest_addr;
-            msg.msg_namelen = sizeof(dest_addr);
-            msg.msg_iov = &iov;
-            msg.msg_iovlen = 1;
-
-            syslog (LOG_DEBUG, "Sending block message to kernel\n");
-            sendmsg(sock_fd,&msg,0);
-            syslog (LOG_DEBUG, "Waiting for block ack message from kernel\n");
-
-            /* Read message from kernel */
-            recvmsg(sock_fd, &msg, 0);
-            memcpy(&wgtt_msg, NLMSG_DATA(nlh), sizeof(wgtt_msg));
-            syslog (LOG_DEBUG, "Received block ack message client: %u, seq: %u\n", wgtt_msg.client, wgtt_msg.seq);
-
+            
+            // // printf("<--- Call MEMDEV_IOCGETDATA --->\n");
+            // cmd = MEMDEV_IOCGETDATA;
+            // if (ioctl(fd, cmd, &arg) < 0)
+            //     {
+            //         // printf("Call cmd MEMDEV_IOCGETDATA fail\n");
+            //         return;
+            // }
+            // // printf("<--- In User Space MEMDEV_IOCGETDATA Get Data is %d --->\n\n",arg);    
+   
+            // }
 
             const unsigned char & dst_ap = start_ap(p_in);
             WritablePacket *p = Packet::make(sizeof(click_ether)+2);
@@ -326,12 +292,12 @@ void WGTTQueue::push_control(Packet *p_in)
             control_content[0] = client_ip(p_in);
             control_content[1] = _head[c];
             syslog (LOG_DEBUG, "switch to ap: %d\n", dst_ap+1);
-            syslog (LOG_DEBUG, "switch id: %X\n", _head[c]);
+            // syslog (LOG_DEBUG, "switch id: %X\n", _head[c]);
             memcpy(p->data()+sizeof(click_ether), &control_content, 2);
             memcpy(p->data(), &(_ethh[dst_ap+1]), sizeof(click_ether));
 
             p_in -> kill();
-            syslog (LOG_DEBUG, "send ap-ap seq\n");
+            // syslog (LOG_DEBUG, "send ap-ap seq\n");
 
             checked_output_push(1, p);
         }

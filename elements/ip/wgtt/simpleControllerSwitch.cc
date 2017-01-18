@@ -47,9 +47,18 @@ void SimpleControllerSwitch::push(int port, Packet *p_in)
     reset_ap();
   }
 
-  // syslog (LOG_DEBUG, "pkt_type: %x\n", pkt_type(p_in));
-  push_status(p_in);
+  switch(pkt_type(p_in))
+  {
+    case CONTROL_SUFFIX:  push_control(p_in);break;
+    case STATUS_SUFFIX:   push_status(p_in);break;
+  }
+}
 
+void SimpleControllerSwitch::push_control(Packet *p_in)
+{
+  struct timeval ts;
+  gettimeofday(&ts, NULL); 
+  syslog (LOG_DEBUG, "issu switch at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
 }
 
 void SimpleControllerSwitch::reset_ap()
@@ -84,6 +93,8 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
   const unsigned char a = status_ap(p_in) - 1;
   unsigned char c = 0;
   static uint32_t tmp_counter = 0;
+  struct timeval ts;
+
   tmp_counter++;
 
   p_in -> kill();
@@ -120,9 +131,9 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
     }
     memcpy(p->data(), _ethh, sizeof(click_ether));
 
-    syslog (LOG_DEBUG, "issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
     output_port = best_ap;
-
+    gettimeofday(&ts, NULL); 
+    syslog (LOG_DEBUG, "issu switch at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
     output(1).push(p);
   }
 

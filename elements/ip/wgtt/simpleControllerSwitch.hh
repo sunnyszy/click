@@ -31,6 +31,7 @@ class SimpleControllerSwitch : public Element { public:
     void reset_ap();
     void push(int port, Packet *p_in);
     
+    void push_control(Packet *p_in);
     void push_status(Packet *p_in);
     
   private:
