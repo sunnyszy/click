@@ -50,7 +50,7 @@ void SimpleControllerSwitch::push(int port, Packet *p_in)
   switch(pkt_type(p_in))
   {
     case CONTROL_SUFFIX:  push_control(p_in);break;
-    case 0:   push_status(p_in);break;
+    case STATUS_SUFFIX:   push_status(p_in);break;
   }
 }
 
