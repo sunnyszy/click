@@ -58,7 +58,7 @@ void SimpleControllerSwitch::push_control(Packet *p_in)
 {
   struct timeval ts;
   gettimeofday(&ts, NULL); 
-  syslog (LOG_DEBUG, "receive ack at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+  syslog (LOG_DEBUG, "receive ack at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
 }
 
 void SimpleControllerSwitch::reset_ap()
@@ -133,7 +133,7 @@ void SimpleControllerSwitch::push_status(Packet *p_in)
 
     output_port = best_ap;
     gettimeofday(&ts, NULL); 
-    syslog (LOG_DEBUG, "issu switch at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+    syslog (LOG_DEBUG, "issu switch at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
     output(1).push(p);
   }
 

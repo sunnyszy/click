@@ -265,13 +265,13 @@ void WGTTQueue::push_control(Packet *p_in)
         {
 
             gettimeofday(&ts, NULL); 
-            syslog (LOG_DEBUG, "click receive cont-ap control at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            syslog (LOG_DEBUG, "click receive cont-ap control at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
             _block[c] = true;
 
             if(identity == 4)
             {  
             gettimeofday(&ts, NULL); 
-            syslog (LOG_DEBUG, "click tx to kernel at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            syslog (LOG_DEBUG, "click tx to kernel at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
             cmd = MEMDEV_IOCSETDATA;
             arg = 0;
             if (ioctl(fd, cmd, &arg) < 0)
@@ -290,7 +290,7 @@ void WGTTQueue::push_control(Packet *p_in)
             }
             // printf("<--- In User Space MEMDEV_IOCGETDATA Get Data is %d --->\n\n",arg);    
             gettimeofday(&ts, NULL); 
-            syslog (LOG_DEBUG, "click rx from kernel at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            syslog (LOG_DEBUG, "click rx from kernel at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
             
             }
 
@@ -307,7 +307,7 @@ void WGTTQueue::push_control(Packet *p_in)
             p_in -> kill();
             // syslog (LOG_DEBUG, "send ap-ap seq\n");
             gettimeofday(&ts, NULL); 
-            syslog (LOG_DEBUG, "click tx to ap at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+            syslog (LOG_DEBUG, "click tx to ap at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
             checked_output_push(1, p);
         }
         
@@ -315,7 +315,7 @@ void WGTTQueue::push_control(Packet *p_in)
     else //from ap
     {
         gettimeofday(&ts, NULL); 
-        syslog (LOG_DEBUG, "click rx from ap at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+        syslog (LOG_DEBUG, "click rx from ap at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
             
 
         const unsigned char & start_seq = start_seq(p_in);
@@ -342,7 +342,7 @@ void WGTTQueue::push_control(Packet *p_in)
         // syslog (LOG_DEBUG, "ap-c packet push\n");
         _block[c] = false;
         gettimeofday(&ts, NULL); 
-        syslog (LOG_DEBUG, "click tx to controller at: %lld.%.9ld\n", (long long)ts.tv_sec, ts.tv_usec);
+        syslog (LOG_DEBUG, "click tx to controller at: %lld.%.6ld\n", (long long)ts.tv_sec, ts.tv_usec);
         checked_output_push(1, p);
     }
 }
