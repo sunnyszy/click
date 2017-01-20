@@ -192,7 +192,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         }
       }
       else
-         best_ap = find_best_ap_neighbor(c);
+         best_ap = find_best_ap_global(c);
 
       if(best_ap != output_port[c])
       {
