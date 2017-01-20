@@ -243,8 +243,8 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
   for(i=0; i<n_compare;i++)
     tmp_score[1][i] = score[c][current][i];
   qsort(tmp_score[1], sizeof(tmp_score[1])/sizeof(*tmp_score[1]), sizeof(*tmp_score[1]), comp);
-  for(i=0; i<n_compare;i++)
-    printf("%dth element: %d\n", i, tmp_score[1][i]);
+  // for(i=0; i<n_compare;i++)
+  //   printf("%dth element: %d\n", i, tmp_score[1][i]);
 
   // find potential, can only be left 1 or right one
   if(current==0)
