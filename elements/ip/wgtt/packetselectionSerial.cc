@@ -261,7 +261,7 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
     
     num_bigger = 0;
     for(j=0; j<n_compare; j++)
-      if(tmp_score[0][j] < tmp_score[1][j])
+      if(tmp_score[0][j] <= tmp_score[1][j])
       {
         num_bigger ++;
       }
@@ -277,7 +277,7 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
   
     num_bigger = 0;
     for(j=0; j<n_compare; j++)
-      if(tmp_score[2][j] < tmp_score[1][j])
+      if(tmp_score[2][j] <= tmp_score[1][j])
       {
         num_bigger ++;
       }
@@ -288,7 +288,7 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
   {
     num_bigger = 0;
     for(j=0; j<n_compare; j++)
-      if(tmp_score[0][j] < tmp_score[2][j])
+      if(tmp_score[0][j] <= tmp_score[2][j])
       {
         num_bigger ++;
       }
