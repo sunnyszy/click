@@ -31,7 +31,10 @@ class RClientControl : public Element { public:
     void push_updata(Packet *);
 
   private:
-    char rssi[MAX_N_AP];
+    double rssi[MAX_N_AP];
+    char rssi_threshold;
+    double alpha;
+
     unsigned char identity;
     unsigned char state;
     unsigned char current_ap;

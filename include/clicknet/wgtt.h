@@ -60,6 +60,7 @@ struct my_test_struct {
 #define RING_SIZE 256
 // unit ms
 #define SWITCH_MIN 60
+#define K_SWITCH_MIN 1000
 // content encapsulated in mac header
 #define RESET_CONTENT 0xff
 

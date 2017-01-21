@@ -17,6 +17,7 @@ int
 RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   int i, tmp_start[4],tmp_id;
+  char tmp_rssi_threshold;
   openlog("RClientControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   for(i=0;i<MAX_N_AP;i++)
   {
@@ -30,8 +31,11 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("FIRSTSTART4", IntArg(), tmp_start[3])
       .read_p("INTERVAL", IntArg(), interval)
       .read_p("PRINTINTERVAL", IntArg(), print_interval)
+      .read_p("RSSITHRESHOLD", IntArg(), tmp_rssi_threshold)
+      .read_p("ALPHA", DoubleArg(), alpha)
       .complete() < 0)
     return -1;
+  rssi_threshold = tmp_rssi_threshold;
 
   identity = tmp_id;
   current_ap = tmp_start[identity-1] - 1;
@@ -137,13 +141,13 @@ void RClientControl::push_80211(Packet*p_in)
   }
   
   if(c == identity)
-    rssi[ap] = rssi_this;
+    rssi[ap] = (1-alpha)*rssi[ap] + alpha*rssi_this;
   else
     return;
-  printf("ap:%u, rssi:%d\n", ap, rssi_this);
+  // printf("ap:%u, rssi:%d\n", ap, rssi_this);
 
   //if not update, return
-  if(rssi[current_ap]==-127)
+  if(rssi[current_ap] < -80)
     return;
   // if IDLE, considering switching
   static unsigned int tmp_counter = 0;
@@ -156,7 +160,7 @@ void RClientControl::push_80211(Packet*p_in)
 
   gettimeofday(&tv, NULL);
   double now_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
-  if(now_time - last_time > SWITCH_MIN)
+  if(now_time - last_time > K_SWITCH_MIN)
     time_lock = false;
 
 
@@ -176,10 +180,10 @@ void RClientControl::push_80211(Packet*p_in)
     }
     else
     {
-      if(rssi[current_ap] >= -68)
+      if(rssi[current_ap] >= rssi_threshold)
         return;
 
-      char max_rssi = -127;
+      double max_rssi = -127;
       // find max rssi
       for(i=0;i<MAX_N_AP;i++)
         if(rssi[i] > max_rssi)
@@ -190,7 +194,7 @@ void RClientControl::push_80211(Packet*p_in)
     }
     if(max_id == current_ap)
       return;
-    syslog (LOG_DEBUG, "Considering to switch, current rssi: %d\n", rssi[current_ap]);
+    syslog (LOG_DEBUG, "Considering to switch, current rssi: %f\n", rssi[current_ap]);
     control_content[0] = 0x04;
     control_content[1] = identity-1;
     control_content[2] = current_ap;
