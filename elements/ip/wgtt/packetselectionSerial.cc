@@ -50,7 +50,7 @@ PacketSelectionSerial::PacketSelectionSerial()
     time_lock[i] = false;
     last_time[i] = 0;
   }
-  tmp_score = new int*[3];
+  tmp_score = new int*[MAX_N_AP];
   for(i=0;i<MAX_N_AP;i++)
     tmp_score[i] = new int[n_compare];
 
