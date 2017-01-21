@@ -140,6 +140,7 @@ void RClientControl::push_80211(Packet*p_in)
     rssi[ap] = rssi_this;
   else
     return;
+  printf("ap:%u, rssi:%d\n", ap, rssi_this);
 
   //if not update, return
   if(rssi[current_ap]==-127)
