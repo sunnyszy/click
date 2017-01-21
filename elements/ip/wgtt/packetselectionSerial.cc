@@ -51,7 +51,7 @@ PacketSelectionSerial::PacketSelectionSerial()
     last_time[i] = 0;
   }
   tmp_score = new int*[3];
-  for(i=0;i<3;i++)
+  for(i=0;i<MAX_N_AP;i++)
     tmp_score[i] = new int[n_compare];
 
   _ethh = new click_ether;
@@ -312,17 +312,20 @@ unsigned char PacketSelectionSerial::find_best_ap_global(unsigned char c)
 {
   int min_id = 0, min_value = 9999;
   unsigned char i, j;
+
   for(i=0; i<MAX_N_AP;i++)
   {
-    int sum = 0;
-    for(j=0; j<n_compare;j++)
-    {
-      sum += score[c][i][j];
-    }
-    if(sum < min_value)
+    for(j=0; j<n_compare; j++)
+      tmp_score[i][j] = score[c][i][j];
+    qsort(tmp_score[i], sizeof(tmp_score[i])/sizeof(*tmp_score[i]), sizeof(*tmp_score[i]), comp);
+  } 
+
+  for(i=0; i<MAX_N_AP;i++)
+  {
+    if(tmp_score[i][n_compare/2] < min_value)
     {
       min_id = i;
-      min_value = sum;
+      min_value = tmp_score[i][n_compare/2];
     }
   }
   return min_id;
