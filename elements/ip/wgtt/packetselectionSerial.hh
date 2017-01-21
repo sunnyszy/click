@@ -14,7 +14,11 @@
 #include <clicknet/wgtt.h>
 #include <sys/time.h>
 #include <syslog.h>
+#include <stdio.h>
+#include <stdlib.h>
 CLICK_DECLS
+
+int comp (const void *, const void *);  
 
 class PacketSelectionSerial : public Element { public:
 
@@ -26,7 +30,8 @@ class PacketSelectionSerial : public Element { public:
     const char *flags() const		{ return "A"; }
 
     int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
-   
+
+      
     void reset_ap();
     void push(int port, Packet *p_in);
     void push_control(Packet *p_in);
@@ -39,8 +44,10 @@ class PacketSelectionSerial : public Element { public:
     
     unsigned char state[MAX_N_CLIENT];
     static const unsigned char n_compare = 5;
+    static const unsigned char MAJOR = 3;
     // [client, ap, n_compare]
     int ***score;
+    int **tmp_score; //every time just need 3 ap * n_compare
     // [client, ap]
     unsigned char ** next_score_id;
     unsigned char output_port[MAX_N_CLIENT];

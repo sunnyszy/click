@@ -14,6 +14,18 @@
 
 CLICK_DECLS
 
+int comp (const void * elem1, const void * elem2) 
+{
+    int f = *((int*)elem1);
+    int s = *((int*)elem2);
+    if (f > s) return  1;
+    if (f < s) return -1;
+    return 0;
+}
+
+
+
+
 PacketSelectionSerial::PacketSelectionSerial()
 {
   int i,j,k;
@@ -38,6 +50,9 @@ PacketSelectionSerial::PacketSelectionSerial()
     time_lock[i] = false;
     last_time[i] = 0;
   }
+  tmp_score = new int*[MAX_N_AP];
+  for(i=0;i<MAX_N_AP;i++)
+    tmp_score[i] = new int[n_compare];
 
   _ethh = new click_ether;
   _ethh->ether_type = htons(CONTROL_SUFFIX+ETHER_PROTO_BASE);
@@ -138,6 +153,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     case CLIENT4_MAC_SUFFIX: c = 3;break;
   }
   //since the score are minus, we minus again
+  //TODO: smaller is better?
   score[c][a][next_score_id[c][a]] = - status_score(p_in);
   next_score_id[c][a] = (next_score_id[c][a] + 1)%n_compare;
   // able to change state
@@ -220,10 +236,15 @@ void PacketSelectionSerial::push_status(Packet *p_in)
 unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
 {
   unsigned char &current = output_port[c];
-  
-  // unsigned char potential = (current+1)%2;
   bool switch_to_left = true, switch_to_right = true;
-  int j;
+  int i,j;
+  int num_bigger;
+  // copy to tmp: current, sort
+  for(i=0; i<n_compare;i++)
+    tmp_score[1][i] = score[c][current][i];
+  qsort(tmp_score[1], sizeof(tmp_score[1])/sizeof(*tmp_score[1]), sizeof(*tmp_score[1]), comp);
+  // for(i=0; i<n_compare;i++)
+  //   printf("%dth element: %d\n", i, tmp_score[1][i]);
 
   // find potential, can only be left 1 or right one
   if(current==0)
@@ -233,34 +254,48 @@ unsigned char PacketSelectionSerial::find_best_ap_neighbor(unsigned char c)
 
   if(switch_to_left)
   {
+    // copy to tmp: left, sort
+    for(i=0; i<n_compare;i++)
+      tmp_score[0][i] = score[c][current-1][i];
+    qsort(tmp_score[0], sizeof(tmp_score[0])/sizeof(*tmp_score[0]), sizeof(*tmp_score[0]), comp);
+    
+    num_bigger = 0;
     for(j=0; j<n_compare; j++)
-      if(score[c][current-1][n_compare-j-1]>=score[c][current][j])
+      if(tmp_score[0][j] <= tmp_score[1][j])
       {
-        switch_to_left = false;
-        break;
+        num_bigger ++;
       }
+    if(num_bigger < MAJOR)
+      switch_to_left = false;
   }
   if(switch_to_right)
   {
+    //copy to tmp: right, sort
+    for(i=0; i<n_compare;i++)
+      tmp_score[2][i] = score[c][current+1][i];
+    qsort(tmp_score[2], sizeof(tmp_score[2])/sizeof(*tmp_score[2]), sizeof(*tmp_score[2]), comp);
+  
+    num_bigger = 0;
     for(j=0; j<n_compare; j++)
-      if(score[c][current+1][n_compare-j-1]>=score[c][current][j])
+      if(tmp_score[2][j] <= tmp_score[1][j])
       {
-        switch_to_right = false;
-        break;
+        num_bigger ++;
       }
+    if(num_bigger < MAJOR)
+      switch_to_right = false;
   }
   if(switch_to_left && switch_to_right)
   {
-    int sum_left = 0, sum_right = 0;
+    num_bigger = 0;
     for(j=0; j<n_compare; j++)
-    {
-      sum_left += score[c][current-1][j];
-      sum_right += score[c][current+1][j];
-    }
-    if(sum_left <= sum_right)
-      switch_to_right = false;
-    else
+      if(tmp_score[0][j] <= tmp_score[2][j])
+      {
+        num_bigger ++;
+      }
+    if(num_bigger < MAJOR)
       switch_to_left = false;
+    else
+      switch_to_right = false;
   }
   
 
@@ -277,17 +312,20 @@ unsigned char PacketSelectionSerial::find_best_ap_global(unsigned char c)
 {
   int min_id = 0, min_value = 9999;
   unsigned char i, j;
+
   for(i=0; i<MAX_N_AP;i++)
   {
-    int sum = 0;
-    for(j=0; j<n_compare;j++)
-    {
-      sum += score[c][i][j];
-    }
-    if(sum < min_value)
+    for(j=0; j<n_compare; j++)
+      tmp_score[i][j] = score[c][i][j];
+    qsort(tmp_score[i], sizeof(tmp_score[i])/sizeof(*tmp_score[i]), sizeof(*tmp_score[i]), comp);
+  } 
+
+  for(i=0; i<MAX_N_AP;i++)
+  {
+    if(tmp_score[i][n_compare/2] < min_value)
     {
       min_id = i;
-      min_value = sum;
+      min_value = tmp_score[i][n_compare/2];
     }
   }
   return min_id;
