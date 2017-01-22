@@ -16,7 +16,7 @@
 int
 RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  int i, tmp_start[4],tmp_id;
+  int i,tmp_id;
 
   openlog("RAPControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
 
@@ -93,7 +93,7 @@ RAPControl::push(int port, Packet *p_in)
 
 void RAPControl::push_up_control(Packet*p_in)
 {
-
+  int i;
   const unsigned char & t = r_control_type(p_in);
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
@@ -128,12 +128,35 @@ void RAPControl::push_up_control(Packet*p_in)
     syslog (LOG_DEBUG, "ap %d pass reas for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(0).push(p);
   }
+  else if(t == 0xff)
+  {
+
+    for(i=0;i<MAX_N_CLIENT;i++)
+    {
+      state[i] = (identity==tmp_start[i])? IDLE:INACTIVE;
+    }
+
+    control_content[0] = 0xff;
+    control_content[1] = 0xff;
+    control_content[2] = 0xff;
+    control_content[3] = 0xff;
+
+    WritablePacket *p = Packet::make(4);
+    // // data part
+    memcpy(p->data(), &control_content, 4);
+
+    syslog (LOG_DEBUG, "ap %d pass reset\n", identity);
+    output(0).push(p);
+
+
+  }
   p_in -> kill();
   
 }
 
 void RAPControl::push_down_control(Packet*p_in)
 {
+  int i;
   const unsigned char & t = r_control_type(p_in);
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
@@ -185,6 +208,22 @@ void RAPControl::push_down_control(Packet*p_in)
     memcpy(p->data(), &(_ethh[c]), sizeof(click_ether));
     syslog (LOG_DEBUG, "ap %d pass reas ack for client %d, ap_ori %d, ap_tar %d\n", identity, c+1, ori+1, tar+1);
     output(2).push(p);
+  }
+  else if(t == 0xff)
+  {
+
+    for(i=0;i<MAX_N_CLIENT;i++)
+    {
+      state[i] = (identity==tmp_start[i])? IDLE:INACTIVE;
+    }
+
+    control_content[0] = 0xff;
+    control_content[1] = 0xff;
+    control_content[2] = 0xff;
+    control_content[3] = 0xff;
+
+    syslog (LOG_DEBUG, "ap %d perform reset from controller\n", identity);
+
   }
   p_in -> kill();
   

@@ -57,9 +57,37 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
   return 0;
 }
 
+void RClientControl::reset()
+{
+    WritablePacket *p = Packet::make(sizeof(click_ether)+4);
+    // // data part
+
+    control_content[0] = 0xff;
+    control_content[1] = 0xff;
+    control_content[2] = 0xff;
+    control_content[3] = 0xff;
+
+    memcpy(p->data()+sizeof(click_ether), &control_content, 4);
+  
+    memcpy(p->data(), _ethh, sizeof(click_ether));
+
+    syslog (LOG_DEBUG, "client issue reset\n");
+    output(0).push(p);
+
+}
+
 void
 RClientControl::push(int port, Packet *p_in)
 {
+
+  // here is a small bug, I can not put the reset function in the initial function
+  static unsigned char lock = 0;
+  if(!lock)
+  { 
+    lock++;
+    reset();
+  }
+
   switch(port)
   {
     case 0: push_updata(p_in);break;

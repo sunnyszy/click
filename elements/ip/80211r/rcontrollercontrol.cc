@@ -16,7 +16,7 @@
 int
 RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  int i, tmp_start[4];
+  int i;
   openlog("RControlerControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   _ethh = new click_ether[MAX_N_AP*2];
   if (Args(conf, this, errh)
@@ -85,6 +85,7 @@ RControlerControl::push(int port, Packet *p_in)
 
 void RControlerControl::push_up_control(Packet*p_in)
 {
+  int i;
   const unsigned char & t = r_control_type(p_in);
   const unsigned char & c = r_control_client(p_in);
   const unsigned char & ori = r_control_ori(p_in);
@@ -138,6 +139,30 @@ void RControlerControl::push_up_control(Packet*p_in)
     outport[c] = tar;
     syslog (LOG_DEBUG, "controller ack reas for client %d, ap_ori %d, ap_tar %d\n", c+1, ori+1, tar+1);
     output(0).push(p);
+  }
+  else if(t == 0xff)
+  {
+
+    for(i=0;i<MAX_N_CLIENT;i++)
+    {
+      outport[i] = tmp_start[i] - 1;
+    }
+    control_content[0] = 0xff;
+    control_content[1] = 0xff;
+    control_content[2] = 0xff;
+    control_content[3] = 0xff;
+    for(i=0;i<MAX_N_AP;i++)
+    {
+      WritablePacket *p = Packet::make(sizeof(click_ether)+4);
+      // // data part
+      memcpy(p->data()+sizeof(click_ether), &control_content, 4);
+    
+      memcpy(p->data(), &(_ethh[i]), sizeof(click_ether));
+
+      syslog (LOG_DEBUG, "controller reset and broadcast reset\n");
+      output(0).push(p);
+    }
+
   }
   p_in -> kill();
   

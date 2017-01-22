@@ -32,6 +32,7 @@ class RControlerControl : public Element { public:
     unsigned char outport[MAX_N_CLIENT];
     unsigned char control_content[4];
     click_ether * _ethh;
+    int tmp_start[4];
 
     
 

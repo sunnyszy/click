@@ -29,6 +29,7 @@ class RClientControl : public Element { public:
     void push_80211(Packet *);
     void push_downdata(Packet *);
     void push_updata(Packet *);
+    void reset();
 
   private:
     double rssi[MAX_N_AP];
