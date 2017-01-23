@@ -11,7 +11,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <syslog.h>
-#ifdef __arm__
+// #include <click/string.hh>
+#ifdef __mips__
 #include <clicknet/wgtt.h>
 extern "C"
 {
@@ -21,6 +22,7 @@ extern "C"
 
 
 CLICK_DECLS
+char ifname[10];
 
 class RSSIBecon : public Element { public:
 
@@ -39,11 +41,10 @@ class RSSIBecon : public Element { public:
  private:
 
 
-#ifdef __arm__
+#ifdef __mips__
   int len;
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];
-  char ifname[6];
   struct iwinfo_assoclist_entry *e;
 #endif 
 

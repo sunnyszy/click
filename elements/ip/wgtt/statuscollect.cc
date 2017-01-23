@@ -15,7 +15,7 @@ CLICK_DECLS
 
 StatusCollect::StatusCollect()
 {
-#ifdef __arm__
+#ifdef __mips__
     openlog("APControl_StatusCollect", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     syslog (LOG_DEBUG, "finish init\n");
     // total_msg_cnt = 0;
@@ -26,7 +26,7 @@ StatusCollect::StatusCollect()
 
 StatusCollect::~StatusCollect()
 {
-#ifdef __arm__ 
+#ifdef __mips__ 
     iwinfo_finish();
 #endif
 }
@@ -34,22 +34,19 @@ StatusCollect::~StatusCollect()
 int
 StatusCollect::configure(Vector<String> &conf, ErrorHandler *errh)
 {
+    syslog (LOG_DEBUG, "in configure\n");
     int wlan_port;
     if (Args(conf, this, errh)
       .read_p("SAMPLERATE", IntArg(), sample_rate)
       .read_p("WLANPORT", IntArg(), wlan_port)
       .complete() < 0)
     return -1;
-
-#ifdef __arm__ 
-    if(wlan_port == 0)
-        strcpy(ifname, "wlan0");
-    else if(wlan_port == 1)
-        strcpy(ifname, "wlan1");
-    else
-        syslog (LOG_DEBUG, "Invalid wlan_port argument\n");
-    iw = iwinfo_backend(ifname);
-    if (!iw)
+    syslog (LOG_DEBUG, "finish parsing arguments\n");
+#ifdef __mips__ 
+    strcpy(ifname, "wlan0");
+    syslog (LOG_DEBUG, "finish copying\n");
+    // iw = iwinfo_backend(ifname);
+    // if (!iw)
         syslog (LOG_DEBUG, "Can not connect to backend iwinfo\n");
 #endif
     syslog (LOG_DEBUG, "Finish configure, ready to start\n");
@@ -59,7 +56,7 @@ StatusCollect::configure(Vector<String> &conf, ErrorHandler *errh)
 void
 StatusCollect::fragment(Packet *p_in)
 {
-#ifdef __arm__ 
+#ifdef __mips__ 
     int i,j;
     sample_counter ++;
     if(sample_counter>sample_rate)
@@ -72,6 +69,7 @@ StatusCollect::fragment(Packet *p_in)
         //     // syslog (LOG_DEBUG, "StatusCollect: associ number < 0\n");
         // else if (len)
         {
+            syslog (LOG_DEBUG, "Len: %d\n", len);
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
             
             for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
@@ -109,7 +107,7 @@ StatusCollect::fragment(Packet *p_in)
 void
 StatusCollect::push(int, Packet *p)
 {
-#ifdef __arm__ 
+#ifdef __mips__ 
     // syslog (LOG_DEBUG, "StatusCollect: in push\n");
 	fragment(p);
 #endif
