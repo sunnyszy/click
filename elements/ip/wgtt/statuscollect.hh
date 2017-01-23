@@ -47,6 +47,7 @@ class StatusCollect : public Element { public:
 
 #ifdef __mips__
   int len;
+  char ifname[20];
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];
   struct iwinfo_assoclist_entry *e;

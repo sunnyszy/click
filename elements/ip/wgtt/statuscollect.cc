@@ -41,12 +41,12 @@ StatusCollect::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("WLANPORT", IntArg(), wlan_port)
       .complete() < 0)
     return -1;
-    syslog (LOG_DEBUG, "finish parsing arguments\n");
+    // syslog (LOG_DEBUG, "finish parsing arguments\n");
 #ifdef __mips__ 
     strcpy(ifname, "wlan0");
-    syslog (LOG_DEBUG, "finish copying\n");
-    // iw = iwinfo_backend(ifname);
-    // if (!iw)
+    // syslog (LOG_DEBUG, "finish copying\n");
+    iw  = iwinfo_backend(ifname);
+    if (!iw)
         syslog (LOG_DEBUG, "Can not connect to backend iwinfo\n");
 #endif
     syslog (LOG_DEBUG, "Finish configure, ready to start\n");
@@ -69,7 +69,7 @@ StatusCollect::fragment(Packet *p_in)
         //     // syslog (LOG_DEBUG, "StatusCollect: associ number < 0\n");
         // else if (len)
         {
-            syslog (LOG_DEBUG, "Len: %d\n", len);
+            // syslog (LOG_DEBUG, "Len: %d\n", len);
             // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
             
             for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
