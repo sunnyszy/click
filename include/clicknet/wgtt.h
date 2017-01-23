@@ -95,4 +95,6 @@ struct my_test_struct {
 #define r_dst_mac_suffix(p) *(p->data()+5)
 #define r_ether_type_suffix(p) *(p->data()+13)
 
+char ifname[20];
+
 #endif

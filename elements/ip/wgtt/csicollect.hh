@@ -47,7 +47,6 @@ class CSICollect : public Element { public:
   int len;
   const struct iwinfo_ops *iw;
   char buf[IWINFO_BUFSIZE];
-  char ifname[6];
   struct iwinfo_assoclist_entry *e;
 #endif 
 

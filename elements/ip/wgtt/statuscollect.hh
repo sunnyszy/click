@@ -22,7 +22,7 @@ extern "C"
 }
 #endif 
 
-char ifname[10];
+
 
 CLICK_DECLS
 

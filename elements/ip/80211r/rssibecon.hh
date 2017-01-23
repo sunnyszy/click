@@ -22,7 +22,7 @@ extern "C"
 
 
 CLICK_DECLS
-char ifname[10];
+
 
 class RSSIBecon : public Element { public:
 
