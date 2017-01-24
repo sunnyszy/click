@@ -39,6 +39,7 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
 
   identity = tmp_id;
   current_ap = tmp_start[identity-1] - 1;
+  rssi[current_ap] = -60; //in case that fast switching at beginning
   state = IDLE;
 
 
