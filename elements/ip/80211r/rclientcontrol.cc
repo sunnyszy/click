@@ -16,7 +16,7 @@
 int
 RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  int i, tmp_start[4],tmp_id;
+  int i, tmp_start[3],tmp_id;
   char tmp_rssi_threshold;
   openlog("RClientControl", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
   for(i=0;i<MAX_N_AP;i++)
@@ -28,7 +28,6 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])
       .read_p("FIRSTSTART2", IntArg(), tmp_start[1])
       .read_p("FIRSTSTART3", IntArg(), tmp_start[2])
-      .read_p("FIRSTSTART4", IntArg(), tmp_start[3])
       .read_p("INTERVAL", IntArg(), interval)
       .read_p("PRINTINTERVAL", IntArg(), print_interval)
       .read_p("RSSITHRESHOLD", IntArg(), tmp_rssi_threshold)
@@ -49,6 +48,8 @@ RClientControl::configure(Vector<String> &conf, ErrorHandler *errh)
   switch(identity)
   {
     case 1: cp_ethernet_address(CLIENT1_MAC, _ethh->ether_shost);break;
+    case 2: cp_ethernet_address(CLIENT2_MAC, _ethh->ether_shost);break;
+    case 3: cp_ethernet_address(CLIENT3_MAC, _ethh->ether_shost);break;
   }
   cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_dhost);
 
@@ -166,7 +167,6 @@ void RClientControl::push_80211(Packet*p_in)
     case CLIENT1_MAC_SUFFIX: c = 1;break;
     case CLIENT2_MAC_SUFFIX: c = 2;break;
     case CLIENT3_MAC_SUFFIX: c = 3;break;
-    case CLIENT4_MAC_SUFFIX: c = 4;break;
   }
   
   if(c == identity)

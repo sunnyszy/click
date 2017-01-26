@@ -63,13 +63,12 @@ PacketSelectionSerial::PacketSelectionSerial()
 
 int PacketSelectionSerial::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-  int i,tmp[4];
+  int i,tmp[3];
   if (Args(conf, this, errh)
       .read_p("INTERVAL", IntArg(), interval)
       .read_p("FIRSTSTART1", IntArg(), tmp[0])
       .read_p("FIRSTSTART2", IntArg(), tmp[1])
       .read_p("FIRSTSTART3", IntArg(), tmp[2])
-      .read_p("FIRSTSTART4", IntArg(), tmp[3])
       .read_p("PRINTINTERVAL", IntArg(), print_interval)
       .complete() < 0)
     return -1;
@@ -150,7 +149,6 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     case CLIENT1_MAC_SUFFIX: c = 0;break;
     case CLIENT2_MAC_SUFFIX: c = 1;break;
     case CLIENT3_MAC_SUFFIX: c = 2;break;
-    case CLIENT4_MAC_SUFFIX: c = 3;break;
   }
   //since the score are minus, we minus again
   //TODO: smaller is better?

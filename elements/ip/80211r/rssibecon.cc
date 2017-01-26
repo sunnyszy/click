@@ -62,8 +62,8 @@ RSSIBecon::fragment(Packet *p_in)
         // syslog (LOG_DEBUG, "prepare to send, len: %d\n", len);
         // WritablePacket *p_csi = Packet::make(sizeof(my_test_struct)*N_CLIENT);
         
-        // for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
-        if(len>0)
+        for (i = 0; i < len; i += sizeof(struct iwinfo_assoclist_entry))
+        // if(len>0)
         {
             //one pkt per client
             WritablePacket *p_csi = Packet::make(11);

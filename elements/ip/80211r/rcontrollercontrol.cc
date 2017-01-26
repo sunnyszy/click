@@ -23,7 +23,6 @@ RControlerControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])
       .read_p("FIRSTSTART2", IntArg(), tmp_start[1])
       .read_p("FIRSTSTART3", IntArg(), tmp_start[2])
-      .read_p("FIRSTSTART4", IntArg(), tmp_start[3])
       .complete() < 0)
     return -1;
 

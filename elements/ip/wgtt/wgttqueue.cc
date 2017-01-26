@@ -33,13 +33,12 @@ WGTTQueue::WGTTQueue()
 int
 WGTTQueue::configure(Vector<String> &conf, ErrorHandler *errh)
 {
-    int tmp[4], i;
+    int tmp[3], i;
     if (Args(conf, this, errh)
         .read_p("IDENTITY", IntArg(), identity)
         .read_p("FIRSTSTART1", IntArg(), tmp[0])
         .read_p("FIRSTSTART2", IntArg(), tmp[1])
         .read_p("FIRSTSTART3", IntArg(), tmp[2])
-        .read_p("FIRSTSTART4", IntArg(), tmp[3])
         .complete() < 0)
     return -1;
     for(i=0;i<MAX_N_CLIENT;i++)
@@ -251,7 +250,6 @@ void WGTTQueue::push_data(Packet *p_in)
         case CLIENT1_MAC_SUFFIX: c=0;break;
         case CLIENT2_MAC_SUFFIX: c=1;break;
         case CLIENT3_MAC_SUFFIX: c=2;break;
-        case CLIENT4_MAC_SUFFIX: c=3;break;
     }
     // if(_tail[c])
     //     syslog (LOG_DEBUG, "wgttQueue in push data for active client: %d\n", c+1);

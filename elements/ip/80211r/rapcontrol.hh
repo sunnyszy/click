@@ -37,7 +37,7 @@ class RAPControl : public Element { public:
 
     click_ether * _ethh;
     unsigned char control_content[4];
-    int tmp_start[4];
+    int tmp_start[3];//set this fix because # of click configuration interface
 
     
 

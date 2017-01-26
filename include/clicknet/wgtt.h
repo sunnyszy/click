@@ -30,18 +30,21 @@ struct my_test_struct {
 #define ANT 3
 
 // client 1 ip
-#define MAX_N_CLIENT 2
+#define MAX_N_CLIENT 3
 //currently unused
 // #define RSSI_THRESHOLD -67
 
 #define CLIENT1_MAC_SUFFIX 0x07
-#define CLIENT2_MAC_SUFFIX 0xb1
-#define CLIENT3_MAC_SUFFIX 0x09
-#define CLIENT4_MAC_SUFFIX 0x0a
+#define CLIENT2_MAC_SUFFIX 0x0b
+#define CLIENT3_MAC_SUFFIX 0x0d
 #define CLIENT1_MAC "44:c3:06:31:5b:07"
+#define CLIENT2_MAC "44:c3:06:31:5b:0b"
+#define CLIENT3_MAC "44:c3:06:31:5b:0d"
 // ap 
 #define MAX_N_AP 8
 #define CLIENT1_IP_SUFFIX 135
+#define CLIENT2_IP_SUFFIX 136
+#define CLIENT3_IP_SUFFIX 137
 #define AP1_MAC "70:88:6b:80:60:01"
 #define AP2_MAC "70:88:6b:80:60:02"
 #define AP3_MAC "70:88:6b:80:60:03"

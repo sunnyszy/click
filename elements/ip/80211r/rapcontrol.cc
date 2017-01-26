@@ -26,7 +26,6 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
       .read_p("FIRSTSTART1", IntArg(), tmp_start[0])
       .read_p("FIRSTSTART2", IntArg(), tmp_start[1])
       .read_p("FIRSTSTART3", IntArg(), tmp_start[2])
-      .read_p("FIRSTSTART4", IntArg(), tmp_start[3])
       .complete() < 0)
     return -1;
 
@@ -51,6 +50,8 @@ RAPControl::configure(Vector<String> &conf, ErrorHandler *errh)
     switch(i)
     {
       case 0:cp_ethernet_address(CLIENT1_MAC, _ethh[i].ether_dhost);break;
+      case 1:cp_ethernet_address(CLIENT2_MAC, _ethh[i].ether_dhost);break;
+      case 2:cp_ethernet_address(CLIENT3_MAC, _ethh[i].ether_dhost);break;
     }
   }
 
@@ -237,7 +238,6 @@ void RAPControl::push_down_data(Packet*p_in)
     case CLIENT1_MAC_SUFFIX: c = 0;break;
     case CLIENT2_MAC_SUFFIX: c = 1;break;
     case CLIENT3_MAC_SUFFIX: c = 2;break;
-    case CLIENT4_MAC_SUFFIX: c = 3;break;
   }
   if(state[c] == INACTIVE)
     p_in -> kill();
@@ -253,7 +253,6 @@ void RAPControl::push_up_data(Packet*p_in)
     case CLIENT1_MAC_SUFFIX: c = 0;break;
     case CLIENT2_MAC_SUFFIX: c = 1;break;
     case CLIENT3_MAC_SUFFIX: c = 2;break;
-    case CLIENT4_MAC_SUFFIX: c = 3;break;
   }
   if(state[c] == INACTIVE)
     p_in -> kill();
