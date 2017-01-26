@@ -18,7 +18,7 @@ class RControlerControl : public Element { public:
 
 
     const char *class_name() const	{ return "RControlerControl"; }
-    const char *port_count() const	{ return "5/2"; }
+    const char *port_count() const	{ return "4/2"; }
     const char *flags() const		{ return "A"; }
 
     int configure(Vector<String> &, ErrorHandler *) CLICK_COLD;
