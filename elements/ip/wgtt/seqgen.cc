@@ -31,6 +31,7 @@ int SeqGen::configure(Vector<String> &conf, ErrorHandler *errh)
 {
   if (Args(conf, this, errh)
       .read_p("SWITCHINTERVAL", IntArg(), interval)
+      .read_p("PACKETLENGTH", IntArg(), pkt_len)
       .complete() < 0)
     return -1;
 
@@ -128,8 +129,8 @@ void SeqGen::push_status(Packet *p_in)
   }
 
   //data packet
-  WritablePacket *p_data = Packet::make(1);
-  memcpy(p_data->data(), &counter, 1);
+  WritablePacket *p_data = Packet::make(pkt_len);
+  memcpy(p_data->end_data()-1, &counter, 1);
   
     //syslog (LOG_DEBUG, "issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
     //output_port = best_ap;
