@@ -83,12 +83,7 @@ void SeqGen::reset_ap()
 
 void SeqGen::push_status(Packet *p_in)
 {
-  const unsigned char a = status_ap(p_in) - 1;
   unsigned char c = 0;
-
-  
-
-  p_in -> kill();
   // syslog (LOG_DEBUG, "state idle\n");
   unsigned char best_ap;
   // syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
@@ -130,7 +125,7 @@ void SeqGen::push_status(Packet *p_in)
   }
 
   //data packet
-  WritablePacket *p_data = Packet::make(pkt_len);
+  WritablePacket *p_data = p_in -> put(sizeof(uint16_t));
   uint16_t tmp_seq = htons(counter);
   memcpy(p_data->end_data()-sizeof(uint16_t), &tmp_seq, sizeof(uint16_t));
   
