@@ -13,7 +13,7 @@ CLICK_DECLS
 
 WGTTQueue::WGTTQueue()
 {
-    int i;
+    int i, j;
     openlog("APControl_WGTTQueue", LOG_PERROR | LOG_CONS | LOG_NDELAY, 0);
     _q = new Packet **[MAX_N_CLIENT];
     for(i=0; i<MAX_N_CLIENT; i++)
@@ -21,6 +21,10 @@ WGTTQueue::WGTTQueue()
         _q[i] = new Packet *[RING_SIZE];
         _head[i] = 0;
         _tail[i] = 0;
+        for(j=0;j<RING_SIZE;j++)
+        {   
+            _q[i][j] = 0;
+        }
     }
     // 0: controller, 1-MAX_N_AP: ap
     _ethh = new click_ether[MAX_N_AP+1];
@@ -176,18 +180,26 @@ void WGTTQueue::push_control(Packet *p_in)
     {
         if(client_ip(p_in) == RESET_CONTENT) //reset
         {
-            syslog (LOG_DEBUG, "receive reset req for client: %d\n", c+1);
+            syslog (LOG_DEBUG, "receive reset req\n");
             for(i=0; i<MAX_N_CLIENT;i++)
-            {
+            {   
+                // syslog (LOG_DEBUG, "before tail reset\n");
                 _tail[i] = 0;
-                _head[i] = 0;   
+                // syslog (LOG_DEBUG, "before head reset\n");
+                _head[i] = 0; 
+                // syslog (LOG_DEBUG, "before block reset\n");  
                 _block[i] = (identity != first_start[i]);
-                for(j=0;j<256;j++)
+                // syslog (LOG_DEBUG, "before queue reset\n");
+                int tmp_counter = 0;
+                for(j=0;j<RING_SIZE;j++)
                 {   
                     if(_q[i][j] != 0)
+                        // tmp_counter ++;
                         _q[i][j] -> kill();
                 }
+                // syslog (LOG_DEBUG, "receive reset req for client: %d, counter %d\n", i, tmp_counter);
             }
+            syslog (LOG_DEBUG, "finish reset req\n");
         }
         else
         {
@@ -243,7 +255,9 @@ void WGTTQueue::push_control(Packet *p_in)
 
 void WGTTQueue::push_data(Packet *p_in)
 {
-    const unsigned char & seq = queue_seq(p_in);
+    // syslog (LOG_DEBUG, "begin push_data\n");
+    const unsigned char & seq = *(p_in -> end_data()-1);
+    // syslog (LOG_DEBUG, "seq: %u\n", seq);
     unsigned char c;
     switch(data_client(p_in))
     {
@@ -260,7 +274,7 @@ void WGTTQueue::push_data(Packet *p_in)
         // syslog (LOG_DEBUG, "wgttQueue: before for client: %d\n", c+1);
         enRing(c, 0);
     }
-    p_in -> pull(15);
+    p_in -> pull(14);
     // syslog (LOG_DEBUG, "after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
     enRing(c, p_in);
 }
