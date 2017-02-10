@@ -22,7 +22,7 @@ SeqGen::SeqGen()
   _ethh->ether_type = htons(CONTROL_SUFFIX+ETHER_PROTO_BASE);
   cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_shost);
   output_port = 3;
-  counter = 0;
+  counter = 100;
 
   syslog (LOG_DEBUG, "Init finish, ready to start\n");
 }
