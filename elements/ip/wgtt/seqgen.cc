@@ -93,7 +93,8 @@ void SeqGen::push_status(Packet *p_in)
   unsigned char best_ap;
   // syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
   // WGTT
-  counter++;
+  // increment by 1
+  counter = (counter >= 4095)? 0: counter + 1; 
   
   if(!(counter%interval))
   {
@@ -130,7 +131,8 @@ void SeqGen::push_status(Packet *p_in)
 
   //data packet
   WritablePacket *p_data = Packet::make(pkt_len);
-  memcpy(p_data->end_data()-1, &counter, 1);
+  uint16_t tmp_seq = htons(counter);
+  memcpy(p_data->end_data()-sizeof(uint16_t), &tmp_seq, sizeof(uint16_t));
   
     //syslog (LOG_DEBUG, "issu switch. for client: %d to ap: %d\n", c+1, best_ap+1);
     //output_port = best_ap;

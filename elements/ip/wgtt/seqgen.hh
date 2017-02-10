@@ -44,7 +44,7 @@ class SeqGen : public Element { public:
     int interval;
 
     click_ether * _ethh;
-    uint8_t counter;
+    uint16_t counter;
 
     int pkt_len;
 
