@@ -21,7 +21,7 @@ SeqGen::SeqGen()
   _ethh = new click_ether;
   _ethh->ether_type = htons(CONTROL_SUFFIX+ETHER_PROTO_BASE);
   cp_ethernet_address(CONTROLLER_IN_MAC, _ethh->ether_shost);
-  output_port = 3;
+  output_port = 0;
   counter = 100;
 
   syslog (LOG_DEBUG, "Init finish, ready to start\n");
@@ -83,7 +83,7 @@ void SeqGen::reset_ap()
 
 void SeqGen::push_status(Packet *p_in)
 {
-  unsigned char c = 0;
+  unsigned char c = 2;
   // syslog (LOG_DEBUG, "state idle\n");
   unsigned char best_ap;
   // syslog (LOG_DEBUG, "current_state: %d, time_lock: %d\n", state[c], time_lock[c]);
