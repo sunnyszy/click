@@ -94,7 +94,7 @@ void SeqGen::push_status(Packet *p_in)
   if(!(counter%interval))
   {
     best_ap = output_port;
-    best_ap = 7 - best_ap; //only switch between 3,4
+    best_ap = 1 - best_ap; //only switch between 0, 1
     syslog (LOG_DEBUG, "prepare manually switch to ap %X\n", best_ap+1);
   
     // send_meg(best_ap)
