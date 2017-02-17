@@ -30,7 +30,7 @@ class IDAdder : public Element { public:
     
   private:
     
-    unsigned char counter[MAX_N_CLIENT];
+    uint16_t counter[MAX_N_CLIENT];
     click_ether _ethh;
 
 

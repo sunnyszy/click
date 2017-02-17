@@ -33,16 +33,15 @@ void IDAdder::push(int port, Packet *p_in)
 		cp_ethernet_address(CONTROLLER_IN_MAC, _ethh.ether_shost);
 	}
 	// syslog (LOG_DEBUG, "IDadder: counter: %X\n", counter);
-
-	p_in->push(sizeof(click_ether)+1);
-	for(int i = 1;i<MAX_N_AP;i++)
+	WritablePacket *p_base = p_in-> uniqueify();
+	*(p_base -> data()+13) &= 0x10;  // add a flag to the packet
+	p_base->push(sizeof(click_ether));  // tunneling head
+	p_base->put(2);  //mac80211 seq
+	for(int i = 0;i<MAX_N_AP;i++)
 	{	
-		Packet *p_tmp = p_in->clone();
+		Packet *p_tmp = p_base->clone();
 		WritablePacket *p = p_tmp->uniqueify();
-		// data
-		memcpy(p->data()+sizeof(click_ether), &counter[port], 1);
 		// eth
-
 		switch(i)
 		{
 			case 0:cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);break;
@@ -55,17 +54,12 @@ void IDAdder::push(int port, Packet *p_in)
 			case 7:cp_ethernet_address(AP8_MAC, _ethh.ether_dhost);break;
 		}
 		memcpy(p->data(), &_ethh, sizeof(click_ether));
+		// data
+		uint16_t net_form_seq = htons(counter[port]);
+		memcpy(p->end_data()-2, &net_form_seq, 2);
 		// syslog (LOG_DEBUG, "idadder push %dth\n", i);
 		output(0).push(p);
 	}
-	WritablePacket *p = p_in->uniqueify();
-	//data
-	memcpy(p->data()+sizeof(click_ether), &counter[port], 1);
-	//eth
-	cp_ethernet_address(AP1_MAC, _ethh.ether_dhost);
-	memcpy(p->data(), &_ethh, sizeof(click_ether));
-	counter[port]++;
-	output(0).push(p);
 }
 
 
