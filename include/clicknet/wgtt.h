@@ -30,7 +30,7 @@ struct my_test_struct {
 #define ANT 3
 
 // client 1 ip
-#define MAX_N_CLIENT 3
+#define MAX_N_CLIENT 1
 //currently unused
 // #define RSSI_THRESHOLD -67
 
@@ -41,7 +41,7 @@ struct my_test_struct {
 #define CLIENT2_MAC "44:c3:06:31:5b:0b"
 #define CLIENT3_MAC "44:c3:06:31:5b:0d"
 // ap 
-#define MAX_N_AP 2
+#define MAX_N_AP 3
 #define CLIENT1_IP_SUFFIX 135
 #define CLIENT2_IP_SUFFIX 136
 #define CLIENT3_IP_SUFFIX 137

@@ -60,6 +60,7 @@ void IDAdder::push(int port, Packet *p_in)
 		// syslog (LOG_DEBUG, "idadder push %dth\n", i);
 		output(0).push(p);
 	}
+	counter[port] = (counter[port] + 1) & 0xfff;
 }
 
 

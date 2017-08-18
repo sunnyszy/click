@@ -22,7 +22,7 @@ class IDAdder : public Element { public:
     IDAdder() CLICK_COLD;
 
     const char *class_name() const	{ return "IDAdder"; }
-    const char *port_count() const	{ return "3/1"; }
+    const char *port_count() const	{ return "1/1"; }
     const char *flags() const		{ return "A"; }
 
     void push(int port, Packet *p_in);
