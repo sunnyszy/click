@@ -127,30 +127,21 @@ WGTTQueue::deRing()
     bool flag = false;//no pick out
     Packet *p;
     //next_client after function
-    unsigned char next_client_after = (next_client+1)%MAX_N_CLIENT; 
-    for(i=0; i<MAX_N_CLIENT; i++, next_client = (next_client+1)%MAX_N_CLIENT)
+    if(_block[0] || _head[0]==_tail[0])
     {
-        if(_block[next_client] || _head[next_client]==_tail[next_client])
-        {
-            // if(_block[next_client])
-            //     syslog (LOG_DEBUG, "wgttQueue: queue %d is inactive\n", next_client+1);
-            // if(_head[next_client]==_tail[next_client])
-            //     syslog (LOG_DEBUG, "wgttQueue: queue %d is empty\n", next_client+1);
-            continue;
-        }
-        while((_head[next_client]+1)%MAX_N_CLIENT != _tail[next_client]
-             && !_head[next_client])
-            _head[next_client] = (_head[next_client]+1)%RING_SIZE;
-        flag = true;
-        p = _q[next_client][_head[next_client]];
-        _head[next_client] = (_head[next_client]+1)%RING_SIZE;
-        // syslog (LOG_DEBUG, "deque pkt from queue: %d\n", next_client+1);
-        break;
+        // if(_block[next_client])
+        //     syslog (LOG_DEBUG, "wgttQueue: queue %d is inactive\n", next_client+1);
+        // if(_head[next_client]==_tail[next_client])
+        //     syslog (LOG_DEBUG, "wgttQueue: queue %d is empty\n", next_client+1);
+        return 0;
     }
+    while(((_head[0]+1)%MAX_N_CLIENT) != _tail[0] && !_head[0])
+        _head[0] = (_head[0]+1)%RING_SIZE;
+    p = _q[0][_head[0]];
+    _head[0] = (_head[0]+1)%RING_SIZE;
+    // syslog (LOG_DEBUG, "deque pkt from queue: %d\n", next_client+1);
 
-    next_client = next_client_after;
-
-    if(flag)
+    if(p)
     {
         // syslog (LOG_DEBUG, "wgttQueue: deque succeed\n");
         return p;
@@ -197,7 +188,7 @@ void WGTTQueue::push_control(Packet *p_in)
                         // tmp_counter ++;
                         _q[i][j] -> kill();
                 }
-                // syslog (LOG_DEBUG, "receive reset req for client: %d, counter %d\n", i, tmp_counter);
+                syslog (LOG_DEBUG, "receive reset req for client: %d, counter %d\n", i, tmp_counter);
             }
             syslog (LOG_DEBUG, "finish reset req\n");
         }
@@ -256,8 +247,19 @@ void WGTTQueue::push_control(Packet *p_in)
 void WGTTQueue::push_data(Packet *p_in)
 {
     // syslog (LOG_DEBUG, "begin push_data\n");
-    const unsigned char & seq = *(p_in -> end_data()-1);
-    // syslog (LOG_DEBUG, "seq: %u\n", seq);
+    unsigned char seq =  *(p_in -> end_data()-3);
+    // const unsigned char * p_c;
+    // int i;
+    // for (p_c = p_in->data(); p_c+i != p_in ->end_data(); i++)
+        // printf("%x", *(p_c+i));
+    // printf("\n");
+    // printf("-1 %x\n", *(p_in->end_data()-1));
+    // printf("-2 %x\n", *(p_in->end_data()-2));
+    // printf("-3 %x\n", *(p_in->end_data()-3));
+    // printf("-4 %x\n", *(p_in->end_data()-4));
+
+
+    // syslog (LOG_DEBUG, "seq: %x\n", seq);
     unsigned char c;
     switch(data_client(p_in))
     {
@@ -275,7 +277,7 @@ void WGTTQueue::push_data(Packet *p_in)
         enRing(c, 0);
     }
     p_in -> pull(14);
-    // syslog (LOG_DEBUG, "after enring, _head: %X, _tail: %X\n", _head[c], _tail[c]);
+    // syslog (LOG_DEBUG, "enring client %d, after enring, _head: %X, _tail: %X\n", c+1, _head[c], _tail[c]);
     enRing(c, p_in);
 }
 

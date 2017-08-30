@@ -5,6 +5,36 @@
 #ifndef _WGTT_H_
 #define _WGTT_H_
 
+
+// #define WGTT_DEBUG
+// #ifdef WGTT_DEBUG
+// #define DPRINT(fmt, args...) syslog (LOG_DEBUG, "%s: " fmt, __func__ , ## args) 
+// #else
+// #define DPRINT(fmt, args...) do {} while (0)
+// #endif
+// #define NDPRINT(fmt, args...) do {} while(0)
+
+// #ifdef WGTT_DEBUG
+// #define DASSERT(expr)						\
+//     if (!(expr)) {						\
+//         syslog("Assertion failed! %s,%s,%s,line=%d\n",	\
+//                #expr, __FILE__, __func__, __LINE__);	\
+//     }
+// #else
+// #define DASSERT(expr) do {} while (0)
+// #endif
+
+// #ifdef WGTT_DEBUG
+// #define DASSERT2(expr1, expr2)						\
+//     if (expr1 != expr2) {						\
+//         syslog("Assertion failed! %s,%016lx,%s,%016lx,%s,%s,line=%d\n",	\
+//                #expr1, expr1, #expr2, expr2, __FILE__, __func__, __LINE__);	\
+//     }
+// #else
+// #define DASSERT2(expr1, expr2) do {} while (0)
+// #endif
+
+
 struct my_test_struct {
   uint8_t mac;
   int8_t signal;

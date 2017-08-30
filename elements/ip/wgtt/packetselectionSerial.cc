@@ -164,8 +164,8 @@ void PacketSelectionSerial::push_status(Packet *p_in)
     int tx_rate = status_txrate(p_in);
     syslog (LOG_DEBUG, "client mac: %X, ap id: %X\n", status_mac(p_in), status_ap(p_in));
     syslog (LOG_DEBUG, "signal: %d, noise: %d\n", status_score(p_in), status_noise(p_in));
-    syslog (LOG_DEBUG, "rx_rate: %d.%dMb/s, tx_rate: %d.%d Mb/s\n", 
-      rx_rate / 1000, rx_rate / 100, tx_rate / 1000, tx_rate / 100);
+    // syslog (LOG_DEBUG, "rx_rate: %d.%dMb/s, tx_rate: %d.%d Mb/s\n", 
+      // rx_rate / 1000, rx_rate / 100, tx_rate / 1000, tx_rate / 100);
   }
 
   gettimeofday(&tv, NULL);
@@ -185,7 +185,7 @@ void PacketSelectionSerial::push_status(Packet *p_in)
         best_ap = output_port[c];
         if(!(tmp_counter%interval))
         {
-            best_ap = (best_ap + 1)% 2;
+            best_ap = (best_ap + 1)% 3;
             syslog (LOG_DEBUG, "prepare manually switch to ap %X\n", best_ap+1);
         }
       }

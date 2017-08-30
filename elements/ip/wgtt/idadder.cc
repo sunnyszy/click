@@ -34,7 +34,7 @@ void IDAdder::push(int port, Packet *p_in)
 	}
 	// syslog (LOG_DEBUG, "IDadder: counter: %X\n", counter);
 	WritablePacket *p_base = p_in-> uniqueify();
-	*(p_base -> data()+13) |= 0x10;  // add a flag to the packet
+	// *(p_base -> data()+13) |= 0x10;  // add a flag to the packet
 	p_base->push(sizeof(click_ether));  // tunneling head
 	p_base->put(2);  //mac80211 seq
 	for(int i = 0;i<MAX_N_AP;i++)
